@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     HOST: str = "127.0.0.1"
     PORT: int = 8000
 
+    # Text Chunking Defaults (Phase 2)
+    CHUNKING_TARGET_SIZE: int = 1200
+    CHUNKING_MAX_SIZE: int = 1600
+    CHUNKING_OVERLAP: int = 200
+
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
