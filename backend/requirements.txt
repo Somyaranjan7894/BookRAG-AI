@@ -7,7 +7,11 @@ pydantic-settings>=2.6.0,<3.0.0
 # Document Ingestion (Phase 1)
 pymupdf>=1.25.0,<2.0.0
 
+# Embeddings (Phase 3)
+sentence-transformers>=3.0.0,<7.0.0
+
 # Testing
 pytest>=8.3.0,<9.0.0
 httpx>=0.28.0,<1.0.0
+
 

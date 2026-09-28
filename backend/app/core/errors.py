@@ -90,6 +90,54 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    from app.services.embeddings.exceptions import (
+        EmbeddingError,
+        InvalidChunkError,
+        ModelLoadError,
+    )
+
+    @app.exception_handler(InvalidChunkError)
+    async def invalid_chunk_handler(request: Request, exc: InvalidChunkError) -> JSONResponse:
+        """Handle malformed or empty chunk embedding errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(ModelLoadError)
+    async def model_load_handler(request: Request, exc: ModelLoadError) -> JSONResponse:
+        """Handle model loading failures."""
+        logger.error("Embedding model load error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(EmbeddingError)
+    async def embedding_error_handler(request: Request, exc: EmbeddingError) -> JSONResponse:
+        """Handle general embedding failures."""
+        logger.error("Embedding service error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""

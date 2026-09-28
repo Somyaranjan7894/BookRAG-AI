@@ -16,6 +16,13 @@ from app.schemas.document import (
     DocumentMetadata,
     Page,
 )
+from app.schemas.embedding import (
+    EmbeddingConfig,
+    EmbeddingRecord,
+    EmbedChunkRequest,
+    EmbedChunksRequest,
+    EmbedChunksResponse,
+)
 from app.schemas.health import HealthResponse
 
 __all__ = [
@@ -28,9 +35,15 @@ __all__ = [
     "DocumentIngestRequest",
     "DocumentIngestResponse",
     "DocumentMetadata",
+    "EmbeddingConfig",
+    "EmbeddingRecord",
+    "EmbedChunkRequest",
+    "EmbedChunksRequest",
+    "EmbedChunksResponse",
     "HealthResponse",
     "Page",
     "TextCleanRequest",
     "TextCleanResponse",
 ]
+
 

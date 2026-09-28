@@ -35,6 +35,14 @@ class Settings(BaseSettings):
     CHUNKING_MAX_SIZE: int = 1600
     CHUNKING_OVERLAP: int = 200
 
+    # Semantic Embeddings (Phase 3)
+    EMBEDDING_MODEL_NAME: str = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_BATCH_SIZE: int = 32
+    EMBEDDING_NORMALIZE: bool = True
+    EMBEDDING_DEVICE: str = "auto"
+    EMBEDDING_DIMENSION: int = 384
+
+
 
     model_config = SettingsConfigDict(
         env_file=".env",
