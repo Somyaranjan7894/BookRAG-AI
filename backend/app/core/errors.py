@@ -43,6 +43,53 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Late import to avoid circular dependency
+    from app.services.pdf.exceptions import (
+        InvalidPDFError,
+        PDFIngestionError,
+        PDFNotFoundError,
+    )
+
+    @app.exception_handler(PDFNotFoundError)
+    async def pdf_not_found_handler(request: Request, exc: PDFNotFoundError) -> JSONResponse:
+        """Handle missing PDF file errors."""
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "code": status.HTTP_404_NOT_FOUND,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidPDFError)
+    async def invalid_pdf_handler(request: Request, exc: InvalidPDFError) -> JSONResponse:
+        """Handle malformed or corrupt PDF errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(PDFIngestionError)
+    async def pdf_ingestion_handler(request: Request, exc: PDFIngestionError) -> JSONResponse:
+        """Handle unexpected PDF ingestion failures."""
+        logger.error("PDF ingestion error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""

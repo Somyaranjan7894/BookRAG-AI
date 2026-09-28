@@ -60,6 +60,8 @@ logs/
 !/data/processed/.gitkeep
 /data/indexes/*
 !/data/indexes/.gitkeep
+*.pdf
+
 
 # Machine Learning & Vector Index artifacts (Future phases)
 *.bin

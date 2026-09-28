@@ -62,43 +62,44 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase 0 Scope
+## 4. Current Phase Scope: Phase 1 Complete
 
-This repository is currently at **Phase 0: Foundation and Architecture**.
+This repository has completed **Phase 0: Foundation and Architecture** and **Phase 1: PDF Ingestion and Page-Aware Document Representation**.
 
-### What is implemented in Phase 0:
-- Repository layout and directory conventions.
-- Git configuration and comprehensive `.gitignore` rules.
-- Centralized configuration management using `pydantic-settings` with `.env.example`.
-- Configurable application logging.
-- Structured HTTP error handling and unhandled exception safety.
-- FastAPI application initialization with `/api/v1` versioning.
-- Operational health check endpoint: `GET /api/v1/health`.
-- Automated test suite using `pytest` and `httpx`.
-- Minimal skeleton configuration for future Docker setups.
+### What is implemented:
+- **Repository & Runtime Foundation (Phase 0)**:
+  - Repository layout, virtual environment, and Git configuration.
+  - Centralized settings with `pydantic-settings` and `.env.example`.
+  - Configurable application logging.
+  - Structured HTTP error handling and unhandled exception safety.
+  - FastAPI application initialization with `/api/v1` versioning.
+  - Operational health check endpoint: `GET /api/v1/health`.
+- **PDF Ingestion & Page-Aware Representation (Phase 1)**:
+  - Low-level PDF parser abstraction using PyMuPDF (`pymupdf>=1.25.0`).
+  - High-level `PDFIngestionService` for safe document opening, validation, and metadata extraction.
+  - 1-based page numbering preserving page provenance for future citations.
+  - Exact raw text extraction with per-page and document-wide character and word counts.
+  - Extraction diagnostics identifying empty and low-text pages without crashing the ingestion process.
+  - Controlled domain exceptions (`PDFNotFoundError`, `InvalidPDFError`, `PDFExtractionError`).
+  - Deterministic document ID generation derived from content SHA-256 hashes.
+  - Minimal development API endpoint (`POST /api/v1/documents/ingest`).
+  - Automated test suite with 21 unit and integration tests using deterministic test fixtures.
 
-### What is intentionally NOT implemented in Phase 0:
-To guarantee deliberate, incremental development, future components remain **intentionally unbuilt**:
-- No PDF parsing, text extraction, or OCR.
-- No text cleaning or chunking logic.
-- No embeddings or Sentence Transformers.
-- No vector stores (FAISS, pgvector, Chromadb, etc.).
-- No relational database schemas or migrations.
-- No background task workers (Redis, Celery).
-- No reranking models or Cross-Encoders.
-- No Extractive or Abstractive QA inference.
-- No LLM answer synthesis or question generation.
-- No frontend React application.
-- No user authentication or authorization.
+### Explicit Architectural Boundaries:
+- **Text extraction is not OCR**: PyMuPDF extracts embedded digital text streams. Scanned image-only PDFs will produce empty-text diagnostics rather than trigger OCR.
+- **No semantic text cleaning or chunking**: Raw text is preserved as extracted. Phase 2 will introduce structural cleaning and intelligent chunking.
+- **Preserves page-level provenance**: Page numbers and boundaries are maintained throughout the ingestion data structures to enable page-level citations in later QA phases.
+- **No mock implementations of future phases**: No vector stores, embeddings, database migrations, background task queues, or LLMs are present.
 
 ---
 
 ## 5. Technology Stack
 
-### Backend (Current Phase 0):
-- **Language**: Python 3.11+ (Tested on Python 3.13)
+### Backend (Current Phase 1):
+- **Language**: Python 3.11+ (Tested on Python 3.13.7)
 - **Web Framework**: [FastAPI](https://fastapi.tiangolo.com/) (>= 0.115.0)
 - **ASGI Server**: [Uvicorn](https://www.uvicorn.org/) (>= 0.32.0)
+- **PDF Extraction**: [PyMuPDF](https://pymupdf.readthedocs.io/) (>= 1.25.0)
 - **Configuration & Validation**: [Pydantic v2](https://docs.pydantic.dev/) & [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - **Testing**: [pytest](https://docs.pytest.org/) & [HTTPX](https://www.python-httpx.org/)
 
@@ -122,28 +123,40 @@ BookRAG-AI/
 │   │   │   └── v1/
 │   │   │       ├── endpoints/
 │   │   │       │   ├── __init__.py
+│   │   │       │   ├── documents.py       # POST /api/v1/documents/ingest
 │   │   │       │   └── health.py          # GET /api/v1/health implementation
 │   │   │       ├── __init__.py
 │   │   │       └── router.py              # Assembles version 1 routes
 │   │   ├── core/
 │   │   │   ├── __init__.py
 │   │   │   ├── config.py                  # Pydantic BaseSettings management
-│   │   │   ├── errors.py                  # Safe global exception handlers
+│   │   │   ├── errors.py                  # Safe global & domain exception handlers
 │   │   │   └── logging.py                 # Standardized logging setup
-│   │   ├── models/                        # Domain models (Phase 0 placeholder)
-│   │   ├── repositories/                  # Persistence repositories (Phase 0 placeholder)
+│   │   ├── models/                        # Domain entities (Reserved for future DB models)
+│   │   ├── repositories/                  # Persistence repositories (Future phase)
 │   │   ├── schemas/
 │   │   │   ├── __init__.py
+│   │   │   ├── document.py                # Document, Page, Metadata Pydantic models
 │   │   │   └── health.py                  # Health check Pydantic schemas
-│   │   ├── services/                      # Business logic services (Phase 0 placeholder)
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   └── pdf/
+│   │   │       ├── __init__.py
+│   │   │       ├── exceptions.py          # Domain-specific PDF ingestion exceptions
+│   │   │       ├── ingestion.py           # Orchestration, validation, diagnostics
+│   │   │       └── parser.py              # PyMuPDF-specific extraction mechanics
 │   │   ├── __init__.py
 │   │   └── main.py                        # FastAPI application entry point
 │   │
 │   ├── tests/
 │   │   ├── __init__.py
-│   │   ├── conftest.py                    # Pytest client fixtures
-│   │   └── test_health.py                 # Startup and health check tests
-│   ├── requirements.txt                   # Phase 0 dependencies only
+│   │   ├── conftest.py                    # Pytest client and deterministic PDF fixtures
+│   │   ├── fixtures/
+│   │   │   ├── __init__.py
+│   │   │   └── pdf_factory.py             # Synthetic, reproducible PDF generators
+│   │   ├── test_health.py                 # Startup and health check tests
+│   │   └── test_pdf_ingestion.py          # Phase 1 ingestion, validation, and API tests
+│   ├── requirements.txt                   # Phase 0 & 1 dependencies
 │   └── .env.example                       # Non-sensitive configuration template
 │
 ├── frontend/                              # Reserved for future React application
@@ -156,14 +169,60 @@ BookRAG-AI/
 ├── docs/                                  # Architectural specifications and design records
 ├── evaluation/                            # Benchmarking datasets and evaluation scripts
 │
-├── .gitignore                             # Ignore rules for caches, env, data, models
+├── .gitignore                             # Ignore rules for caches, env, data, models, *.pdf
 ├── README.md                              # Project documentation
 └── docker-compose.yml                     # Minimal deployment skeleton for future phases
 ```
 
 ---
 
-## 7. Backend Setup
+## 7. Data Representation & Extraction Model
+
+During Phase 1, documents are parsed and represented in structured Pydantic models:
+
+```json
+{
+  "document_id": "doc_3b364081b1aeaafc",
+  "filename": "sample_book.pdf",
+  "source_path": "C:\\Book_Rag_AI\\data\\uploads\\sample_book.pdf",
+  "page_count": 3,
+  "total_characters": 72,
+  "total_words": 13,
+  "metadata": {
+    "title": "BookRAG AI Test Document",
+    "author": "Antigravity Engineering",
+    "subject": "Phase 1 Ingestion Verification",
+    "creator": null,
+    "producer": null,
+    "creation_date": null,
+    "mod_date": null,
+    "custom": {}
+  },
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "BookRAG AI Phase 1\n",
+      "char_count": 19,
+      "word_count": 4,
+      "has_text": true,
+      "extraction_warning": null
+    },
+    {
+      "page_number": 2,
+      "text": "This is a PDF ingestion test.\n",
+      "char_count": 30,
+      "word_count": 6,
+      "has_text": true,
+      "extraction_warning": null
+    }
+  ],
+  "warnings": []
+}
+```
+
+---
+
+## 8. Backend Setup
 
 ### Prerequisites
 - Python 3.11, 3.12, or 3.13 installed.
@@ -176,39 +235,32 @@ BookRAG-AI/
    cd c:/Book_Rag_AI
    ```
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv backend/.venv
-   ```
-
-3. Activate the virtual environment:
+2. Create and activate a virtual environment:
    - **Windows (PowerShell)**:
      ```powershell
+     python -m venv backend/.venv
      .\backend\.venv\Scripts\Activate.ps1
-     ```
-   - **Windows (Command Prompt)**:
-     ```cmd
-     backend\.venv\Scripts\activate.bat
      ```
    - **Linux / macOS**:
      ```bash
+     python -m venv backend/.venv
      source backend/.venv/bin/activate
      ```
 
-4. Install Phase 0 dependencies:
+3. Install dependencies:
    ```bash
    pip install --upgrade pip
    pip install -r backend/requirements.txt
    ```
 
-5. (Optional) Configure environment variables:
+4. (Optional) Configure environment variables:
    ```bash
    cp backend/.env.example backend/.env
    ```
 
 ---
 
-## 8. How to Run the Backend
+## 9. How to Run the Backend
 
 With the virtual environment activated and working directory at `backend`:
 
@@ -217,43 +269,39 @@ cd backend
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Or from the project root:
-```bash
-python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload
-```
-
-Access interactive documentation in your browser:
+Interactive API documentation:
 - Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
 ---
 
-## 9. How to Run Tests
+## 10. How to Run Tests
 
-Ensure the virtual environment is activated, then run pytest from the `backend` directory:
+Run pytest from the `backend` directory:
 
 ```bash
 cd backend
-pytest -v
+.\.venv\Scripts\pytest.exe -v
 ```
 
-All tests should pass, confirming application initialization, router resolution, health response structure, and structured error responses.
+All 21 tests will run, covering:
+- Application startup and metadata.
+- Health endpoint status and schema.
+- PDF opening, page counts, and 1-based page numbering.
+- Text, character, and word count accuracy.
+- Extraction diagnostics on empty and low-text pages without process crashes.
+- Controlled error handling for missing files, corrupt files, and 0-page PDFs.
+- Deterministic document ID generation and custom ID retention.
+- Dev API endpoint functionality and HTTP status mappings.
 
 ---
 
-## 10. Health Endpoint
+## 11. API Endpoints
 
-### Endpoint Details
+### 1. Health Probe
 - **Method**: `GET`
 - **Path**: `/api/v1/health`
-- **Authentication**: None (public monitoring probe)
-
-### Example Request
-```bash
-curl -X GET http://127.0.0.1:8000/api/v1/health
-```
-
-### Example Response
+- **Response**:
 ```json
 {
   "status": "ok",
@@ -261,21 +309,37 @@ curl -X GET http://127.0.0.1:8000/api/v1/health
 }
 ```
 
+### 2. Document Ingestion (Development / Testing)
+- **Method**: `POST`
+- **Path**: `/api/v1/documents/ingest`
+- **Request Body**:
+```json
+{
+  "file_path": "data/uploads/sample.pdf",
+  "document_id": "optional_custom_id"
+}
+```
+- **Response (200 OK)**:
+```json
+{
+  "status": "success",
+  "document": { ... }
+}
+```
+
 ---
 
-## 11. Future Roadmap
+## 12. Future Roadmap
 
-BookRAG AI will be developed in rigorous, verifiable phases:
-
-| Phase | Milestone | Focus Areas |
-| :--- | :--- | :--- |
-| **Phase 0** | **Foundation (Current)** | Repository structure, configuration, logging, health API, test suite. |
-| **Phase 1** | Document Ingestion | PDF page extraction, layout preservation, text cleaning. |
-| **Phase 2** | Structural Chunking | Chapter-aware and semantic window chunking with page metadata. |
-| **Phase 3** | Embeddings & Indexing | Sentence Transformers, dense embeddings, FAISS indexing. |
-| **Phase 4** | Retrieval & Reranking | Hybrid lexical + semantic retrieval, cross-encoder reranking. |
-| **Phase 5** | Extractive QA | Span extraction, page-level citation mapping. |
-| **Phase 6** | Abstractive QA | Synthesis, groundedness verification, hallucination checks. |
-| **Phase 7** | Question Generation | User-controlled question synthesis across chapters and difficulty levels. |
-| **Phase 8** | Web UI & Evaluation | React + Vite UI, Relevant Matching Board, RAG benchmark metrics. |
-| **Phase 9** | Production Hardening | PostgreSQL + pgvector, Redis task queues, Docker Compose deployment. |
+| Phase | Milestone | Status | Focus Areas |
+| :--- | :--- | :--- | :--- |
+| **Phase 0** | Foundation | **Complete** | Repository structure, configuration, logging, health API, test suite. |
+| **Phase 1** | Document Ingestion | **Complete** | PyMuPDF parser, page-aware data models, diagnostics, deterministic test fixtures. |
+| **Phase 2** | Structural Chunking | Planned | Document cleaning, chapter/section identification, semantic window chunking. |
+| **Phase 3** | Embeddings & Indexing | Planned | Sentence Transformers, dense embeddings, FAISS indexing. |
+| **Phase 4** | Retrieval & Reranking | Planned | Hybrid lexical + semantic retrieval, cross-encoder reranking. |
+| **Phase 5** | Extractive QA | Planned | Span extraction, page-level citation mapping. |
+| **Phase 6** | Abstractive QA | Planned | Synthesis, groundedness verification, hallucination checks. |
+| **Phase 7** | Question Generation | Planned | User-controlled question synthesis across chapters and difficulty levels. |
+| **Phase 8** | Web UI & Evaluation | Planned | React + Vite UI, Relevant Matching Board, RAG benchmark metrics. |
+| **Phase 9** | Production Hardening | Planned | PostgreSQL + pgvector, Redis task queues, Docker Compose deployment. |
