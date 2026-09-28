@@ -1,0 +1,76 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables & secrets (Never commit secrets)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Testing & Type checking
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logging
+*.log
+logs/
+
+# Data directories (Keep directory structure via .gitkeep, ignore runtime files)
+/data/uploads/*
+!/data/uploads/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/data/indexes/*
+!/data/indexes/.gitkeep
+
+# Machine Learning & Vector Index artifacts (Future phases)
+*.bin
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.faiss
+*.index
+
+# Node / Frontend artifacts (Future phases)
+frontend/node_modules/
+frontend/dist/
+frontend/.next/

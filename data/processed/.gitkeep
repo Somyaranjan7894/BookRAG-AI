@@ -1,0 +1,2 @@
+# Intended for extracted and chunked document artifacts
+# Files placed here during runtime are excluded from version control via .gitignore.

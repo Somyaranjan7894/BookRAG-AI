@@ -1,0 +1,33 @@
+# ==============================================================================
+# BookRAG AI - Docker Compose Configuration (Phase 0 Skeleton / Placeholder)
+# ==============================================================================
+# NOTE: This file is intentionally NOT used for Phase 0.
+# Phase 0 runs as a lightweight local Python FastAPI service.
+#
+# In future phases, services will be enabled incrementally:
+# - backend: FastAPI application
+# - db: PostgreSQL + pgvector
+# - cache: Redis for async task queues and caching
+# - worker: Celery / background worker for PDF ingestion & embeddings
+# - frontend: React + TypeScript + Vite UI
+# ==============================================================================
+
+version: "3.8"
+
+services:
+  # Placeholder for future containerized backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile # To be created in future infrastructure phase
+    container_name: bookrag_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    profiles:
+      - future-infrastructure # Prevents automatic startup during Phase 0
