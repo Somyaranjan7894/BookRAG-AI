@@ -24,8 +24,19 @@ from app.schemas.embedding import (
     EmbedChunksResponse,
 )
 from app.schemas.health import HealthResponse
+from app.schemas.retrieval import (
+    BuildIndexRequest,
+    BuildIndexResponse,
+    IndexMetadata,
+    RetrievalQueryRequest,
+    RetrievalQueryResponse,
+    RetrievalResult,
+    VectorMappingItem,
+)
 
 __all__ = [
+    "BuildIndexRequest",
+    "BuildIndexResponse",
     "Chunk",
     "ChunkingConfig",
     "ChunkPageRequest",
@@ -41,9 +52,15 @@ __all__ = [
     "EmbedChunksRequest",
     "EmbedChunksResponse",
     "HealthResponse",
+    "IndexMetadata",
     "Page",
+    "RetrievalQueryRequest",
+    "RetrievalQueryResponse",
+    "RetrievalResult",
     "TextCleanRequest",
     "TextCleanResponse",
+    "VectorMappingItem",
 ]
+
 
 

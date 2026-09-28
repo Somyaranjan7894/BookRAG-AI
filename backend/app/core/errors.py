@@ -137,6 +137,98 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    from app.services.retrieval.exceptions import (
+        CorruptedIndexError,
+        EmptyIndexError,
+        IndexDimensionMismatchError,
+        IndexNotFoundError,
+        IndexPersistenceError,
+        InvalidQueryError,
+        RetrievalError,
+    )
+
+    @app.exception_handler(InvalidQueryError)
+    async def invalid_query_handler(request: Request, exc: InvalidQueryError) -> JSONResponse:
+        """Handle empty or invalid query strings."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(IndexDimensionMismatchError)
+    async def dimension_mismatch_handler(request: Request, exc: IndexDimensionMismatchError) -> JSONResponse:
+        """Handle vector dimension mismatches."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(IndexNotFoundError)
+    async def index_not_found_handler(request: Request, exc: IndexNotFoundError) -> JSONResponse:
+        """Handle missing index requests."""
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "code": status.HTTP_404_NOT_FOUND,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(CorruptedIndexError)
+    async def corrupted_index_handler(request: Request, exc: CorruptedIndexError) -> JSONResponse:
+        """Handle corrupted index or metadata files."""
+        logger.error("Corrupted index detected on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(IndexPersistenceError)
+    async def index_persistence_handler(request: Request, exc: IndexPersistenceError) -> JSONResponse:
+        """Handle index save/load failures."""
+        logger.error("Index persistence error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(RetrievalError)
+    async def retrieval_error_handler(request: Request, exc: RetrievalError) -> JSONResponse:
+        """Handle general retrieval failures."""
+        logger.error("Retrieval error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+
 
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:

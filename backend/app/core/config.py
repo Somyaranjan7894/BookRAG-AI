@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     EMBEDDING_DEVICE: str = "auto"
     EMBEDDING_DIMENSION: int = 384
 
+    # Vector Retrieval (Phase 4)
+    RETRIEVAL_DEFAULT_TOP_K: int = 5
+    RETRIEVAL_MAX_TOP_K: int = 100
+    INDEX_STORAGE_DIR: str = "data/indexes"
+
 
 
     model_config = SettingsConfigDict(

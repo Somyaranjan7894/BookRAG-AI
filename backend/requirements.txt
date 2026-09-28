@@ -10,8 +10,12 @@ pymupdf>=1.25.0,<2.0.0
 # Embeddings (Phase 3)
 sentence-transformers>=3.0.0,<7.0.0
 
+# Vector Retrieval (Phase 4)
+faiss-cpu>=1.9.0,<2.0.0
+
 # Testing
 pytest>=8.3.0,<9.0.0
 httpx>=0.28.0,<1.0.0
+
 
 

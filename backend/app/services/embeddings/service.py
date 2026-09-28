@@ -5,12 +5,14 @@ while preserving complete document and page provenance.
 """
 
 from typing import Any, List, Optional
+import numpy as np
 
 from app.core.logging import get_logger
 from app.schemas.chunk import Chunk
 from app.schemas.embedding import EmbeddingConfig, EmbeddingRecord
 from app.services.embeddings.exceptions import InvalidChunkError
 from app.services.embeddings.model import EmbeddingModel
+
 
 logger = get_logger(__name__)
 
@@ -56,6 +58,34 @@ class EmbeddingService:
         """
         records = self.embed_chunks([chunk], config=config)
         return records[0]
+
+    def embed_query(
+        self,
+        query: str,
+        config: Optional[EmbeddingConfig] = None,
+    ) -> np.ndarray:
+        """Encode a user query string into a normalized dense vector for search.
+
+        Args:
+            query: Non-empty search query string.
+            config: Optional configuration override.
+
+        Returns:
+            np.ndarray of shape (1, dimension) and dtype float32.
+        """
+        if query is None or not isinstance(query, str) or not query.strip():
+            raise InvalidChunkError("Query text cannot be empty or whitespace-only.")
+
+        cfg = config or self.default_config
+        model = self.model or EmbeddingModel.get_instance(
+            model_name=cfg.model_name,
+            device=cfg.device,
+        )
+        return model.encode(
+            texts=[query],
+            batch_size=1,
+            normalize_embeddings=cfg.normalize_embeddings,
+        )
 
     def embed_chunks(
         self,

@@ -12,7 +12,7 @@ Key capabilities planned for the platform include:
 - Preserving page numbers, chapter hierarchies, and contextual book metadata.
 - Intelligent document cleaning and structural chunking.
 - Dense semantic vector embeddings preserving full chunk provenance.
-- Vector indexing and hybrid lexical/dense search.
+- Exact vector retrieval using FAISS IndexFlatIP over unit-normalized dense vectors.
 - Cross-encoder reranking for precision context selection.
 - Dual-mode synthesis: **Extractive QA** (exact text citations) and **Abstractive QA** (synthesized reasoning).
 - Groundedness validation and hallucination mitigation.
@@ -52,7 +52,7 @@ The target end-to-end architecture is structured as a modular monolith:
  [ Reranker & QA ]     [ Ingestion → Cleaning → Chunking → Embeddings ]
         │                     │
         ▼                     ▼
- [ FAISS Vector Index / PostgreSQL + pgvector ]
+ [ FAISS Vector Index (IndexFlatIP) / PostgreSQL + pgvector ]
 ```
 
 ### Architectural Layering:
@@ -61,14 +61,15 @@ The target end-to-end architecture is structured as a modular monolith:
   - `services/pdf/`: Safe ingestion, validation, and page-aware PDF representation.
   - `services/text/`: Conservative text normalization and paragraph/sentence-aware intelligent chunking.
   - `services/embeddings/`: Dense semantic vector representations with device negotiation and provenance retention.
+  - `services/retrieval/`: Exact vector indexing (FAISS IndexFlatIP), metadata mapping synchronization, document-isolated top-K search, and disk persistence.
 - **Data & Repository Layer (`backend/app/repositories/` & `backend/app/models/`)**: Abstracted persistence for book metadata, chunks, and index mappings (reserved for future database phases).
 - **Core Platform (`backend/app/core/`)**: Cross-cutting concerns including centralized settings, structured logging, and unified error handling.
 
 ---
 
-## 4. Current Phase Scope: Phase 3 Complete
+## 4. Current Phase Scope: Phase 4 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, and **Phase 3 (Semantic Embeddings)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, and **Phase 4 (Vector Retrieval with FAISS)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -99,30 +100,41 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Vector normalization to unit length ($L_2 \approx 1.0$) for cosine similarity compatibility with FAISS.
   - `EmbeddingRecord` schema guaranteeing that chunk provenance (`chunk_id`, `document_id`, `page_number`) remains attached to every vector.
   - Raw `Chunk` objects remain completely immutable after embedding.
-  - Complete automated test suite: **68 unit, validation, and API integration tests** passing with 100% success rate.
+- **Vector Retrieval with FAISS (Phase 4)**:
+  - `faiss.IndexFlatIP` integration computing exact inner products over $L_2$-normalized 384-dimensional dense vectors.
+  - `VectorToChunkMapping` maintaining a synchronized, deterministic 1-to-1 correspondence between FAISS internal integer vector slots and source chunk provenance.
+  - `VectorIndex` container managing FAISS index lifecycle, vector addition, dimension validation, and disk persistence (`.faiss` binary + `.json` metadata mapping).
+  - `RetrievalService` orchestrator embedding natural language search queries with the identical Phase 3 embedding model and executing top-K nearest vector search.
+  - Document isolation and filtering allowing queries to be restricted to specific book documents without cross-book pollution.
+  - Structured, ranked `RetrievalResult` objects preserving complete provenance (`chunk_id`, `document_id`, `page_number`, `text`, `similarity_score`, `rank`).
+  - Strict validation: rejects dimension mismatches, empty/whitespace queries, non-positive top_k, and corrupted metadata files.
+  - Complete automated test suite: **91 unit, validation, and API integration tests** passing with 100% success rate.
 
 ### Explicit Architectural Boundaries:
-- **Embedding Generation $\neq$ Vector Search**: Phase 3 generates dense vectors. FAISS indexing and vector retrieval are intentionally reserved for Phase 4.
-- **No Vector Databases or Indexes**: No FAISS, pgvector, or Chroma.
-- **No Rerankers or QA Inference**: No cross-encoders, LLM calls, or question generation.
-- **No Database Persistence or Background Tasks**: No PostgreSQL, Redis, or Celery.
+- **Retrieval $\neq$ Question Answering**: Phase 4 retrieves candidate chunks based on semantic similarity. It does not synthesize answers, evaluate truthfulness, or generate citations.
+- **No Rerankers or Cross-Encoders**: Cross-encoder precision reranking is reserved for future phases.
+- **No LLM Generation or Prompt Assembly**: No FLAN-T5, OpenAI, or question answering models.
+- **No Complex Databases or Distributed Queues**: No PostgreSQL, pgvector, Redis, or Celery.
 
 ---
 
 ## 5. Technology Stack
 
-### Backend (Current Phase 3):
+### Backend (Current Phase 4):
 - **Language**: Python 3.11+ (Tested on Python 3.13.7)
 - **Web Framework**: [FastAPI](https://fastapi.tiangolo.com/) (>= 0.115.0)
 - **ASGI Server**: [Uvicorn](https://www.uvicorn.org/) (>= 0.32.0)
 - **PDF Extraction**: [PyMuPDF](https://pymupdf.readthedocs.io/) (>= 1.25.0)
 - **Embeddings & NLP**: [Sentence Transformers](https://www.sbert.net/) (`sentence-transformers/all-MiniLM-L6-v2`), PyTorch (>= 2.2.0)
+- **Vector Indexing & Retrieval**: [FAISS](https://github.com/facebookresearch/faiss) (`faiss-cpu>=1.9.0`)
 - **Configuration & Validation**: [Pydantic v2](https://docs.pydantic.dev/) & [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - **Testing**: [pytest](https://docs.pytest.org/) & [HTTPX](https://www.python-httpx.org/)
 
 ### Future Planned Stack:
 - **Frontend**: React, TypeScript, Vite, TailwindCSS
-- **Vector Storage**: FAISS (Phase 4) transitioning to PostgreSQL + pgvector
+- **Reranker**: Cross-Encoder (`ms-marco-MiniLM-L-6-v2` or similar)
+- **Generative QA**: Extractive QA and Abstractive LLM synthesis
+- **Vector Storage**: PostgreSQL + pgvector (for persistent production deployment)
 - **Task Queues**: Redis & Celery
 - **Infrastructure**: Docker & Docker Compose
 
@@ -142,7 +154,8 @@ BookRAG-AI/
 │   │   │       │   ├── chunks.py          # POST /api/v1/chunks/clean & chunk-page
 │   │   │       │   ├── documents.py       # POST /api/v1/documents/ingest
 │   │   │       │   ├── embeddings.py      # POST /api/v1/embeddings/embed-chunk & embed-chunks
-│   │   │       │   └── health.py          # GET /api/v1/health implementation
+│   │   │       │   ├── health.py          # GET /api/v1/health implementation
+│   │   │       │   └── retrieval.py       # POST /api/v1/retrieval/index & search
 │   │   │       ├── __init__.py
 │   │   │       └── router.py              # Assembles version 1 routes
 │   │   ├── core/
@@ -157,7 +170,8 @@ BookRAG-AI/
 │   │   │   ├── chunk.py                   # Chunk, ChunkingConfig models
 │   │   │   ├── document.py                # Document, Page, Metadata Pydantic models
 │   │   │   ├── embedding.py               # EmbeddingRecord, EmbeddingConfig models
-│   │   │   └── health.py                  # Health check Pydantic schemas
+│   │   │   ├── health.py                  # Health check Pydantic schemas
+│   │   │   └── retrieval.py               # RetrievalResult, IndexMetadata, VectorMappingItem
 │   │   ├── services/
 │   │   │   ├── __init__.py
 │   │   │   ├── pdf/                       # Phase 1 Ingestion Service
@@ -171,11 +185,17 @@ BookRAG-AI/
 │   │   │   │   ├── cleaner.py             # Conservative deterministic text cleaner
 │   │   │   │   ├── exceptions.py          # Text processing domain exceptions
 │   │   │   │   └── processor.py           # Document-level multi-page text processing
-│   │   │   └── embeddings/                # Phase 3 Semantic Embeddings Service
+│   │   │   ├── embeddings/                # Phase 3 Semantic Embeddings Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py          # Embedding domain exceptions
+│   │   │   │   ├── model.py               # EmbeddingModel wrapper & instance registry
+│   │   │   │   └── service.py             # EmbeddingService & batch inference
+│   │   │   └── retrieval/                 # Phase 4 FAISS Vector Retrieval Service
 │   │   │       ├── __init__.py
-│   │   │       ├── exceptions.py          # Embedding domain exceptions
-│   │   │       ├── model.py               # EmbeddingModel wrapper & instance registry
-│   │   │       └── service.py             # EmbeddingService & batch inference
+│   │   │       ├── exceptions.py          # Retrieval & FAISS domain exceptions
+│   │   │       ├── index.py               # VectorIndex wrapper & persistence
+│   │   │       ├── mapping.py             # VectorToChunkMapping synchronization
+│   │   │       └── service.py             # RetrievalService query search orchestrator
 │   │   ├── __init__.py
 │   │   └── main.py                        # FastAPI application entry point
 │   │
@@ -188,8 +208,9 @@ BookRAG-AI/
 │   │   ├── test_embeddings.py             # Phase 3 embedding inference, normalization, batch tests
 │   │   ├── test_health.py                 # Startup and health check tests (Phase 0)
 │   │   ├── test_pdf_ingestion.py          # Phase 1 ingestion, validation, and API tests
+│   │   ├── test_retrieval.py              # Phase 4 FAISS index, top-k search, mapping, persistence tests
 │   │   └── test_text_processing.py        # Phase 2 cleaning, chunking, and overlap tests
-│   ├── requirements.txt                   # Phase 0, 1, 2, 3 dependencies
+│   ├── requirements.txt                   # Project dependencies
 │   └── .env.example                       # Non-sensitive configuration template
 │
 ├── frontend/                              # Reserved for future React application
@@ -197,7 +218,7 @@ BookRAG-AI/
 ├── data/                                  # Runtime data directories (version controlled via .gitkeep)
 │   ├── uploads/                           # Destination for uploaded book PDFs
 │   ├── processed/                         # Destination for extracted/chunked artifacts
-│   └── indexes/                           # Destination for vector indexes
+│   └── indexes/                           # Destination for saved FAISS indexes & metadata JSON
 │
 ├── docs/                                  # Architectural specifications and design records
 ├── evaluation/                            # Benchmarking datasets and evaluation scripts
@@ -209,55 +230,66 @@ BookRAG-AI/
 
 ---
 
-## 7. Semantic Embedding Architecture
+## 7. Vector Retrieval Pipeline (Phase 4)
 
 ```
-Chunk (from Phase 2)
-  ├── chunk_id: "doc_3b364081b1aeaafc_p001_c0000"
-  ├── document_id: "doc_3b364081b1aeaafc"
-  ├── page_number: 1
-  └── text: "Traditional information retrieval systems have long relied on keyword matching..."
+User Query ("How do neural networks learn features?")
        │
        ▼
-[ EmbeddingService.embed_chunks(chunks) ]
-  ├── Input validation (rejects None, malformed, empty/whitespace text)
-  ├── SentenceTransformer model resolution (cached singleton)
-  ├── Hardware negotiation (CUDA if present, otherwise CPU)
-  ├── Batch encoding (batch_size = 32)
-  └── L2 normalization (||v|| ≈ 1.0)
+[ EmbeddingService.embed_query(query) ]
        │
        ▼
-[ EmbeddingRecord ]
-  ├── chunk_id: "doc_3b364081b1aeaafc_p001_c0000"     <-- Provenance Preserved!
-  ├── document_id: "doc_3b364081b1aeaafc"             <-- Provenance Preserved!
-  ├── page_number: 1                                   <-- Provenance Preserved!
-  ├── text: "Traditional information retrieval..."     <-- Source Text Preserved!
-  ├── embedding: [-0.0418, 0.0812, ..., 0.0125]       <-- 384-dimensional dense vector
-  ├── dimension: 384
-  ├── model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  ├── device: "cpu"
-  └── normalized: true
+384-dimensional L2-normalized Query Vector (||q|| ≈ 1.0)
+       │
+       ▼
+[ FAISS IndexFlatIP Search (top_k = 5) ]
+   ├── Exact inner product computation: S(q, d) = q · d
+   ├── Document isolation / filter check (document_id = "doc_ai")
+   └── Returns top-K nearest slots & inner product distances
+       │
+       ▼
+[ VectorToChunkMapping ]
+   ├── Slot 0 -> doc_ai_p001_c0001 (Page 1)
+   ├── Slot 1 -> doc_ai_p002_c0002 (Page 2)
+   └── Synchronizes integer slot with complete chunk provenance
+       │
+       ▼
+[ Structured RetrievalResult[] ]
+   ├── Rank 1: Chunk doc_ai_p002_c0002 (Score: 0.812, Page: 2)
+   ├── Rank 2: Chunk doc_ai_p001_c0001 (Score: 0.745, Page: 1)
+   └── Complete text and provenance attached!
 ```
 
-### Why all-MiniLM-L6-v2?
-`all-MiniLM-L6-v2` maps sentences and paragraphs into a 384-dimensional dense vector space. It is specifically optimized for semantic search, offering an outstanding balance between inference speed (~5x faster than BERT-base), compact vector storage footprint (384 floats = 1,536 bytes per chunk), and strong retrieval quality.
+### Why FAISS IndexFlatIP?
+`faiss.IndexFlatIP` computes the exact inner product between vectors with brute-force precision. Because all document chunk vectors and query vectors are $L_2$-normalized to unit length ($\|v\|_2 = 1.0$), the inner product mathematically equals the **cosine similarity**:
 
-### Normalization
-When `normalize_embeddings=True`, vectors are normalized such that their Euclidean norm ($L_2$) equals 1.0:
-$$\|v\|_2 = \sqrt{\sum_{i=1}^{384} v_i^2} \approx 1.0$$
-This guarantees that the dot product of two normalized vectors equals their cosine similarity, enabling maximum search efficiency during Phase 4 vector retrieval:
-$$\text{Cosine Similarity}(u, v) = u \cdot v$$
+$$\text{Cosine Similarity}(q, d) = \frac{q \cdot d}{\|q\|_2 \|d\|_2} = q \cdot d = \text{Inner Product}(q, d)$$
+
+This provides an exact, uncompressed baseline search without quantization distortions (such as IVF or PQ).
+
+### Understanding Similarity Scores
+- **Ranking Signal**: Similarity scores indicate relative semantic closeness between the query and candidate passages.
+- **Not a Probability**: A score of `0.85` does not mean 85% probability or confidence.
+- **Not Factual Correctness**: Semantic proximity does not guarantee that a text chunk contains a factually accurate answer to the question. Reranking and groundedness evaluation are applied in subsequent phases.
+
+### Persistence Format
+Persisted vector indexes are stored as two co-located files:
+1. `<base_name>.faiss`: Binary serialized FAISS index structure.
+2. `<base_name>.json`: Structured JSON containing index metadata (`dimension`, `model_name`, `total_vectors`, `document_ids`, `normalized`) and contiguous `VectorMappingItem` records.
 
 ---
 
-## 8. Embedding Configuration
+## 8. Configuration Settings
 
 | Parameter | Default | Constraint | Purpose |
 | :--- | :--- | :--- | :--- |
-| `model_name` | `sentence-transformers/all-MiniLM-L6-v2` | Valid HF model ID | Hugging Face model repository identifier. |
-| `batch_size` | `32` | `gt=0` | Number of text chunks encoded in parallel per forward pass. |
-| `normalize_embeddings` | `True` | boolean | Normalizes vectors to unit length ($L_2 = 1.0$). |
-| `device` | `"auto"` | `"auto"`, `"cpu"`, `"cuda"` | Hardware target; `"auto"` selects CUDA if available, else CPU. |
+| `EMBEDDING_MODEL_NAME` | `sentence-transformers/all-MiniLM-L6-v2` | Valid HF model ID | Hugging Face model repository identifier. |
+| `EMBEDDING_BATCH_SIZE` | `32` | `gt=0` | Number of text chunks encoded in parallel per forward pass. |
+| `EMBEDDING_NORMALIZE` | `True` | boolean | Normalizes vectors to unit length ($L_2 = 1.0$). |
+| `EMBEDDING_DEVICE` | `"auto"` | `"auto"`, `"cpu"`, `"cuda"` | Hardware target; `"auto"` selects CUDA if available, else CPU. |
+| `RETRIEVAL_DEFAULT_TOP_K` | `5` | `gt=0` | Default number of candidate chunks returned per query. |
+| `RETRIEVAL_MAX_TOP_K` | `100` | `gt=0` | Maximum allowable top_k limit for search queries. |
+| `INDEX_STORAGE_DIR` | `"data/indexes"` | Directory path | Local filesystem directory for saving/loading FAISS indexes. |
 
 ---
 
@@ -285,21 +317,27 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **68 tests** will run, covering:
-- Phase 0: FastAPI initialization, settings, logging, health check probe.
-- Phase 1: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
-- Phase 2: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
-- Phase 3:
-  - Model loading and 384-dimensional output verification.
-  - Single chunk and batch chunk embedding generation.
-  - Output order preservation across batches.
-  - $L_2$ unit normalization verification ($\|v\| \approx 1.0$).
-  - Strict provenance survival (`chunk_id`, `document_id`, `page_number`).
-  - Raw `Chunk` object immutability.
-  - Input validation (rejection of None, empty text, whitespace-only chunks).
-  - Determinism across repeated inference runs.
-  - Hardware device resolution (`auto` $\rightarrow$ `cpu`/`cuda`).
-  - Development API endpoints (`POST /api/v1/embeddings/embed-chunk` and `embed-chunks`).
+All **91 tests** will run, covering:
+- **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
+- **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
+- **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
+- **Phase 3 (20 tests)**: Model loading, 384-dimensional output verification, batch inference order preservation, numerical $L_2$ unit normalization ($\|v\| \approx 1.0$), provenance survival, chunk immutability, determinism.
+- **Phase 4 (23 tests)**:
+  - FAISS `IndexFlatIP` initialization with 384 dimensions.
+  - Index creation, vector insertion, and slot count synchronization.
+  - Incremental batch vector addition with contiguous slot mapping.
+  - Semantic query search and rank-1 relevance verification.
+  - Top-K boundaries (`top_k=1`, `top_k=3`, `top_k > ntotal`).
+  - Strict provenance retention (`chunk_id`, `document_id`, `page_number`, `text`).
+  - Dimension mismatch rejection on vector addition and query search.
+  - Controlled empty index behavior (returns `[]` without error).
+  - Unregistered index handling (`IndexNotFoundError`).
+  - Document isolation and filtering across multi-document corpuses.
+  - Disk persistence (`.faiss` + `.json`) and reload verification.
+  - Corrupted metadata and vector count mismatch detection.
+  - Determinism across repeated queries.
+  - Query input validation (rejects empty / whitespace-only queries).
+  - API development endpoints (`POST /api/v1/retrieval/index` and `POST /api/v1/retrieval/search`).
 
 ---
 
@@ -317,7 +355,7 @@ All **68 tests** will run, covering:
 ### 3. Text Cleaning (Development / Testing)
 - **Method**: `POST`
 - **Path**: `/api/v1/chunks/clean`
-- **Request Body**: `{"text": "Raw  text with intel-\nligence."}`
+- **Request Body**: `{"text": "Raw text with intel-\nligence."}`
 
 ### 4. Page Chunking (Development / Testing)
 - **Method**: `POST`
@@ -327,36 +365,33 @@ All **68 tests** will run, covering:
 ### 5. Single Chunk Embedding (Development / Testing)
 - **Method**: `POST`
 - **Path**: `/api/v1/embeddings/embed-chunk`
-- **Request Body**:
-```json
-{
-  "chunk_id": "doc_001_p001_c0001",
-  "document_id": "doc_001",
-  "page_number": 1,
-  "text": "Dense representations enable semantic search."
-}
-```
+- **Request Body**: `{"chunk_id": "doc_001_p001_c0001", "document_id": "doc_001", "page_number": 1, "text": "Text..."}`
 
 ### 6. Batch Chunk Embedding (Development / Testing)
 - **Method**: `POST`
 - **Path**: `/api/v1/embeddings/embed-chunks`
+
+### 7. Vector Indexing (Development / Testing)
+- **Method**: `POST`
+- **Path**: `/api/v1/retrieval/index`
 - **Request Body**:
 ```json
 {
-  "chunks": [
-    {
-      "chunk_id": "doc_001_p001_c0001",
-      "document_id": "doc_001",
-      "page_number": 1,
-      "text": "First passage on page one."
-    },
-    {
-      "chunk_id": "doc_001_p002_c0002",
-      "document_id": "doc_001",
-      "page_number": 2,
-      "text": "Second passage on page two."
-    }
-  ]
+  "index_id": "book_intro_index",
+  "document_id": "doc_ai",
+  "records": [...]
+}
+```
+
+### 8. Semantic Vector Search (Development / Testing)
+- **Method**: `POST`
+- **Path**: `/api/v1/retrieval/search`
+- **Request Body**:
+```json
+{
+  "query": "How do deep neural networks learn hierarchical representations?",
+  "top_k": 5,
+  "document_id": "doc_ai"
 }
 ```
 
@@ -370,7 +405,7 @@ All **68 tests** will run, covering:
 | **Phase 1** | Document Ingestion | **Complete** | PyMuPDF parser, page-aware data models, diagnostics, deterministic test fixtures. |
 | **Phase 2** | Text Cleaning & Chunking | **Complete** | Conservative text cleaning, dehyphenation, paragraph/sentence-aware chunking, provenance. |
 | **Phase 3** | Semantic Embeddings | **Complete** | Sentence Transformers, all-MiniLM-L6-v2, 384d vectors, L2 normalization, batch inference. |
-| **Phase 4** | Retrieval & Indexing | Planned | FAISS vector indexing, similarity search, top-k retrieval, evaluation. |
+| **Phase 4** | Vector Retrieval (FAISS) | **Complete** | IndexFlatIP, VectorToChunkMapping, top-K search, document isolation, disk persistence. |
 | **Phase 5** | Extractive QA | Planned | Span extraction, page-level citation mapping. |
 | **Phase 6** | Abstractive QA | Planned | Synthesis, groundedness verification, hallucination checks. |
 | **Phase 7** | Question Generation | Planned | User-controlled question synthesis across chapters and difficulty levels. |
