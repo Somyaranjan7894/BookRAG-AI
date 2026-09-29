@@ -33,6 +33,11 @@ from app.schemas.retrieval import (
     RetrievalResult,
     VectorMappingItem,
 )
+from app.schemas.search import (
+    SearchRequest,
+    SearchResponse,
+    SearchResult,
+)
 
 __all__ = [
     "BuildIndexRequest",
@@ -57,6 +62,9 @@ __all__ = [
     "RetrievalQueryRequest",
     "RetrievalQueryResponse",
     "RetrievalResult",
+    "SearchRequest",
+    "SearchResponse",
+    "SearchResult",
     "TextCleanRequest",
     "TextCleanResponse",
     "VectorMappingItem",

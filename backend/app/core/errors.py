@@ -32,13 +32,22 @@ def setup_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
         """Handle schema validation errors safely."""
+        from fastapi.encoders import jsonable_encoder
+
+        clean_errors = []
+        for err in exc.errors():
+            item = dict(err)
+            if "ctx" in item and isinstance(item["ctx"], dict):
+                item["ctx"] = {k: str(v) for k, v in item["ctx"].items()}
+            clean_errors.append(item)
+
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "error": {
                     "code": status.HTTP_422_UNPROCESSABLE_ENTITY,
                     "message": "Request validation error",
-                    "details": exc.errors(),
+                    "details": jsonable_encoder(clean_errors),
                 }
             },
         )
@@ -218,6 +227,110 @@ def setup_exception_handlers(app: FastAPI) -> None:
     async def retrieval_error_handler(request: Request, exc: RetrievalError) -> JSONResponse:
         """Handle general retrieval failures."""
         logger.error("Retrieval error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    from app.services.search.exceptions import (
+        DocumentNotFoundError,
+        IndexNotInitializedError,
+        InvalidSearchQueryError,
+        InvalidTopKError,
+        SearchEmbeddingError,
+        SearchError,
+        SearchRetrievalError,
+    )
+
+    @app.exception_handler(InvalidSearchQueryError)
+    async def invalid_search_query_handler(request: Request, exc: InvalidSearchQueryError) -> JSONResponse:
+        """Handle invalid or empty search query strings."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidTopKError)
+    async def invalid_top_k_handler(request: Request, exc: InvalidTopKError) -> JSONResponse:
+        """Handle invalid top_k parameter values."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(DocumentNotFoundError)
+    async def document_not_found_handler(request: Request, exc: DocumentNotFoundError) -> JSONResponse:
+        """Handle unknown document ID requests in search."""
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "code": status.HTTP_404_NOT_FOUND,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(IndexNotInitializedError)
+    async def index_not_initialized_handler(request: Request, exc: IndexNotInitializedError) -> JSONResponse:
+        """Handle uninitialized or missing search index."""
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "code": status.HTTP_404_NOT_FOUND,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(SearchEmbeddingError)
+    async def search_embedding_error_handler(request: Request, exc: SearchEmbeddingError) -> JSONResponse:
+        """Handle search query embedding failures."""
+        logger.error("Search embedding error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(SearchRetrievalError)
+    async def search_retrieval_error_handler(request: Request, exc: SearchRetrievalError) -> JSONResponse:
+        """Handle search vector retrieval execution failures."""
+        logger.error("Search retrieval error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(SearchError)
+    async def general_search_error_handler(request: Request, exc: SearchError) -> JSONResponse:
+        """Handle general search domain errors."""
+        logger.error("General search service error on %s: %s", request.url.path, exc)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={

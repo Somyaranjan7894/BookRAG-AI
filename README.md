@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 4 Complete
+## 4. Current Phase Scope: Phase 5 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, and **Phase 4 (Vector Retrieval with FAISS)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, and **Phase 5 (Semantic Search Service & API)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -108,10 +108,19 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Document isolation and filtering allowing queries to be restricted to specific book documents without cross-book pollution.
   - Structured, ranked `RetrievalResult` objects preserving complete provenance (`chunk_id`, `document_id`, `page_number`, `text`, `similarity_score`, `rank`).
   - Strict validation: rejects dimension mismatches, empty/whitespace queries, non-positive top_k, and corrupted metadata files.
-  - Complete automated test suite: **91 unit, validation, and API integration tests** passing with 100% success rate.
+- **Semantic Search Service & API (Phase 5)**:
+  - Application-level `SearchService` orchestrating the pipeline: query validation → query embedding (`EmbeddingService`) → vector retrieval (`RetrievalService`) → provenance mapping (`SearchResult`) → `SearchResponse`.
+  - Thin FastAPI endpoint: `POST /api/v1/search` with dependency injection (`Depends(get_search_service)`).
+  - Complete provenance preservation: `rank`, `chunk_id`, `document_id`, `page_number`, `text`, `similarity_score`, `chunk_index`, and `metadata`.
+  - Document isolation and filtering: isolates search to the requested document ID; returns structured HTTP 404 when querying an unknown or missing document.
+  - Safe empty index handling: gracefully returns an empty result set (200 OK) without crashing.
+  - Strict parameter validation: `SearchRequest` schema validates non-empty query string and strictly bounds `top_k` ($1 \le \text{top\_k} \le 100$).
+  - Critical semantic rule enforced: `similarity_score` represents vector-space semantic retrieval relevance (cosine similarity). It is explicitly **not** an answer confidence, probability, factual correctness score, or hallucination metric.
+  - Public API contract abstraction: hides internal FAISS vector positions (`vector_index`) from public responses.
+  - Complete automated test suite: **130 unit, validation, isolation, and integration tests** passing with 100% success rate.
 
 ### Explicit Architectural Boundaries:
-- **Retrieval $\neq$ Question Answering**: Phase 4 retrieves candidate chunks based on semantic similarity. It does not synthesize answers, evaluate truthfulness, or generate citations.
+- **Search $\neq$ Question Answering**: Phase 5 searches and retrieves relevant candidate chunks. It does not synthesize answers, evaluate truthfulness, or generate citations.
 - **No Rerankers or Cross-Encoders**: Cross-encoder precision reranking is reserved for future phases.
 - **No LLM Generation or Prompt Assembly**: No FLAN-T5, OpenAI, or question answering models.
 - **No Complex Databases or Distributed Queues**: No PostgreSQL, pgvector, Redis, or Celery.
@@ -155,7 +164,8 @@ BookRAG-AI/
 │   │   │       │   ├── documents.py       # POST /api/v1/documents/ingest
 │   │   │       │   ├── embeddings.py      # POST /api/v1/embeddings/embed-chunk & embed-chunks
 │   │   │       │   ├── health.py          # GET /api/v1/health implementation
-│   │   │       │   └── retrieval.py       # POST /api/v1/retrieval/index & search
+│   │   │       │   ├── retrieval.py       # POST /api/v1/retrieval/index & search
+│   │   │       │   └── search.py          # POST /api/v1/search (Phase 5 search endpoint)
 │   │   │       ├── __init__.py
 │   │   │       └── router.py              # Assembles version 1 routes
 │   │   ├── core/
@@ -171,7 +181,8 @@ BookRAG-AI/
 │   │   │   ├── document.py                # Document, Page, Metadata Pydantic models
 │   │   │   ├── embedding.py               # EmbeddingRecord, EmbeddingConfig models
 │   │   │   ├── health.py                  # Health check Pydantic schemas
-│   │   │   └── retrieval.py               # RetrievalResult, IndexMetadata, VectorMappingItem
+│   │   │   ├── retrieval.py               # RetrievalResult, IndexMetadata, VectorMappingItem
+│   │   │   └── search.py                  # SearchRequest, SearchResponse, SearchResult (Phase 5)
 │   │   ├── services/
 │   │   │   ├── __init__.py
 │   │   │   ├── pdf/                       # Phase 1 Ingestion Service
@@ -190,12 +201,16 @@ BookRAG-AI/
 │   │   │   │   ├── exceptions.py          # Embedding domain exceptions
 │   │   │   │   ├── model.py               # EmbeddingModel wrapper & instance registry
 │   │   │   │   └── service.py             # EmbeddingService & batch inference
-│   │   │   └── retrieval/                 # Phase 4 FAISS Vector Retrieval Service
+│   │   │   ├── retrieval/                 # Phase 4 FAISS Vector Retrieval Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py          # Retrieval & FAISS domain exceptions
+│   │   │   │   ├── index.py               # VectorIndex wrapper & persistence
+│   │   │   │   ├── mapping.py             # VectorToChunkMapping synchronization
+│   │   │   │   └── service.py             # RetrievalService query search orchestrator
+│   │   │   └── search/                    # Phase 5 Application Search Service
 │   │   │       ├── __init__.py
-│   │   │       ├── exceptions.py          # Retrieval & FAISS domain exceptions
-│   │   │       ├── index.py               # VectorIndex wrapper & persistence
-│   │   │       ├── mapping.py             # VectorToChunkMapping synchronization
-│   │   │       └── service.py             # RetrievalService query search orchestrator
+│   │   │       ├── exceptions.py          # Search domain exceptions
+│   │   │       └── service.py             # SearchService query orchestrator
 │   │   ├── __init__.py
 │   │   └── main.py                        # FastAPI application entry point
 │   │
@@ -209,6 +224,7 @@ BookRAG-AI/
 │   │   ├── test_health.py                 # Startup and health check tests (Phase 0)
 │   │   ├── test_pdf_ingestion.py          # Phase 1 ingestion, validation, and API tests
 │   │   ├── test_retrieval.py              # Phase 4 FAISS index, top-k search, mapping, persistence tests
+│   │   ├── test_search.py                 # Phase 5 SearchService & API tests
 │   │   └── test_text_processing.py        # Phase 2 cleaning, chunking, and overlap tests
 │   ├── requirements.txt                   # Project dependencies
 │   └── .env.example                       # Non-sensitive configuration template

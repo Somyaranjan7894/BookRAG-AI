@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import chunks, documents, embeddings, health, retrieval
+from app.api.v1.endpoints import chunks, documents, embeddings, health, retrieval, search
 
 api_router = APIRouter()
 api_router.include_router(health.router)
@@ -10,6 +10,7 @@ api_router.include_router(documents.router)
 api_router.include_router(chunks.router)
 api_router.include_router(embeddings.router)
 api_router.include_router(retrieval.router)
+api_router.include_router(search.router)
 
 
 

@@ -6,6 +6,7 @@ RetrievalResult assembly with complete provenance and document isolation.
 
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
+import numpy as np
 
 from app.core.logging import get_logger
 from app.schemas.chunk import Chunk
@@ -128,6 +129,63 @@ class RetrievalService:
         records = self.embedding_service.embed_chunks(chunks)
         return self.build_index_from_records(records, index_id=index_id, set_as_default=set_as_default)
 
+    def search_by_vector(
+        self,
+        query_vector: np.ndarray,
+        top_k: int = 5,
+        document_id: Optional[str] = None,
+        index_id: Optional[str] = None,
+        index: Optional[VectorIndex] = None,
+    ) -> List[RetrievalResult]:
+        """Perform semantic vector retrieval directly using a precomputed query embedding vector.
+
+        Args:
+            query_vector: 1D or 2D numpy array containing the query embedding.
+            top_k: Maximum number of nearest candidate chunks to retrieve (default: 5).
+            document_id: Optional document ID to restrict retrieval.
+            index_id: Optional specific index ID to query.
+            index: Optional direct VectorIndex instance override.
+
+        Returns:
+            List of RetrievalResult objects ranked by similarity score.
+
+        Raises:
+            RetrievalError: If top_k <= 0.
+            IndexNotFoundError: If no target index is available.
+        """
+        if top_k <= 0:
+            raise RetrievalError(f"top_k must be strictly positive (got {top_k}).")
+
+        # Resolve target index
+        target_index: VectorIndex
+        if index is not None:
+            target_index = index
+        elif document_id and document_id in self._indices:
+            target_index = self._indices[document_id]
+        else:
+            target_index = self.get_index(index_id)
+
+        # Empty index check
+        if target_index.total_vectors == 0:
+            logger.debug("Retrieval requested on empty index '%s'. Returning empty list.", target_index.index_id)
+            return []
+
+        # Perform search and map to RetrievalResults
+        results = target_index.search(
+            query_vector=query_vector,
+            top_k=top_k,
+            document_id=document_id,
+        )
+
+        logger.info(
+            "Vector search retrieved %d candidates from index '%s' (top_k=%d, doc_filter=%s).",
+            len(results),
+            target_index.index_id,
+            top_k,
+            document_id,
+        )
+        return results
+
     def search(
         self,
         query: str,
@@ -169,39 +227,17 @@ class RetrievalService:
         if top_k <= 0:
             raise RetrievalError(f"top_k must be strictly positive (got {top_k}).")
 
-        # 2. Resolve target index
-        target_index: VectorIndex
-        if index is not None:
-            target_index = index
-        elif document_id and document_id in self._indices:
-            target_index = self._indices[document_id]
-        else:
-            target_index = self.get_index(index_id)
-
-        # 3. Empty index check
-        if target_index.total_vectors == 0:
-            logger.debug("Retrieval requested on empty index '%s'. Returning empty list.", target_index.index_id)
-            return []
-
-        # 4. Generate query embedding using same model contract as chunks
+        # 2. Generate query embedding using same model contract as chunks
         query_vector = self.embedding_service.embed_query(query.strip())
 
-        # 5 & 6. Perform search and map to RetrievalResults
-        results = target_index.search(
+        # 3. Delegate to vector retrieval
+        return self.search_by_vector(
             query_vector=query_vector,
             top_k=top_k,
             document_id=document_id,
+            index_id=index_id,
+            index=index,
         )
-
-        logger.info(
-            "Query '%s' retrieved %d candidates from index '%s' (top_k=%d, doc_filter=%s).",
-            query.strip()[:40],
-            len(results),
-            target_index.index_id,
-            top_k,
-            document_id,
-        )
-        return results
 
     def save_index(
         self,
