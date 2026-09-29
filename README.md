@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 9 Complete
+## 4. Current Phase Scope: Phase 10 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, and **Phase 9 (Groundedness & Hallucination Control)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, and **Phase 10 (Citation & Provenance Mapping Layer)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -136,7 +136,16 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Transparent provenance tracking of supporting and contradicting evidence chunks.
   - Safe decision policy suppressing ungrounded or contradicted answers while preserving diagnostic claim breakdown and evidence provenance.
   - Dedicated public endpoint: `POST /api/v1/grounded-answer`.
-  - Complete test suite: **239 unit, integration, and API tests** passing with 100% success rate.
+- **Citation & Provenance Mapping Layer (Phase 10)**:
+  - Deterministic `CitationService` translating verified NLI grounding evidence into response-local citation objects (`cite_1`, `cite_2`, ...).
+  - Strict preservation of the core architectural principle: *"The generator generates the answer. The system assigns citations from verified evidence."*
+  - Complete provenance retention (`citation_id`, `document_id`, `chunk_id`, `page_number`, `chunk_index`, unedited `source_text`, scores).
+  - Many-to-many claim-to-citation relationships (one claim can have multiple citations; one chunk can support multiple claims).
+  - Global citation deduplication using deterministic `(document_id, chunk_id)` keys.
+  - Preservation of contradiction and conflict diagnostics (`relation="supports" | "contradicts"`) without converting refutations into false endorsements.
+  - Strict document isolation enforcing single-document provenance boundaries per response.
+  - Complete presentation-independence returning structured metadata for frontend UI rendering.
+  - Full test suite: **255 unit, integration, and regression tests** passing with 100% success rate.
 
 
 ---
@@ -397,18 +406,48 @@ BookRAG-AI/
 │   │   ├── schemas/
 │   │   │   ├── __init__.py
 │   │   │   ├── chunk.py                   # Chunk, ChunkingConfig models
+│   │   │   ├── citation.py                # Citation, ClaimCitationRef, CitationMappingResult (Phase 10)
 │   │   │   ├── document.py                # Document, Page, Metadata Pydantic models
 │   │   │   ├── embedding.py               # EmbeddingRecord, EmbeddingConfig models
+│   │   │   ├── generation.py             # GenerationRequest, GenerationResponse (Phase 8)
+│   │   │   ├── grounding.py              # GroundedAnswerRequest, GroundingReport, ClaimResult (Phase 9)
 │   │   │   ├── health.py                  # Health check Pydantic schemas
+│   │   │   ├── qa.py                      # QARequest, QAResponse (Phase 7)
 │   │   │   ├── retrieval.py               # RetrievalResult, IndexMetadata, VectorMappingItem
 │   │   │   └── search.py                  # SearchRequest, SearchResponse, SearchResult (Phase 5)
 │   │   ├── services/
 │   │   │   ├── __init__.py
+│   │   │   ├── citation/                  # Phase 10 Citation & Provenance Mapping Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py          # Citation & DocumentIsolationError exceptions
+│   │   │   │   └── service.py             # CitationService deterministic deduplication
+│   │   │   ├── generation/                # Phase 8 Abstractive QA Generation Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py
+│   │   │   │   ├── model.py               # FLAN-T5 Seq2Seq model wrapper
+│   │   │   │   └── service.py             # GenerationService & EvidenceBuilder
+│   │   │   ├── grounding/                 # Phase 9 Groundedness & Hallucination Control
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── claims.py              # Deterministic ClaimDecomposer
+│   │   │   │   ├── exceptions.py
+│   │   │   │   ├── model.py               # DeBERTa-v3 CrossEncoder NLI wrapper
+│   │   │   │   ├── orchestrator.py        # GroundedAnswerService end-to-end pipeline
+│   │   │   │   └── service.py             # GroundingService pair validation
 │   │   │   ├── pdf/                       # Phase 1 Ingestion Service
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── exceptions.py          # Domain-specific PDF ingestion exceptions
 │   │   │   │   ├── ingestion.py           # Orchestration, validation, diagnostics
 │   │   │   │   └── parser.py              # PyMuPDF-specific extraction mechanics
+│   │   │   ├── qa/                        # Phase 7 Extractive QA Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py
+│   │   │   │   ├── model.py               # RoBERTa SQuAD2 model wrapper
+│   │   │   │   └── service.py             # QAService sliding window span extraction
+│   │   │   ├── reranking/                 # Phase 6 Cross-Encoder Reranking Service
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exceptions.py
+│   │   │   │   ├── model.py               # Cross-Encoder MiniLM model wrapper
+│   │   │   │   └── service.py             # RerankerService precision re-scoring
 │   │   │   ├── text/                      # Phase 2 Text Processing Service
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── chunker.py             # Paragraph & sentence-aware intelligent chunker
@@ -439,9 +478,14 @@ BookRAG-AI/
 │   │   ├── fixtures/
 │   │   │   ├── __init__.py
 │   │   │   └── pdf_factory.py             # Synthetic, reproducible PDF generators
+│   │   ├── test_citation.py               # Phase 10 citation mapping, deduplication & isolation tests
 │   │   ├── test_embeddings.py             # Phase 3 embedding inference, normalization, batch tests
+│   │   ├── test_generation.py             # Phase 8 FLAN-T5 abstractive generation tests
+│   │   ├── test_grounding.py              # Phase 9 NLI groundedness and hallucination tests
 │   │   ├── test_health.py                 # Startup and health check tests (Phase 0)
 │   │   ├── test_pdf_ingestion.py          # Phase 1 ingestion, validation, and API tests
+│   │   ├── test_qa.py                     # Phase 7 RoBERTa extractive QA tests
+│   │   ├── test_reranking.py              # Phase 6 Cross-Encoder reranking tests
 │   │   ├── test_retrieval.py              # Phase 4 FAISS index, top-k search, mapping, persistence tests
 │   │   ├── test_search.py                 # Phase 5 SearchService & API tests
 │   │   └── test_text_processing.py        # Phase 2 cleaning, chunking, and overlap tests
@@ -597,7 +641,123 @@ When `GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED=true` (default):
 
 ---
 
-## 9. Configuration Settings
+## 9. Citation & Provenance Mapping Layer (Phase 10)
+
+### The Core Architectural Principle
+> **"The generator generates the answer. The system assigns citations from verified evidence."**
+
+Generative language models (such as FLAN-T5) should never be tasked with inserting citation brackets or hallucinating book page numbers into generated text. In BookRAG AI:
+1. FLAN-T5 focuses solely on fluent semantic synthesis conditioned on retrieved context.
+2. The system decomposes the synthesized answer into claim propositions.
+3. Natural Language Inference (Phase 9) rigorously validates which exact book chunks entail each claim.
+4. **Phase 10 constructs deterministic, deduplicated citation objects exclusively from that verified evidence.**
+
+### End-to-End Pipeline
+```
+User Query
+    ↓
+SearchService (Dense FAISS Retrieval + Cross-Encoder Reranking)
+    ↓
+Evidence Chunks (Provenance: document_id, page_number, chunk_id, source_text)
+    ↓
+GenerationService (FLAN-T5 Abstractive Synthesis)
+    ↓
+Generated Answer
+    ↓
+Claim Decomposition (Sentence-Level Propositions)
+    ↓
+Grounding Validation (DeBERTa-v3 NLI Entailment / Contradiction Verification)
+    ↓
+Verified Claim → Evidence Mapping (Filtering for Entailed Passages)
+    ↓
+Citation Builder (Deduplication, Deterministic ID Assignment, Provenance Preservation)
+    ↓
+Final Grounded Answer + Citations (Structured Presentation-Independent Response)
+```
+
+### Why Citations Are Generated After Grounding
+In naive RAG systems, any chunk returned by vector search is displayed to the user as a "source" or "citation". This is fundamentally flawed:
+- **Retrieval is not Entailment**: A chunk may have high cosine similarity or high keyword overlap with the question, yet say nothing about the specific claim made in the generated answer, or even contradict it.
+- **Hallucinated Citations**: If the LLM generates an unsubstantiated claim, attaching a retrieved chunk creates the dangerous illusion of authority.
+- **Verified Grounding First**: Only evidence that has been evaluated by the NLI cross-encoder and verified to have entailment score $\ge \tau_e$ without contradiction is authorized to become a citation.
+
+### Why Retrieval Scores Are NOT Citations
+- `similarity_score`: Measures dense vector closeness in bi-encoder space.
+- `reranker_score`: Measures cross-encoder relevance to the query.
+
+Neither score evaluates whether the passage logically supports the specific claims synthesized by the generative model. Assigning citations based on retrieval ranks or proximity yields misleading provenance. Citations must represent **verified claim entailment**.
+
+### Provenance Retention
+Every `Citation` object preserves exact, unedited book metadata:
+- `citation_id`: Deterministic, response-local identifier (`cite_1`, `cite_2`, ...).
+- `document_id`: Target book identifier.
+- `chunk_id`: Durable chunk key (`{document_id}_p{page:03d}_c{index:04d}`).
+- `page_number`: 1-based book page number.
+- `chunk_index`: 0-based chunk index within the document.
+- `source_text`: The exact, unedited passage text from the book chunk. (Source text is never rewritten or summarized by the citation service).
+- Optional telemetry: `similarity_score`, `reranker_score`, and `evidence_rank`.
+
+### Claim-to-Evidence Mapping (Many-to-Many)
+BookRAG AI does not assume a simplistic 1-to-1 relationship between claims and sources:
+- **One claim supported by multiple chunks**: If a claim draws upon complementary evidence on different pages (e.g. Page 12 and Page 15), both are preserved in `claim.citations`.
+- **One chunk supporting multiple claims**: If a comprehensive passage supports multiple separate sentences across the answer, that chunk is referenced across multiple claims while sharing a single deduplicated citation object.
+
+### Deterministic Citation IDs & Global Deduplication
+- **Deterministic Numbering**: Citations are assigned sequential, response-local IDs based strictly on the order in which unique verified chunks first appear across the validated claims (`cite_1`, `cite_2`, `cite_3`, ...).
+- **Deduplication Key**: Deduplication is performed using the compound key `(document_id, chunk_id)`.
+- **Referential Integrity**: Every citation ID referenced in `claim.citations` or `claim.contradicting_citations` is guaranteed to exist in the top-level `citations` collection.
+
+### Handling Unsupported Claims
+If Phase 9 classifies a claim as `unsupported`:
+- The claim receives **zero** authoritative citations (`citations = []`).
+- Under strict safety policy (`require_all_claims_supported=true`), the overall answer is safely suppressed (`answer=null`, `grounded=false`, `grounding_status="unsupported"`), while diagnostic claim breakdown and evidence provenance are preserved for auditability.
+
+### Handling Contradictions and Conflicts
+When conflicting or contradicting statements exist in the source text:
+- **Contradicted claims**: Contradicting passages are preserved in `claim.contradicting_citations` with `relation="contradicts"`. The system **never** silently converts a contradicted chunk into a normal supporting citation.
+- **Conflicted claims**: When different book passages present opposing evidence (e.g. Page 12 supports while Page 30 contradicts), both are retained in the response:
+  ```text
+  Claim: "The company was founded in London in 2005."
+  ├── Page 12 (cite_1) → relation: "supports"
+  └── Page 30 (cite_2) → relation: "contradicts"
+  ```
+  This provides transparent auditing of internal contradictions within book manuscripts.
+
+### Document Isolation
+To ensure strict security and prevent cross-document citation pollution:
+- All evidence chunks in a response must belong to the single document specified in `request.document_id`.
+- If an evidence chunk has a mismatched `document_id` or inconsistent document IDs are detected, `CitationService` raises `DocumentIsolationError`.
+- The orchestration layer catches this violation, logs the error, and safely refuses the request (`grounded=false`, `citations=[]`, `reason="Document isolation error..."`).
+
+### Why Citation Rendering Belongs to the Frontend
+The backend provides structured, presentation-independent metadata:
+```json
+{
+  "answer": "Deep learning models are trained via gradient descent.",
+  "grounded": true,
+  "claims": [
+    {
+      "claim_index": 0,
+      "claim_text": "Deep learning models are trained via gradient descent.",
+      "grounding_status": "entailed",
+      "citations": [ { "citation_id": "cite_1" } ]
+    }
+  ],
+  "citations": [
+    {
+      "citation_id": "cite_1",
+      "page_number": 12,
+      "chunk_id": "doc_abc_p012_c0003",
+      "source_text": "Deep neural networks are typically optimized with gradient descent algorithms."
+    }
+  ]
+}
+```
+The backend intentionally does **not** hardcode Markdown citation syntax (e.g. `[Page 12]` or `[^1]`) into the answer text. This architectural separation allows frontend clients total flexibility to render interactive numeric chips `[1]`, tooltips, hovercards, page badges, or Matching Board links without parsing or modifying the generated answer string.
+
+---
+
+## 10. Configuration Settings
 
 | Parameter | Default | Constraint | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -628,7 +788,7 @@ When `GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED=true` (default):
 
 ---
 
-## 10. How to Run the Backend
+## 11. How to Run the Backend
 
 With the virtual environment activated:
 
@@ -643,7 +803,7 @@ Interactive API documentation:
 
 ---
 
-## 11. How to Run Tests
+## 12. How to Run Tests
 
 Run pytest from the `backend` directory:
 
@@ -652,7 +812,7 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **239 tests** will run, covering:
+All **255 tests** will run, covering:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
@@ -663,10 +823,11 @@ All **239 tests** will run, covering:
 - **Phase 7 (24 tests)**: RoBERTa SQuAD2 extractive QA, sliding window, answer span extraction, unanswerability thresholds.
 - **Phase 8 (23 tests)**: FLAN-T5 abstractive generation, EvidenceBuilder budgeting, prompt formatting, empty-evidence handling, beam search.
 - **Phase 9 (34 tests)**: NLI model wrapper, dynamic id2label mapping, sentence-level claim decomposition, pairwise NLI validation, threshold boundaries, safe refusal decision policy, end-to-end orchestration, and API endpoints.
+- **Phase 10 (16 tests)**: Citation object creation, deduplication by chunk ID, many-to-many claim references, unsupported claim handling, contradiction/conflict diagnostics, determinism, exact source text preservation, document isolation enforcement, response schema validation, and FastAPI endpoint verification.
 
 ---
 
-## 12. API Endpoints
+## 13. API Endpoints
 
 ### 1. Health Probe
 - **Method**: `GET`
@@ -687,7 +848,7 @@ All **239 tests** will run, covering:
 - **Path**: `/api/v1/answer`
 - **Request Body**: `{"query": "Explain how backpropagation computes gradients.", "top_k": 5}`
 
-### 5. Grounded Abstractive QA with Hallucination Control (Phase 9)
+### 5. Grounded Abstractive QA with Citations (Phase 9 & 10)
 - **Method**: `POST`
 - **Path**: `/api/v1/grounded-answer`
 - **Request Body**:
@@ -700,10 +861,58 @@ All **239 tests** will run, covering:
   "contradiction_threshold": 0.80
 }
 ```
+- **Example Grounded Response with Citations**:
+```json
+{
+  "query": "How does backpropagation compute gradients in deep networks?",
+  "answer": "Backpropagation computes gradient vectors through recursive application of the chain rule.",
+  "answerable": true,
+  "grounded": true,
+  "groundedness_score": 1.0,
+  "grounding_status": "grounded",
+  "claims": [
+    {
+      "claim_index": 0,
+      "claim_text": "Backpropagation computes gradient vectors through recursive application of the chain rule.",
+      "status": "entailed",
+      "grounding_status": "entailed",
+      "entailment_score": 0.95,
+      "contradiction_score": 0.01,
+      "neutral_score": 0.04,
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "deep_learning_handbook",
+          "chunk_id": "deep_learning_handbook_p012_c0003",
+          "page_number": 12,
+          "chunk_index": 3,
+          "relation": "supports"
+        }
+      ]
+    }
+  ],
+  "citations": [
+    {
+      "citation_id": "cite_1",
+      "document_id": "deep_learning_handbook",
+      "chunk_id": "deep_learning_handbook_p012_c0003",
+      "page_number": 12,
+      "chunk_index": 3,
+      "source_text": "Backpropagation computes gradient vectors of the loss function with respect to weights using recursive application of the chain rule.",
+      "similarity_score": 0.88,
+      "reranker_score": 0.94,
+      "evidence_rank": 1
+    }
+  ],
+  "reason": "All 1 claims are fully grounded in the retrieved book evidence.",
+  "model_name": "google/flan-t5-base",
+  "grounding_model_name": "cross-encoder/nli-deberta-v3-base"
+}
+```
 
 ---
 
-## 13. Future Roadmap
+## 14. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -717,7 +926,8 @@ All **239 tests** will run, covering:
 | **Phase 7** | Extractive Question Answering | **Complete** | RoBERTa SQuAD2 span extraction, sliding window, SQuAD 2.0 unanswerability, `POST /api/v1/qa`. |
 | **Phase 8** | Abstractive QA (Generation) | **Complete** | FLAN-T5 abstractive synthesis, EvidenceBuilder context budgeting, prompt grounding, `POST /api/v1/answer`. |
 | **Phase 9** | Groundedness & Evaluation | **Complete** | DeBERTa-v3 NLI model wrapper, dynamic id2label discovery, claim decomposition, safe decision policy, `POST /api/v1/grounded-answer`. |
-| **Phase 10** | Production Hardening & UI | Planned | React frontend, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+| **Phase 10** | Citation & Provenance Mapping | **Complete** | Deterministic citation IDs (`cite_1`), claim-evidence deduplication, many-to-many references, conflict diagnostics, document isolation. |
+| **Phase 11** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
 
 
 

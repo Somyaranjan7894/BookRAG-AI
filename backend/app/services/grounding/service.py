@@ -273,12 +273,18 @@ class GroundingService:
             # Find strongest contradiction
             best_contra_score = -1.0
             contra_evidence_list: List[ClaimEvidenceProvenance] = []
+            supporting_evidence_list: List[ClaimEvidenceProvenance] = []
 
             for ev_item, sc in evals:
                 if sc.entailment > best_ent_score:
                     best_ent_score = sc.entailment
                     best_ent_ev = ev_item.model_copy(update={"nli_score": round(sc.entailment, 4)})
                     best_ent_neutral = sc.neutral
+
+                if sc.entailment >= eff_ent_thresh:
+                    supporting_evidence_list.append(
+                        ev_item.model_copy(update={"nli_score": round(sc.entailment, 4)})
+                    )
 
                 if sc.contradiction > best_contra_score:
                     best_contra_score = sc.contradiction
@@ -319,6 +325,7 @@ class GroundingService:
                     contradiction_score=round(max(best_contra_score, 0.0), 4),
                     neutral_score=round(best_ent_neutral, 4),
                     supporting_evidence=supporting_evidence,
+                    supporting_evidences=supporting_evidence_list if has_entailment else [],
                     contradicting_evidence=contra_evidence_list,
                 )
             )

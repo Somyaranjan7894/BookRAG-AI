@@ -12,6 +12,8 @@ from typing import Optional
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.grounding import GroundedAnswerRequest, GroundedAnswerResponse, GroundingReport
+from app.services.citation.exceptions import DocumentIsolationError
+from app.services.citation.service import CitationService
 from app.services.generation.service import GenerationService
 from app.services.grounding.claims import ClaimDecomposer
 from app.services.grounding.exceptions import InvalidGroundingInputError
@@ -22,7 +24,7 @@ logger = get_logger(__name__)
 
 
 class GroundedAnswerService:
-    """Orchestrates retrieval, generation, claim decomposition, NLI validation, and safe decision policy."""
+    """Orchestrates retrieval, generation, claim decomposition, NLI validation, safe decision policy, and citation mapping."""
 
     def __init__(
         self,
@@ -30,12 +32,21 @@ class GroundedAnswerService:
         generation_service: Optional[GenerationService] = None,
         grounding_service: Optional[GroundingService] = None,
         claim_decomposer: Optional[ClaimDecomposer] = None,
+        citation_service: Optional[CitationService] = None,
     ) -> None:
         """Initialize GroundedAnswerService with injected or lazily resolved components."""
         self._search_service = search_service
         self._generation_service = generation_service
         self._grounding_service = grounding_service
         self._claim_decomposer = claim_decomposer
+        self._citation_service = citation_service
+
+    @property
+    def citation_service(self) -> CitationService:
+        """Return injected or default CitationService."""
+        if self._citation_service is None:
+            self._citation_service = CitationService()
+        return self._citation_service
 
     @property
     def search_service(self) -> SearchService:
@@ -78,9 +89,14 @@ class GroundedAnswerService:
         if not query:
             raise InvalidGroundingInputError("Question query cannot be empty or whitespace-only.")
 
-        model_name = getattr(self.generation_service.model, "model_name", settings.GENERATION_MODEL_NAME)
-        grounding_model_name = getattr(
-            self.grounding_service.model, "model_name", settings.GROUNDING_MODEL_NAME
+        gen_model = getattr(self.generation_service, "model", None)
+        raw_gen_name = getattr(gen_model, "model_name", None)
+        model_name = raw_gen_name if isinstance(raw_gen_name, str) else settings.GENERATION_MODEL_NAME
+
+        grounding_model = getattr(self.grounding_service, "model", None)
+        raw_grounding_name = getattr(grounding_model, "model_name", None)
+        grounding_model_name = (
+            raw_grounding_name if isinstance(raw_grounding_name, str) else settings.GROUNDING_MODEL_NAME
         )
 
         # 1. First & Second Stage Retrieval via SearchService
@@ -184,7 +200,31 @@ class GroundedAnswerService:
             top_k_evidence=request.top_k_evidence,
         )
 
-        # 5. Safe Decision Policy
+        # 5. Citation Mapping via CitationService (Phase 10)
+        try:
+            citation_result = self.citation_service.build_citations(
+                grounding_result=grounding_report,
+                expected_document_id=request.document_id,
+            )
+            citations = citation_result.citations
+        except DocumentIsolationError as exc:
+            logger.error("Document isolation violation during citation mapping: %s", exc)
+            return GroundedAnswerResponse(
+                query=query,
+                answer=None,
+                answerable=False,
+                grounded=False,
+                groundedness_score=0.0,
+                grounding_status="unsupported",
+                claims=grounding_report.claim_results,
+                evidence=gen_response.evidence,
+                citations=[],
+                reason=f"Document isolation error: {exc}",
+                model_name=model_name,
+                grounding_model_name=grounding_model_name,
+            )
+
+        # 6. Safe Decision Policy
         require_all = (
             request.require_all_claims_supported
             if request.require_all_claims_supported is not None
@@ -210,6 +250,7 @@ class GroundedAnswerService:
                     grounding_status="grounded",
                     claims=grounding_report.claim_results,
                     evidence=gen_response.evidence,
+                    citations=citations,
                     reason=grounding_report.reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
@@ -235,6 +276,7 @@ class GroundedAnswerService:
                     grounding_status=grounding_report.overall_status,
                     claims=grounding_report.claim_results,
                     evidence=gen_response.evidence,
+                    citations=citations,
                     reason=safe_reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
@@ -251,6 +293,7 @@ class GroundedAnswerService:
                 grounding_status=grounding_report.overall_status,
                 claims=grounding_report.claim_results,
                 evidence=gen_response.evidence,
+                citations=citations,
                 reason=grounding_report.reason,
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,

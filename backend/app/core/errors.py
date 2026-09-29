@@ -718,6 +718,54 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Late import of Citation exceptions
+    from app.services.citation.exceptions import (
+        CitationError,
+        DocumentIsolationError,
+        InvalidCitationInputError,
+    )
+
+    @app.exception_handler(InvalidCitationInputError)
+    async def invalid_citation_input_handler(request: Request, exc: InvalidCitationInputError) -> JSONResponse:
+        """Handle malformed citation input errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(DocumentIsolationError)
+    async def document_isolation_error_handler(request: Request, exc: DocumentIsolationError) -> JSONResponse:
+        """Handle document isolation violations."""
+        logger.warning("Document isolation violation on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(CitationError)
+    async def general_citation_error_handler(request: Request, exc: CitationError) -> JSONResponse:
+        """Handle general citation domain errors."""
+        logger.error("General citation error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""

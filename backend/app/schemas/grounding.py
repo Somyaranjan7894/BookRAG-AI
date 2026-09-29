@@ -12,6 +12,7 @@ It does NOT determine whether the book itself is objectively or factually true i
 from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from app.schemas.citation import Citation, ClaimCitationRef
 from app.schemas.generation import (
     DEFAULT_GENERATION_CANDIDATE_K,
     DEFAULT_GENERATION_TOP_K,
@@ -50,6 +51,10 @@ class ClaimResult(BaseModel):
     status: Literal["entailed", "contradicted", "unsupported", "conflicted"] = Field(
         description="Grounding status derived from NLI thresholds."
     )
+    grounding_status: Optional[str] = Field(
+        default=None,
+        description="Alias for status (entailed, contradicted, unsupported, conflicted).",
+    )
     entailment_score: float = Field(ge=0.0, le=1.0, description="Highest entailment probability across evidence")
     contradiction_score: float = Field(ge=0.0, le=1.0, description="Highest contradiction probability across evidence")
     neutral_score: float = Field(ge=0.0, le=1.0, description="Neutral score corresponding to strongest evidence")
@@ -57,10 +62,30 @@ class ClaimResult(BaseModel):
         default=None,
         description="Provenance of the evidence chunk with the strongest entailment score.",
     )
+    supporting_evidences: List[ClaimEvidenceProvenance] = Field(
+        default_factory=list,
+        description="Provenance of all evidence chunks with entailment above threshold.",
+    )
     contradicting_evidence: List[ClaimEvidenceProvenance] = Field(
         default_factory=list,
         description="Provenance of evidence chunks with strong contradiction scores.",
     )
+    citations: List[ClaimCitationRef] = Field(
+        default_factory=list,
+        description="Assigned verified citations supporting this claim.",
+    )
+    contradicting_citations: List[ClaimCitationRef] = Field(
+        default_factory=list,
+        description="Assigned verified citations contradicting this claim in conflict scenarios.",
+    )
+
+    @model_validator(mode="after")
+    def sync_grounding_status(self) -> "ClaimResult":
+        """Keep grounding_status and status synchronized."""
+        if self.grounding_status is None:
+            self.grounding_status = self.status
+        return self
+
 
 
 class GroundingReport(BaseModel):
@@ -242,6 +267,10 @@ class GroundedAnswerResponse(BaseModel):
     evidence: List[GenerationEvidenceItem] = Field(
         default_factory=list,
         description="Retrieved evidence chunks evaluated during generation and grounding.",
+    )
+    citations: List[Citation] = Field(
+        default_factory=list,
+        description="Unique citations referencing verified supporting book evidence.",
     )
     reason: Optional[str] = Field(
         default=None,
