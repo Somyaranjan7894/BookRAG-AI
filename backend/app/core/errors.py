@@ -626,9 +626,97 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Late import of Grounding exceptions
+    from app.services.grounding.exceptions import (
+        GroundingError,
+        InvalidGroundingConfigError,
+        InvalidGroundingInputError,
+        NLIInferenceError,
+        NLILabelMappingError,
+        NLIModelLoadError,
+    )
 
+    @app.exception_handler(InvalidGroundingInputError)
+    async def invalid_grounding_input_handler(request: Request, exc: InvalidGroundingInputError) -> JSONResponse:
+        """Handle malformed or empty grounding input errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
 
+    @app.exception_handler(InvalidGroundingConfigError)
+    async def invalid_grounding_config_handler(request: Request, exc: InvalidGroundingConfigError) -> JSONResponse:
+        """Handle out-of-bounds grounding configuration thresholds."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
 
+    @app.exception_handler(NLIModelLoadError)
+    async def nli_model_load_handler(request: Request, exc: NLIModelLoadError) -> JSONResponse:
+        """Handle CrossEncoder NLI model loading failures."""
+        logger.error("NLI model load error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "error": {
+                    "code": status.HTTP_503_SERVICE_UNAVAILABLE,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(NLILabelMappingError)
+    async def nli_label_mapping_handler(request: Request, exc: NLILabelMappingError) -> JSONResponse:
+        """Handle NLI label discovery failures."""
+        logger.error("NLI label mapping error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(NLIInferenceError)
+    async def nli_inference_handler(request: Request, exc: NLIInferenceError) -> JSONResponse:
+        """Handle NLI forward pass or batched inference failures."""
+        logger.error("NLI inference error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(GroundingError)
+    async def general_grounding_error_handler(request: Request, exc: GroundingError) -> JSONResponse:
+        """Handle general grounding domain errors."""
+        logger.error("General grounding error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
 
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:

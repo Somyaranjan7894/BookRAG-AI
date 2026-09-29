@@ -79,7 +79,15 @@ class Settings(BaseSettings):
 
 
 
-
+    # Groundedness & Hallucination Control (Phase 9)
+    GROUNDING_MODEL_NAME: str = "cross-encoder/nli-deberta-v3-base"
+    GROUNDING_ENABLED: bool = True
+    GROUNDING_DEVICE: str = "auto"
+    GROUNDING_ENTAILMENT_THRESHOLD: float = 0.80
+    GROUNDING_CONTRADICTION_THRESHOLD: float = 0.80
+    GROUNDING_TOP_K_EVIDENCE: int = 5
+    GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED: bool = True
+    GROUNDING_MIN_CLAIM_LENGTH: int = 3
 
     model_config = SettingsConfigDict(
         env_file=".env",

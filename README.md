@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 6 Complete
+## 4. Current Phase Scope: Phase 9 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, and **Phase 6 (Cross-Encoder Reranking)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, and **Phase 9 (Groundedness & Hallucination Control)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -117,17 +117,27 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Public API contract abstraction hiding internal FAISS vector positions (`vector_index`).
 - **Cross-Encoder Precision Reranking (Phase 6)**:
   - Two-stage retrieval pipeline: First-stage FAISS dense vector search retrieves a high-recall candidate pool (`candidate_k`, default 20); second-stage `CrossEncoder` (`cross-encoder/ms-marco-MiniLM-L-6-v2`) performs joint full-attention cross-scoring over `(query, passage)` pairs to select final high-precision results (`top_k`, default 5).
-  - Dedicated `RerankerService` and `RerankerModel` with single-load model lifecycle caching (instantiated once per service, never loaded inside HTTP request handlers).
-  - Preserves full retrieval provenance including `original_rank` (initial FAISS rank) alongside final `rank` (post-reranking rank).
-  - Strict 1-to-1 score-to-candidate alignment verification preventing score misalignment or silent truncation.
-  - Document isolation preserved end-to-end: reranker scores only candidates originating from the filtered document.
-  - Configurable execution: supports CPU and CUDA, batched forward-pass scoring under `torch.inference_mode()`, configurable candidate pool (`candidate_k >= top_k`), and optional toggling (`enable_reranking`).
-  - Complete automated test suite: **158 unit, validation, isolation, model inference, and real integration tests** passing with 100% success rate.
+  - Dedicated `RerankerService` and `RerankerModel` with single-load model lifecycle caching.
+  - Full provenance retention (`original_rank` alongside final `rank`).
+- **Extractive Question Answering (Phase 7)**:
+  - Extractive span-selection using `deepset/roberta-base-squad2`.
+  - Sliding-window passage scoring with stride tokenization and SQuAD 2.0 unanswerability handling.
+  - Public endpoint: `POST /api/v1/qa`.
+- **Abstractive QA / Generation with FLAN-T5 (Phase 8)**:
+  - Controlled abstractive answer synthesis using `google/flan-t5-base`.
+  - Token-budgeted context assembly via `EvidenceBuilder` with strict evidence-only instructions.
+  - Deterministic beam search generation without random sampling.
+  - Public endpoint: `POST /api/v1/answer`.
+- **Groundedness & Hallucination Control (Phase 9)**:
+  - Cross-Encoder NLI model wrapper using `cross-encoder/nli-deberta-v3-base` with dynamic `id2label` discovery.
+  - Deterministic `ClaimDecomposer` extracting sentence-level propositions with whitespace normalization.
+  - Batch NLI inference evaluating premise (evidence passage) vs hypothesis (generated claim).
+  - Four-state claim classification: `entailed`, `contradicted`, `unsupported`, and `conflicted`.
+  - Transparent provenance tracking of supporting and contradicting evidence chunks.
+  - Safe decision policy suppressing ungrounded or contradicted answers while preserving diagnostic claim breakdown and evidence provenance.
+  - Dedicated public endpoint: `POST /api/v1/grounded-answer`.
+  - Complete test suite: **239 unit, integration, and API tests** passing with 100% success rate.
 
-### Explicit Architectural Boundaries:
-- **Reranking $\neq$ Question Answering**: Phase 6 scores and re-ranks candidate passages based on joint semantic relevance. It does not synthesize answers, evaluate truthfulness, or generate citations.
-- **No LLM Generation or Prompt Assembly**: No FLAN-T5, OpenAI, or generative models.
-- **No Complex Databases or Distributed Queues**: No PostgreSQL, pgvector, Redis, or Celery.
 
 ---
 
@@ -504,7 +514,90 @@ Persisted vector indexes are stored as two co-located files:
 
 ---
 
-## 8. Configuration Settings
+---
+
+## 8. Groundedness & Hallucination Control (Phase 9)
+
+### The Purpose of Groundedness in BookRAG AI
+> **"The NLI validator checks whether generated claims are supported by retrieved book evidence. It is not a general-purpose factual truth detector."**
+
+A fundamental principle in technical RAG systems is distinguishing **groundedness** from **objective factual correctness**:
+- **Groundedness**: Does the claim logically follow from (is it entailed by) the specific text passages retrieved from the indexed book?
+- **Factual Correctness**: Is the statement an objective truth about the physical universe?
+
+BookRAG AI operates as a retrieval and question-answering assistant for **books**. The book's retrieved evidence is the source of truth for the system. The NLI model evaluates whether the generative model synthesized an answer strictly faithful to the book passages, or whether it extrapolated unsupported propositions (hallucination).
+
+### The Grounded Question Answering Pipeline
+```
+User Query
+    ↓
+SearchService (FAISS Dense Retrieval + Cross-Encoder Precision Reranking)
+    ↓
+Retrieved Evidence Passages
+    ↓
+GenerationService (FLAN-T5 Abstractive Synthesis)
+    ↓
+Raw Generated Answer
+    ↓
+ClaimDecomposer (Deterministic Sentence-Level Proposition Extraction)
+    ↓
+NLI Pair Construction (Premise = Evidence Passage, Hypothesis = Extracted Claim)
+    ↓
+NLIModel (cross-encoder/nli-deberta-v3-base Batched Forward Pass)
+    ↓
+Claim-Level Classification (Entailed / Contradicted / Conflicted / Unsupported)
+    ↓
+Safe Decision Policy (All claims supported? Contradictions present?)
+    ↓
+Safe Final Response (Grounded Answer OR Safe Refusal with Diagnostic Metadata)
+```
+
+### Natural Language Inference (NLI) Model
+We employ `cross-encoder/nli-deberta-v3-base` through `sentence_transformers.CrossEncoder`:
+- **Dynamic Label Discovery**: Rather than hardcoding class indices, the wrapper inspects `model.config.id2label` at load time to dynamically discover class mappings for:
+  - `entailment`: The evidence passage logically guarantees or strongly supports the claim.
+  - `contradiction`: The evidence passage directly refutes or is incompatible with the claim.
+  - `neutral`: The evidence passage provides insufficient information to confirm or deny the claim.
+- **Inference Mode & Caching**: Models are loaded once per process using thread-safe singleton caching under `torch.inference_mode()`.
+
+### Deterministic Claim Decomposition
+Before validation, generated answers are split into verifiable claim propositions using `ClaimDecomposer`:
+- Splits text along sentence boundaries (`[.!?]\s+`).
+- Normalizes whitespace (collapsing tabs, internal newlines, and multi-spaces).
+- Filters out empty fragments and fragments shorter than `GROUNDING_MIN_CLAIM_LENGTH` (default: 3 characters).
+- Assigns deterministic 0-based claim indices (`claim_index`).
+- **Known Limitations**: Sentence splitting is a deterministic heuristic. Compound sentences containing multiple independent clauses are evaluated as a single claim unit.
+
+### Claim-Level Classification Logic
+For each extracted claim $c$ and top retrieved evidence chunks $E = \{e_1, \dots, e_K\}$:
+1. Every `(e_i.source_text, c.claim_text)` pair is evaluated in batched NLI inference.
+2. The strongest entailment score $e_{\max}$ and strongest contradiction score $c_{\max}$ across all evidence passages are identified along with source provenance.
+3. Decision criteria using thresholds $\tau_e$ (`GROUNDING_ENTAILMENT_THRESHOLD=0.80`) and $\tau_c$ (`GROUNDING_CONTRADICTION_THRESHOLD=0.80`):
+   - **`entailed`**: $e_{\max} \ge \tau_e$ AND $c_{\max} < \tau_c$.
+   - **`contradicted`**: $c_{\max} \ge \tau_c$ AND $e_{\max} < \tau_e$.
+   - **`conflicted`**: $e_{\max} \ge \tau_e$ AND $c_{\max} \ge \tau_c$ (different book passages present contradictory statements).
+   - **`unsupported`**: $e_{\max} < \tau_e$ AND $c_{\max} < \tau_c$ (evidence is neutral or weakly related).
+
+### Groundedness Score & Safe Decision Policy
+The overall groundedness score is computed as:
+$$\text{groundedness\_score} = \frac{\text{supported\_claims}}{\text{total\_claims}}$$
+*(If no substantive claims exist, total claims is 0 and groundedness score is explicitly 0.0 with status `empty`).*
+
+When `GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED=true` (default):
+- An answer is accepted **only** when all substantive claims are sufficiently supported (`supported_claims == total_claims`) and there are zero contradicted or conflicted claims.
+- **Safe Refusal Behavior**: If any claim is unsupported, contradicted, or conflicted, the answer is safely refused:
+  - `answer = null`
+  - `answerable = false`
+  - `grounded = false`
+  - `groundedness_score`: accurately reflects partial support (e.g. 0.5)
+  - `grounding_status`: `"unsupported"`, `"contradicted"`, or `"conflicted"`
+  - `claims`: detailed claim breakdown with provenance
+  - `evidence`: complete source evidence passages with provenance
+  - `reason`: clear explanation (e.g., *"The generated answer contains claims that are not sufficiently supported by the retrieved book evidence."*)
+
+---
+
+## 9. Configuration Settings
 
 | Parameter | Default | Constraint | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -515,10 +608,27 @@ Persisted vector indexes are stored as two co-located files:
 | `RETRIEVAL_DEFAULT_TOP_K` | `5` | `gt=0` | Default number of candidate chunks returned per query. |
 | `RETRIEVAL_MAX_TOP_K` | `100` | `gt=0` | Maximum allowable top_k limit for search queries. |
 | `INDEX_STORAGE_DIR` | `"data/indexes"` | Directory path | Local filesystem directory for saving/loading FAISS indexes. |
+| `RERANKER_MODEL_NAME` | `cross-encoder/ms-marco-MiniLM-L-6-v2` | Valid HF model ID | Cross-Encoder reranker repository identifier. |
+| `RERANKER_MAX_LENGTH` | `512` | `gt=0` | Maximum sequence length for reranker joint transformer. |
+| `RERANKER_ENABLED` | `True` | boolean | Enables or disables Phase 6 Cross-Encoder reranking. |
+| `QA_MODEL_NAME` | `deepset/roberta-base-squad2` | Valid HF model ID | Extractive QA span selection model. |
+| `QA_TOP_K_EVIDENCE` | `5` | `gt=0` | Number of top reranked chunks evaluated by extractive QA. |
+| `GENERATION_MODEL_NAME` | `google/flan-t5-base` | Valid HF model ID | Abstractive Seq2Seq generation model. |
+| `GENERATION_MAX_INPUT_TOKENS` | `2048` | `gt=0` | Prompt token budget limit for context assembly. |
+| `GENERATION_MAX_NEW_TOKENS` | `128` | `gt=0` | Maximum generated tokens for abstractive answer. |
+| `GENERATION_NUM_BEAMS` | `4` | `gt=0` | Beam search width for deterministic generation. |
+| `GROUNDING_MODEL_NAME` | `cross-encoder/nli-deberta-v3-base` | Valid HF model ID | NLI CrossEncoder model for premise-hypothesis scoring. |
+| `GROUNDING_ENABLED` | `True` | boolean | Globally enables or disables NLI groundedness validation. |
+| `GROUNDING_DEVICE` | `"auto"` | `"auto"`, `"cpu"`, `"cuda"` | Execution device for NLI inference. |
+| `GROUNDING_ENTAILMENT_THRESHOLD` | `0.80` | `0.0 <= x <= 1.0` | Minimum entailment probability to consider a claim supported. |
+| `GROUNDING_CONTRADICTION_THRESHOLD` | `0.80` | `0.0 <= x <= 1.0` | Minimum contradiction probability to flag a contradiction. |
+| `GROUNDING_TOP_K_EVIDENCE` | `5` | `gt=0` | Number of top evidence passages evaluated per claim. |
+| `GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED` | `True` | boolean | Enforces strict safe refusal if any claim is ungrounded. |
+| `GROUNDING_MIN_CLAIM_LENGTH` | `3` | `gt=0` | Minimum character length for extracted claim sentences. |
 
 ---
 
-## 9. How to Run the Backend
+## 10. How to Run the Backend
 
 With the virtual environment activated:
 
@@ -533,7 +643,7 @@ Interactive API documentation:
 
 ---
 
-## 10. How to Run Tests
+## 11. How to Run Tests
 
 Run pytest from the `backend` directory:
 
@@ -542,87 +652,58 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **91 tests** will run, covering:
+All **239 tests** will run, covering:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
 - **Phase 3 (20 tests)**: Model loading, 384-dimensional output verification, batch inference order preservation, numerical $L_2$ unit normalization ($\|v\| \approx 1.0$), provenance survival, chunk immutability, determinism.
-- **Phase 4 (23 tests)**:
-  - FAISS `IndexFlatIP` initialization with 384 dimensions.
-  - Index creation, vector insertion, and slot count synchronization.
-  - Incremental batch vector addition with contiguous slot mapping.
-  - Semantic query search and rank-1 relevance verification.
-  - Top-K boundaries (`top_k=1`, `top_k=3`, `top_k > ntotal`).
-  - Strict provenance retention (`chunk_id`, `document_id`, `page_number`, `text`).
-  - Dimension mismatch rejection on vector addition and query search.
-  - Controlled empty index behavior (returns `[]` without error).
-  - Unregistered index handling (`IndexNotFoundError`).
-  - Document isolation and filtering across multi-document corpuses.
-  - Disk persistence (`.faiss` + `.json`) and reload verification.
-  - Corrupted metadata and vector count mismatch detection.
-  - Determinism across repeated queries.
-  - Query input validation (rejects empty / whitespace-only queries).
-  - API development endpoints (`POST /api/v1/retrieval/index` and `POST /api/v1/retrieval/search`).
+- **Phase 4 (23 tests)**: FAISS IndexFlatIP initialization, slot count synchronization, top-K boundaries, dimension validation, disk persistence and reload.
+- **Phase 5 (18 tests)**: SearchService orchestration, query validation, top_k overrides, document filtering, HTTP 404 handling.
+- **Phase 6 (49 tests)**: CrossEncoder model loading, device resolution, candidate pool scoring, provenance retention, rank synchronization.
+- **Phase 7 (24 tests)**: RoBERTa SQuAD2 extractive QA, sliding window, answer span extraction, unanswerability thresholds.
+- **Phase 8 (23 tests)**: FLAN-T5 abstractive generation, EvidenceBuilder budgeting, prompt formatting, empty-evidence handling, beam search.
+- **Phase 9 (34 tests)**: NLI model wrapper, dynamic id2label mapping, sentence-level claim decomposition, pairwise NLI validation, threshold boundaries, safe refusal decision policy, end-to-end orchestration, and API endpoints.
 
 ---
 
-## 11. API Endpoints
+## 12. API Endpoints
 
 ### 1. Health Probe
 - **Method**: `GET`
 - **Path**: `/api/v1/health`
 
-### 2. Document Ingestion (Development / Testing)
+### 2. Semantic Search (Two-Stage Retrieval)
 - **Method**: `POST`
-- **Path**: `/api/v1/documents/ingest`
-- **Request Body**: `{"file_path": "path/to/book.pdf"}`
+- **Path**: `/api/v1/search`
+- **Request Body**: `{"query": "What is backpropagation?", "top_k": 5, "enable_reranking": true}`
 
-### 3. Text Cleaning (Development / Testing)
+### 3. Extractive Question Answering
 - **Method**: `POST`
-- **Path**: `/api/v1/chunks/clean`
-- **Request Body**: `{"text": "Raw text with intel-\nligence."}`
+- **Path**: `/api/v1/qa`
+- **Request Body**: `{"query": "Who popularized backpropagation?", "top_k": 5}`
 
-### 4. Page Chunking (Development / Testing)
+### 4. Abstractive Question Answering (FLAN-T5)
 - **Method**: `POST`
-- **Path**: `/api/v1/chunks/chunk-page`
-- **Request Body**: `{"document_id": "b1", "page_number": 1, "text": "Text..."}`
+- **Path**: `/api/v1/answer`
+- **Request Body**: `{"query": "Explain how backpropagation computes gradients.", "top_k": 5}`
 
-### 5. Single Chunk Embedding (Development / Testing)
+### 5. Grounded Abstractive QA with Hallucination Control (Phase 9)
 - **Method**: `POST`
-- **Path**: `/api/v1/embeddings/embed-chunk`
-- **Request Body**: `{"chunk_id": "doc_001_p001_c0001", "document_id": "doc_001", "page_number": 1, "text": "Text..."}`
-
-### 6. Batch Chunk Embedding (Development / Testing)
-- **Method**: `POST`
-- **Path**: `/api/v1/embeddings/embed-chunks`
-
-### 7. Vector Indexing (Development / Testing)
-- **Method**: `POST`
-- **Path**: `/api/v1/retrieval/index`
+- **Path**: `/api/v1/grounded-answer`
 - **Request Body**:
 ```json
 {
-  "index_id": "book_intro_index",
-  "document_id": "doc_ai",
-  "records": [...]
-}
-```
-
-### 8. Semantic Vector Search (Development / Testing)
-- **Method**: `POST`
-- **Path**: `/api/v1/retrieval/search`
-- **Request Body**:
-```json
-{
-  "query": "How do deep neural networks learn hierarchical representations?",
+  "query": "How does backpropagation compute gradients in deep networks?",
   "top_k": 5,
-  "document_id": "doc_ai"
+  "require_all_claims_supported": true,
+  "entailment_threshold": 0.80,
+  "contradiction_threshold": 0.80
 }
 ```
 
 ---
 
-## 12. Future Roadmap
+## 13. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -635,7 +716,8 @@ All **91 tests** will run, covering:
 | **Phase 6** | Cross-Encoder Reranking | **Complete** | Precision reranker (`ms-marco-MiniLM-L-6-v2`), two-stage retrieval, candidate_k pool. |
 | **Phase 7** | Extractive Question Answering | **Complete** | RoBERTa SQuAD2 span extraction, sliding window, SQuAD 2.0 unanswerability, `POST /api/v1/qa`. |
 | **Phase 8** | Abstractive QA (Generation) | **Complete** | FLAN-T5 abstractive synthesis, EvidenceBuilder context budgeting, prompt grounding, `POST /api/v1/answer`. |
-| **Phase 9** | Groundedness & Evaluation | Planned | NLI-based groundedness validation, hallucination detection, RAG benchmark metrics. |
+| **Phase 9** | Groundedness & Evaluation | **Complete** | DeBERTa-v3 NLI model wrapper, dynamic id2label discovery, claim decomposition, safe decision policy, `POST /api/v1/grounded-answer`. |
 | **Phase 10** | Production Hardening & UI | Planned | React frontend, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+
 
 

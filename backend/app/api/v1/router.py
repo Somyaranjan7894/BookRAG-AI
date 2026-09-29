@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     documents,
     embeddings,
     generation,
+    grounded_answer,
     health,
     qa,
     retrieval,
@@ -22,6 +23,7 @@ api_router.include_router(retrieval.router)
 api_router.include_router(search.router)
 api_router.include_router(qa.router)
 api_router.include_router(generation.router)
+api_router.include_router(grounded_answer.router)
 
 
 
