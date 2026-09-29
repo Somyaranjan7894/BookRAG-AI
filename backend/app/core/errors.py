@@ -418,6 +418,111 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    from app.services.qa.exceptions import (
+        InvalidAnswerSpanError,
+        InvalidQAConfigError,
+        InvalidQAEvidenceError,
+        InvalidQAQueryError,
+        QAError,
+        QAInferenceError,
+        QAModelLoadError,
+    )
+
+    @app.exception_handler(InvalidQAQueryError)
+    async def invalid_qa_query_handler(request: Request, exc: InvalidQAQueryError) -> JSONResponse:
+        """Handle invalid or empty question errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidQAEvidenceError)
+    async def invalid_qa_evidence_handler(request: Request, exc: InvalidQAEvidenceError) -> JSONResponse:
+        """Handle malformed QA evidence candidates."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidAnswerSpanError)
+    async def invalid_answer_span_handler(request: Request, exc: InvalidAnswerSpanError) -> JSONResponse:
+        """Handle invalid answer span constraints."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidQAConfigError)
+    async def invalid_qa_config_handler(request: Request, exc: InvalidQAConfigError) -> JSONResponse:
+        """Handle invalid QA configuration errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(QAModelLoadError)
+    async def qa_model_load_handler(request: Request, exc: QAModelLoadError) -> JSONResponse:
+        """Handle QA model loading failures."""
+        logger.error("QA model load error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "error": {
+                    "code": status.HTTP_503_SERVICE_UNAVAILABLE,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(QAInferenceError)
+    async def qa_inference_handler(request: Request, exc: QAInferenceError) -> JSONResponse:
+        """Handle QA inference or sliding window execution errors."""
+        logger.error("QA inference error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(QAError)
+    async def general_qa_error_handler(request: Request, exc: QAError) -> JSONResponse:
+        """Handle general Question Answering domain errors."""
+        logger.error("General QA error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+
 
 
     @app.exception_handler(Exception)

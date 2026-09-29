@@ -194,7 +194,66 @@ This allows every query token to attend to every document token across all trans
 
 ---
 
-## 6. Technology Stack
+## 6. Extractive Question Answering (Phase 7)
+
+Phase 7 introduces an extractive Question Answering layer on top of the two-stage retrieval pipeline. Rather than generating or hallucinating synthetic text, the system extracts the exact token span from the retrieved book evidence that answers the user's question.
+
+### Architectural Pipeline
+
+```
+User Query
+    │
+    ▼
+EmbeddingService (Bi-Encoder: all-MiniLM-L6-v2)
+    │  Generates 384-d normalized query vector
+    ▼
+FAISS Dense Retrieval (Stage 1: High Recall)
+    │  Retrieves candidate_k candidate chunks (default: 20)
+    ▼
+Cross-Encoder Reranker (Stage 2: High Precision)
+    │  Joint query-passage transformer scoring (ms-marco-MiniLM-L-6-v2)
+    ▼
+Top Evidence Selection (Top-N Chunks)
+    │  Passes top_k reranked evidence chunks to QA service
+    ▼
+Extractive QA Service (Stage 3: Span Extraction)
+    │  Hugging Face AutoModelForQuestionAnswering (deepset/roberta-base-squad2)
+    │  Sliding-window tokenization with overflow stride (512 max_length, 128 stride)
+    │  SQuAD 2.0 unanswerable thresholding (score_diff > threshold)
+    ▼
+Best Answer Span with Complete Provenance
+    ├── answer: "1998"
+    ├── answer_start / answer_end character offsets in source chunk text
+    ├── chunk_id, document_id, page_number, chunk_index
+    └── similarity_score, reranker_score, qa_score
+```
+
+### Why Extractive QA with RoBERTa SQuAD2?
+- **Factual Integrity**: Extractive QA copies text spans directly from the source book; it cannot hallucinate non-existent facts, make up dates, or invent citations.
+- **The Evidence is the Truth**: The book is the authoritative ground truth. If the book does not contain the answer, the system explicitly reports the question as unanswerable.
+- **SQuAD 2.0 Unanswerability**: `deepset/roberta-base-squad2` is fine-tuned on SQuAD 2.0, which includes negative (unanswerable) questions. Token 0 (`<s>`) represents the null/no-answer token with score `start_logits[0] + end_logits[0]`.
+
+### Sliding-Window Overflow Handling
+Books contain long context passages that frequently exceed a transformer's maximum token limit (512 tokens). Rather than truncating away critical evidence:
+1. Long passages are split into overlapping context windows using `stride=128`.
+2. Offset mappings and `sequence_ids` ensure answer spans are selected exclusively from context tokens (`sequence_id == 1`), never special tokens or question tokens.
+3. Candidate spans are evaluated across all sliding windows of all evidence chunks.
+4. Token start and end indices are converted back to exact character offsets (`answer_start`, `answer_end`) in the original uncompressed source text.
+
+### Unified Score Semantics
+
+| Metric | Origin | Meaning | What It Does NOT Mean |
+| :--- | :--- | :--- | :--- |
+| `similarity_score` | Bi-Encoder (Stage 1) | Cosine similarity in dense vector space | NOT probability, NOT factual truth |
+| `reranker_score` | Cross-Encoder (Stage 2) | Joint transformer relevance logit | NOT confidence, NOT factual correctness |
+| `qa_score` | RoBERTa SQuAD2 (Stage 3) | Extractive span logit ($s_{\text{start}} + s_{\text{end}}$) | NOT answer accuracy, NOT confidence % |
+| `no_answer_score` | RoBERTa SQuAD2 (Stage 3) | Logit for the null/unanswerable token ($s_0$) | NOT probability of non-existence |
+
+> **IMPORTANT PRINCIPLE**: None of these scores represents factual correctness, answer confidence, or hallucination metrics. The retrieved passage is the sole source of truth; the QA model simply identifies which span within the retrieved evidence best matches the query.
+
+---
+
+## 7. Technology Stack
 
 ### Backend (Current Phase 6):
 - **Language**: Python 3.11+ (Tested on Python 3.13.7)
@@ -489,8 +548,10 @@ All **91 tests** will run, covering:
 | **Phase 2** | Text Cleaning & Chunking | **Complete** | Conservative text cleaning, dehyphenation, paragraph/sentence-aware chunking, provenance. |
 | **Phase 3** | Semantic Embeddings | **Complete** | Sentence Transformers, all-MiniLM-L6-v2, 384d vectors, L2 normalization, batch inference. |
 | **Phase 4** | Vector Retrieval (FAISS) | **Complete** | IndexFlatIP, VectorToChunkMapping, top-K search, document isolation, disk persistence. |
-| **Phase 5** | Extractive QA | Planned | Span extraction, page-level citation mapping. |
-| **Phase 6** | Abstractive QA | Planned | Synthesis, groundedness verification, hallucination checks. |
-| **Phase 7** | Question Generation | Planned | User-controlled question synthesis across chapters and difficulty levels. |
-| **Phase 8** | Web UI & Evaluation | Planned | React + Vite UI, Relevant Matching Board, RAG benchmark metrics. |
-| **Phase 9** | Production Hardening | Planned | PostgreSQL + pgvector, Redis task queues, Docker Compose deployment. |
+| **Phase 5** | Semantic Search API | **Complete** | SearchService, Pydantic contracts, thin FastAPI endpoint `POST /api/v1/search`. |
+| **Phase 6** | Cross-Encoder Reranking | **Complete** | Precision reranker (`ms-marco-MiniLM-L-6-v2`), two-stage retrieval, candidate_k pool. |
+| **Phase 7** | Extractive Question Answering | **Complete** | RoBERTa SQuAD2 span extraction, sliding window, SQuAD 2.0 unanswerability, `POST /api/v1/qa`. |
+| **Phase 8** | Generative QA | Planned | FLAN-T5 abstractive synthesis, groundedness validation, hallucination checks. |
+| **Phase 9** | Question Generation & Eval | Planned | Chapter question generation, RAG benchmark metrics, Relevant Matching Board. |
+| **Phase 10** | Production Hardening & UI | Planned | React frontend, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+

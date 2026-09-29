@@ -55,6 +55,18 @@ class Settings(BaseSettings):
     RERANKER_ENABLED: bool = True
     RETRIEVAL_CANDIDATE_K: int = 20
 
+    # Extractive Question Answering (Phase 7)
+    QA_MODEL_NAME: str = "deepset/roberta-base-squad2"
+    QA_MAX_LENGTH: int = 512
+    QA_DOC_STRIDE: int = 128
+    QA_MAX_ANSWER_LENGTH: int = 64
+    QA_TOP_K_EVIDENCE: int = 5
+    QA_N_BEST_SIZE: int = 20
+    QA_ENABLED: bool = True
+    QA_DEVICE: str = "auto"
+    QA_NO_ANSWER_THRESHOLD: float = 0.0
+
+
 
 
     model_config = SettingsConfigDict(
