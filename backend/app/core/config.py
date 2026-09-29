@@ -6,6 +6,7 @@ and pydantic-settings.
 
 from functools import lru_cache
 from typing import Literal
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -97,6 +98,21 @@ class Settings(BaseSettings):
     QUESTION_GEN_NUM_BEAMS: int = 2
     QUESTION_GEN_CANDIDATE_MULTIPLIER: int = 3
     QUESTION_GEN_QA_THRESHOLD: float = 0.20
+
+    # Phase 13: PostgreSQL Persistent Application Data
+    DATABASE_URL: str = "postgresql+psycopg://postgres@localhost:5433/bookrag"
+    DB_ECHO: bool = False
+    DB_POOL_SIZE: int = 5
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_TIMEOUT: float = 30.0
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def normalize_database_url(cls, v: str) -> str:
+        """Normalize standard postgresql:// scheme to SQLAlchemy psycopg3 format."""
+        if isinstance(v, str) and v.startswith("postgresql://"):
+            return "postgresql+psycopg://" + v[len("postgresql://"):]
+        return v
 
     model_config = SettingsConfigDict(
         env_file=".env",

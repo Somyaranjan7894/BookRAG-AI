@@ -13,21 +13,21 @@
 # ==============================================================================
 
 version: "3.8"
-
 services:
-  # Placeholder for future containerized backend service
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile # To be created in future infrastructure phase
-    container_name: bookrag_backend
-    ports:
-      - "8000:8000"
+  # PostgreSQL persistent system of record (Phase 13)
+  db:
+    image: postgres:16-alpine
+    container_name: bookrag_postgres
+    restart: unless-stopped
     environment:
-      - ENVIRONMENT=development
-      - LOG_LEVEL=INFO
+      POSTGRES_USER: bookrag
+      POSTGRES_PASSWORD: bookrag_password
+      POSTGRES_DB: bookrag
+    ports:
+      - "5432:5432"
     volumes:
-      - ./backend:/app
-      - ./data:/app/data
-    profiles:
-      - future-infrastructure # Prevents automatic startup during Phase 0
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+

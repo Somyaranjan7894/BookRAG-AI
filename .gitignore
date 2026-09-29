@@ -60,6 +60,8 @@ logs/
 !/data/processed/.gitkeep
 /data/indexes/*
 !/data/indexes/.gitkeep
+/data/postgres/*
+!/data/postgres/.gitkeep
 *.pdf
 
 

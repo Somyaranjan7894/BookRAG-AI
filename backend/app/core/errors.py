@@ -820,6 +820,84 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Phase 13: Persistence Exception Handlers
+    from app.services.persistence.exceptions import (
+        ConstraintViolationError,
+        DocumentAlreadyExistsError,
+        DocumentNotFoundError,
+        PersistenceError,
+        ReferentialIntegrityError,
+    )
+
+    @app.exception_handler(DocumentNotFoundError)
+    async def document_not_found_handler(request: Request, exc: DocumentNotFoundError) -> JSONResponse:
+        logger.warning("Document not found: %s", exc)
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "code": status.HTTP_404_NOT_FOUND,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+        )
+
+    @app.exception_handler(DocumentAlreadyExistsError)
+    async def document_already_exists_handler(request: Request, exc: DocumentAlreadyExistsError) -> JSONResponse:
+        logger.warning("Document already exists: %s", exc)
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content={
+                "error": {
+                    "code": status.HTTP_409_CONFLICT,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+        )
+
+    @app.exception_handler(ConstraintViolationError)
+    async def constraint_violation_handler(request: Request, exc: ConstraintViolationError) -> JSONResponse:
+        logger.warning("Database constraint violation on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+        )
+
+    @app.exception_handler(ReferentialIntegrityError)
+    async def referential_integrity_handler(request: Request, exc: ReferentialIntegrityError) -> JSONResponse:
+        logger.warning("Database referential integrity violation on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+        )
+
+    @app.exception_handler(PersistenceError)
+    async def general_persistence_error_handler(request: Request, exc: PersistenceError) -> JSONResponse:
+        logger.error("Persistence error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""

@@ -1,4 +1,12 @@
-"""Database and domain models module.
+"""SQLAlchemy ORM models package for BookRAG AI persistent storage."""
 
-Intentionally reserved for future phases (document entities, chunk metadata, vector models).
-"""
+from app.models.chunk import Chunk
+from app.models.document import Document, DocumentStatus
+from app.models.page import Page
+
+__all__ = [
+    "Chunk",
+    "Document",
+    "DocumentStatus",
+    "Page",
+]

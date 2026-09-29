@@ -165,9 +165,17 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Heuristic difficulty classification (`EASY`, `MEDIUM`, `HARD`).
   - Normalized exact duplicate detection within requests and across candidates.
   - Controlled count limits without fabrication: never fabricates questions if candidate pool is insufficient.
-  - Complete source provenance (`document_id`, `chunk_id`, `page_number`, `source_text`, `answer`).
   - Dedicated public endpoint: `POST /api/v1/questions/generate`.
-  - Full test suite: **334 unit, integration, and regression tests** passing with 100% success rate.
+- **PostgreSQL Persistent Application Data (Phase 13)**:
+  - PostgreSQL persistent system of record for book documents, pages, chunks, metadata, and relational hierarchy.
+  - Strict architectural separation: PostgreSQL stores document structure, text, and metadata, while FAISS remains the dedicated high-performance vector retrieval index. (Embeddings are intentionally NOT stored in DB until Phase 14 pgvector).
+  - SQLAlchemy 2.x declarative models (`Document`, `Page`, `Chunk`) with deterministic IDs, explicit referential foreign keys (`ondelete="CASCADE"`), unique constraints (`uq_pages_document_page_number`, `uq_chunks_document_page_chunk`), and check constraints.
+  - Dedicated repository pattern isolation (`DocumentRepository`, `PageRepository`, `ChunkRepository`) preventing raw SQL and database logic from leaking into domain/ML services.
+  - `DocumentPersistenceService` orchestrating atomic transactions with strict status lifecycle (`processing -> processed`), automatic rollback on failure, and zero partial/dirty state.
+  - Reproducible Alembic migration workflow (`alembic upgrade head`, `alembic downgrade base`) managing schema versioning independently of application startup.
+  - Public endpoints: `POST /api/v1/documents/ingest` (with transactional DB persistence), `GET /api/v1/documents`, `GET /api/v1/documents/{id}`, `GET /api/v1/documents/{id}/pages`, `GET /api/v1/documents/{id}/chunks`, and `DELETE /api/v1/documents/{id}`.
+  - Full test suite: **352 unit, integration, and regression tests** passing with 100% success rate.
+
 
 
 ---
@@ -1112,7 +1120,138 @@ All **334 tests** will run, covering:
 
 ---
 
-## 16. Future Roadmap
+## 16. PostgreSQL Persistent Application Data (Phase 13)
+
+### Purpose & Architectural Separation
+In Phase 13, PostgreSQL is established as the **persistent system of record** for BookRAG AI, holding all ingested documents, extracted pages, chunk metadata, and text content.
+
+FAISS remains the dedicated high-performance vector retrieval index. Vector embeddings are intentionally **NOT stored in PostgreSQL yet**—that capability is deliberately deferred to **Phase 14 (pgvector)**.
+
+```
+PDF storage
+    │
+    ▼
+Document/Page/Chunk processing
+    │
+    ▼
+PostgreSQL (System of Record)
+    │
+    └──── metadata + text
+
+Embeddings (384d MiniLM-L6-v2)
+    │
+    ▼
+FAISS (current vector backend)
+```
+
+### Dependency & Domain Layering Principle
+Database access adheres strictly to clean unidirectional dependencies:
+```
+API (FastAPI Endpoints)
+  ↓
+Application / Domain Service (DocumentPersistenceService, PDFIngestionService)
+  ↓
+Repository Interface / Layer (DocumentRepository, PageRepository, ChunkRepository)
+  ↓
+ORM (SQLAlchemy 2.x Declarative Models)
+  ↓
+PostgreSQL 16 / 18
+```
+Raw SQL and database queries are strictly prohibited inside machine learning, chunking, retrieval, reranking, and QA services.
+
+### Database Schema Overview
+
+```mermaid
+erDiagram
+    DOCUMENTS ||--o{ PAGES : "has (1:N, cascade delete)"
+    DOCUMENTS ||--o{ CHUNKS : "has (1:N, cascade delete)"
+    PAGES ||--o{ CHUNKS : "contains (1:N, cascade delete)"
+
+    DOCUMENTS {
+        string document_id PK "SHA-256 derived deterministic ID"
+        string filename "Source PDF filename"
+        string title "Optional book title"
+        string author "Optional author"
+        integer page_count "Total pages"
+        string status "uploaded | processing | processed | failed"
+        datetime created_at "Creation timestamp"
+        datetime updated_at "Update timestamp"
+    }
+
+    PAGES {
+        string page_id PK "{doc_id}_p{page_number}"
+        string document_id FK "References documents.document_id"
+        integer page_number "1-indexed page number (>= 1)"
+        text text "Raw extracted page text"
+        integer char_count "Character length"
+        integer word_count "Word count"
+        datetime created_at "Persistence timestamp"
+    }
+
+    CHUNKS {
+        string chunk_id PK "Phase 2 deterministic chunk ID"
+        string document_id FK "References documents.document_id"
+        string page_id FK "References pages.page_id"
+        integer page_number "1-indexed page number (>= 1)"
+        integer chunk_index "0-indexed sequence position (>= 0)"
+        text text "Cleaned chunk text content"
+        integer char_count "Character count"
+        integer word_count "Word count"
+        datetime created_at "Persistence timestamp"
+    }
+```
+
+#### Constraints & Indexes
+* **Foreign Keys**: `pages.document_id` and `chunks.document_id` / `chunks.page_id` with deliberate `ON DELETE CASCADE`.
+* **Unique Constraints**:
+  - `uq_pages_document_page_number`: Prevents duplicate page numbers within a document.
+  - `uq_chunks_document_page_chunk`: Prevents duplicate chunk indices within a document page.
+* **Check Constraints**:
+  - `ck_pages_page_number_positive`: `page_number >= 1`
+  - `ck_chunks_page_number_positive`: `page_number >= 1`
+  - `ck_chunks_chunk_index_non_negative`: `chunk_index >= 0`
+* **Performance Indexes**:
+  - `ix_documents_document_id`, `ix_documents_status`
+  - `ix_pages_document_id`, `ix_pages_document_id_page_number`
+  - `ix_chunks_document_id`, `ix_chunks_page_id`, `ix_chunks_document_page`, `ix_chunks_doc_page_idx`
+
+### Transactional Persistence & Rollback Guarantees
+The `DocumentPersistenceService` wraps document, page, and chunk persistence in an atomic transaction:
+1. Document is registered in status `processing`.
+2. Pages are batch-persisted.
+3. Chunks are batch-persisted.
+4. Document status transitions to `processed`.
+5. Transaction commits.
+
+If any failure occurs (e.g. check constraint failure, foreign key violation, duplicate identity), the entire transaction rolls back immediately. No dirty, partial, or orphaned records remain in the database.
+
+### Alembic Migrations
+Alembic manages database migrations independently from application startup:
+* **Upgrade to latest**:
+  ```bash
+  alembic -c backend/alembic.ini upgrade head
+  ```
+* **Downgrade to empty database**:
+  ```bash
+  alembic -c backend/alembic.ini downgrade base
+  ```
+
+### Development & Docker Setup
+PostgreSQL can be run via Docker Compose or as a local PostgreSQL service:
+```bash
+# Start PostgreSQL via Docker Compose
+docker compose up -d db
+
+# Run database migrations
+alembic -c backend/alembic.ini upgrade head
+
+# Run tests
+pytest backend/tests
+```
+
+---
+
+## 17. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1129,7 +1268,10 @@ All **334 tests** will run, covering:
 | **Phase 10** | Citation & Provenance Mapping | **Complete** | Deterministic citation IDs (`cite_1`), claim-evidence deduplication, many-to-many references, conflict diagnostics, document isolation. |
 | **Phase 11** | Query Understanding & Planning | **Complete** | Rule-based query taxonomy, safe normalization, zero-hallucination constraints, multi-query generation, candidate merge, post-merge Cross-Encoder reranking. |
 | **Phase 12** | Question Generation & Validation | **Complete** | Answer-first candidate extraction, T5 question generator (`iarfmoose/t5-base-question-generator`), extractive QA verification, strict answer matching, zero-fabrication count control. |
-| **Phase 13** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+| **Phase 13** | PostgreSQL Persistent Application Data | **Complete** | PostgreSQL system of record, SQLAlchemy 2.x, Alembic migrations, Documents/Pages/Chunks models, transactional persistence, repository layer. |
+| **Phase 14** | pgvector Persistence & Vector Search | Planned | PostgreSQL pgvector extension, vector column migrations, hybrid SQL+vector retrieval. |
+| **Phase 15** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Redis task queues, Celery workers, Docker deployment. |
+
 
 
 

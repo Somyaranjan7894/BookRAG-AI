@@ -54,3 +54,48 @@ class DocumentIngestResponse(BaseModel):
 
     status: str = Field(default="success", description="Status of the ingestion operation")
     document: Document = Field(description="Ingested document representation")
+
+
+class PersistedDocumentResponse(BaseModel):
+    """Response payload representing a document persisted in PostgreSQL."""
+
+    document_id: str
+    filename: str
+    title: Optional[str] = None
+    author: Optional[str] = None
+    page_count: int
+    status: str
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+class DocumentListResponse(BaseModel):
+    """Paginated list of persistent documents."""
+
+    total: int
+    documents: list[PersistedDocumentResponse]
+
+
+class PersistedPageResponse(BaseModel):
+    """Response payload representing an individual persisted page."""
+
+    page_id: str
+    document_id: str
+    page_number: int
+    text: str
+    char_count: int
+    word_count: int
+
+
+class PersistedChunkResponse(BaseModel):
+    """Response payload representing an individual persisted chunk."""
+
+    chunk_id: str
+    document_id: str
+    page_id: str
+    page_number: int
+    chunk_index: int
+    text: str
+    char_count: int
+    word_count: int
+
