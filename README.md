@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 5 Complete
+## 4. Current Phase Scope: Phase 6 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, and **Phase 5 (Semantic Search Service & API)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, and **Phase 6 (Cross-Encoder Reranking)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -109,39 +109,106 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Structured, ranked `RetrievalResult` objects preserving complete provenance (`chunk_id`, `document_id`, `page_number`, `text`, `similarity_score`, `rank`).
   - Strict validation: rejects dimension mismatches, empty/whitespace queries, non-positive top_k, and corrupted metadata files.
 - **Semantic Search Service & API (Phase 5)**:
-  - Application-level `SearchService` orchestrating the pipeline: query validation → query embedding (`EmbeddingService`) → vector retrieval (`RetrievalService`) → provenance mapping (`SearchResult`) → `SearchResponse`.
-  - Thin FastAPI endpoint: `POST /api/v1/search` with dependency injection (`Depends(get_search_service)`).
+  - Application-level `SearchService` orchestrating the retrieval pipeline.
+  - Thin FastAPI endpoint: `POST /api/v1/search` with dependency injection.
   - Complete provenance preservation: `rank`, `chunk_id`, `document_id`, `page_number`, `text`, `similarity_score`, `chunk_index`, and `metadata`.
-  - Document isolation and filtering: isolates search to the requested document ID; returns structured HTTP 404 when querying an unknown or missing document.
-  - Safe empty index handling: gracefully returns an empty result set (200 OK) without crashing.
-  - Strict parameter validation: `SearchRequest` schema validates non-empty query string and strictly bounds `top_k` ($1 \le \text{top\_k} \le 100$).
-  - Critical semantic rule enforced: `similarity_score` represents vector-space semantic retrieval relevance (cosine similarity). It is explicitly **not** an answer confidence, probability, factual correctness score, or hallucination metric.
-  - Public API contract abstraction: hides internal FAISS vector positions (`vector_index`) from public responses.
-  - Complete automated test suite: **130 unit, validation, isolation, and integration tests** passing with 100% success rate.
+  - Document isolation and filtering with structured HTTP 404 for unknown documents.
+  - Safe empty index handling returning empty results without crashing.
+  - Public API contract abstraction hiding internal FAISS vector positions (`vector_index`).
+- **Cross-Encoder Precision Reranking (Phase 6)**:
+  - Two-stage retrieval pipeline: First-stage FAISS dense vector search retrieves a high-recall candidate pool (`candidate_k`, default 20); second-stage `CrossEncoder` (`cross-encoder/ms-marco-MiniLM-L-6-v2`) performs joint full-attention cross-scoring over `(query, passage)` pairs to select final high-precision results (`top_k`, default 5).
+  - Dedicated `RerankerService` and `RerankerModel` with single-load model lifecycle caching (instantiated once per service, never loaded inside HTTP request handlers).
+  - Preserves full retrieval provenance including `original_rank` (initial FAISS rank) alongside final `rank` (post-reranking rank).
+  - Strict 1-to-1 score-to-candidate alignment verification preventing score misalignment or silent truncation.
+  - Document isolation preserved end-to-end: reranker scores only candidates originating from the filtered document.
+  - Configurable execution: supports CPU and CUDA, batched forward-pass scoring under `torch.inference_mode()`, configurable candidate pool (`candidate_k >= top_k`), and optional toggling (`enable_reranking`).
+  - Complete automated test suite: **158 unit, validation, isolation, model inference, and real integration tests** passing with 100% success rate.
 
 ### Explicit Architectural Boundaries:
-- **Search $\neq$ Question Answering**: Phase 5 searches and retrieves relevant candidate chunks. It does not synthesize answers, evaluate truthfulness, or generate citations.
-- **No Rerankers or Cross-Encoders**: Cross-encoder precision reranking is reserved for future phases.
-- **No LLM Generation or Prompt Assembly**: No FLAN-T5, OpenAI, or question answering models.
+- **Reranking $\neq$ Question Answering**: Phase 6 scores and re-ranks candidate passages based on joint semantic relevance. It does not synthesize answers, evaluate truthfulness, or generate citations.
+- **No LLM Generation or Prompt Assembly**: No FLAN-T5, OpenAI, or generative models.
 - **No Complex Databases or Distributed Queues**: No PostgreSQL, pgvector, Redis, or Celery.
 
 ---
 
-## 5. Technology Stack
+## 5. Two-Stage Retrieval Architecture: Bi-Encoder vs. Cross-Encoder
 
-### Backend (Current Phase 4):
+BookRAG AI implements a classical information retrieval two-stage cascade:
+
+```
+User Query: "Why does backpropagation suffer from vanishing gradients?"
+      │
+      ▼
+[Stage 1: Bi-Encoder (SentenceTransformers all-MiniLM-L6-v2)]
+      │  Query embedding generated in isolation: vector ∈ R^384
+      ▼
+[FAISS IndexFlatIP Dense Retrieval]
+      │  High-recall candidate pool search across entire book corpus
+      ▼
+Candidate Pool: candidate_k = 20 candidates (ranked by similarity_score)
+      │
+      ▼
+[Stage 2: Cross-Encoder (ms-marco-MiniLM-L-6-v2)]
+      │  Batched inference over (query, candidate_text) pairs
+      │  Full cross-attention across all query and passage token pairs
+      ▼
+Candidate Scoring & Re-ranking:
+      │  Candidates sorted by descending reranker_score
+      │  original_rank preserved, new rank 1..N assigned
+      ▼
+Final Results: top_k = 5 high-precision evidence chunks
+```
+
+### Why Dense Retrieval is Used First
+A complete book or technical manual can easily contain thousands of chunks. Passing thousands of candidate pairs into a heavy transformer model with full cross-attention for every incoming query would require thousands of forward passes and hundreds of milliseconds to seconds of latency per search request. Bi-encoder dense retrieval solves this by pre-computing chunk embeddings once and performing exact inner-product vector search in sub-millisecond time.
+
+### Why Cross-Encoder Reranking is Needed
+Bi-encoders embed queries and documents independently:
+$$\text{sim}(q, d) = \cos(\mathbf{u}_q, \mathbf{v}_d)$$
+Because the query and document cannot attend to each other during vector encoding, bi-encoders cannot capture complex cross-term interactions, query conditionality, or negative modifier dependencies.
+
+Cross-encoders concatenate the query and passage into a single transformer input sequence:
+$$\text{Input} = \text{[CLS]} \, q_1 \dots q_m \, \text{[SEP]} \, d_1 \dots d_n \, \text{[SEP]}$$
+This allows every query token to attend to every document token across all transformer layers via bidirectional self-attention, yielding substantially higher relevance discrimination and context precision.
+
+### Bi-Encoder vs. Cross-Encoder Comparison
+
+| Dimension | Bi-Encoder (EmbeddingService) | Cross-Encoder (RerankerService) |
+| :--- | :--- | :--- |
+| **Model** | `all-MiniLM-L6-v2` | `ms-marco-MiniLM-L-6-v2` |
+| **Input Structure** | Query alone $\rightarrow \mathbf{u}$; Document alone $\rightarrow \mathbf{v}$ | Joint pair: `(query, passage)` |
+| **Attention Mechanism** | Independent intra-sequence self-attention | Full cross-attention across query and passage tokens |
+| **Computation Speed** | Extremely fast ($O(1)$ vector distance lookup) | Slower forward pass per candidate pair |
+| **Primary Role** | First-stage high-recall candidate retrieval | Second-stage high-precision candidate reranking |
+| **Input Scope** | Entire corpus of book chunks | Candidate pool of size `candidate_k` |
+
+### Candidate_k vs. Final Top_k
+- `candidate_k` (default: 20): Determines the size of the high-recall pool retrieved from FAISS. A larger candidate pool gives the cross-encoder a richer set of semantically diverse candidates to evaluate.
+- `top_k` (default: 5): Determines the final number of top-ranked evidence chunks returned to the caller after cross-encoder reordering.
+- Constraint: `candidate_k` must always be greater than or equal to `top_k`.
+
+### Strict Score Semantics
+- `similarity_score`: Inner-product cosine similarity from first-stage dense retrieval ($[-1.0, 1.0]$ for unit-normalized vectors). Measures vector-space proximity between isolated embeddings.
+- `reranker_score`: Continuous logit score output by the cross-encoder transformer for joint `(query, passage)`.
+- **CRITICAL NOTE**: Neither score represents answer confidence, probability of truth, factual correctness, or hallucination metrics. They measure semantic relevance in their respective retrieval stages.
+
+---
+
+## 6. Technology Stack
+
+### Backend (Current Phase 6):
 - **Language**: Python 3.11+ (Tested on Python 3.13.7)
 - **Web Framework**: [FastAPI](https://fastapi.tiangolo.com/) (>= 0.115.0)
 - **ASGI Server**: [Uvicorn](https://www.uvicorn.org/) (>= 0.32.0)
 - **PDF Extraction**: [PyMuPDF](https://pymupdf.readthedocs.io/) (>= 1.25.0)
-- **Embeddings & NLP**: [Sentence Transformers](https://www.sbert.net/) (`sentence-transformers/all-MiniLM-L6-v2`), PyTorch (>= 2.2.0)
+- **Bi-Encoder Embeddings**: [Sentence Transformers](https://www.sbert.net/) (`sentence-transformers/all-MiniLM-L6-v2`), PyTorch (>= 2.2.0)
+- **Cross-Encoder Reranker**: [Sentence Transformers CrossEncoder](https://www.sbert.net/docs/pretrained_cross-encoders.html) (`cross-encoder/ms-marco-MiniLM-L-6-v2`)
 - **Vector Indexing & Retrieval**: [FAISS](https://github.com/facebookresearch/faiss) (`faiss-cpu>=1.9.0`)
 - **Configuration & Validation**: [Pydantic v2](https://docs.pydantic.dev/) & [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - **Testing**: [pytest](https://docs.pytest.org/) & [HTTPX](https://www.python-httpx.org/)
 
 ### Future Planned Stack:
 - **Frontend**: React, TypeScript, Vite, TailwindCSS
-- **Reranker**: Cross-Encoder (`ms-marco-MiniLM-L-6-v2` or similar)
 - **Generative QA**: Extractive QA and Abstractive LLM synthesis
 - **Vector Storage**: PostgreSQL + pgvector (for persistent production deployment)
 - **Task Queues**: Redis & Celery

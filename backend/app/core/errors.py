@@ -341,6 +341,83 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    from app.services.reranking.exceptions import (
+        InvalidRerankingConfigError,
+        RerankerModelLoadError,
+        RerankingError,
+        RerankingExecutionError,
+        ScoreAlignmentError,
+    )
+
+    @app.exception_handler(InvalidRerankingConfigError)
+    async def invalid_reranking_config_handler(request: Request, exc: InvalidRerankingConfigError) -> JSONResponse:
+        """Handle invalid reranking parameters or query configuration."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(RerankerModelLoadError)
+    async def reranker_model_load_handler(request: Request, exc: RerankerModelLoadError) -> JSONResponse:
+        """Handle CrossEncoder model loading failures."""
+        logger.error("Reranker model load error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(ScoreAlignmentError)
+    async def score_alignment_error_handler(request: Request, exc: ScoreAlignmentError) -> JSONResponse:
+        """Handle score-to-candidate alignment mismatch errors."""
+        logger.error("Score alignment error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(RerankingExecutionError)
+    async def reranking_execution_handler(request: Request, exc: RerankingExecutionError) -> JSONResponse:
+        """Handle cross-encoder inference and forward-pass scoring failures."""
+        logger.error("Reranking execution error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(RerankingError)
+    async def general_reranking_handler(request: Request, exc: RerankingError) -> JSONResponse:
+        """Handle general cross-encoder reranking domain failures."""
+        logger.error("General reranking error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
 
 
     @app.exception_handler(Exception)

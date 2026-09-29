@@ -47,6 +47,14 @@ class Settings(BaseSettings):
     RETRIEVAL_MAX_TOP_K: int = 100
     INDEX_STORAGE_DIR: str = "data/indexes"
 
+    # Cross-Encoder Reranking (Phase 6)
+    RERANKER_MODEL_NAME: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    RERANKER_MAX_LENGTH: int = 512
+    RERANKER_BATCH_SIZE: int = 32
+    RERANKER_DEVICE: str = "auto"
+    RERANKER_ENABLED: bool = True
+    RETRIEVAL_CANDIDATE_K: int = 20
+
 
 
     model_config = SettingsConfigDict(
