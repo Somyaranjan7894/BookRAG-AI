@@ -13,6 +13,7 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.schemas.citation import Citation, ClaimCitationRef
+from app.schemas.query_plan import QueryPlan
 from app.schemas.generation import (
     DEFAULT_GENERATION_CANDIDATE_K,
     DEFAULT_GENERATION_TOP_K,
@@ -271,6 +272,10 @@ class GroundedAnswerResponse(BaseModel):
     citations: List[Citation] = Field(
         default_factory=list,
         description="Unique citations referencing verified supporting book evidence.",
+    )
+    query_plan: Optional[QueryPlan] = Field(
+        default=None,
+        description="Deterministic query plan generated for retrieval orchestration.",
     )
     reason: Optional[str] = Field(
         default=None,

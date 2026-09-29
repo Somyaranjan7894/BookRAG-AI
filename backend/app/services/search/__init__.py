@@ -9,6 +9,7 @@ from app.services.search.exceptions import (
     SearchError,
     SearchRetrievalError,
 )
+from app.services.search.query_search import QuerySearchService
 from app.services.search.service import SearchService
 
 __all__ = [
@@ -16,8 +17,10 @@ __all__ = [
     "IndexNotInitializedError",
     "InvalidSearchQueryError",
     "InvalidTopKError",
+    "QuerySearchService",
     "SearchEmbeddingError",
     "SearchError",
     "SearchRetrievalError",
     "SearchService",
 ]
+

@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 10 Complete
+## 4. Current Phase Scope: Phase 11 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, and **Phase 10 (Citation & Provenance Mapping Layer)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, and **Phase 11 (Query Understanding & Query Planning)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -145,7 +145,17 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Preservation of contradiction and conflict diagnostics (`relation="supports" | "contradicts"`) without converting refutations into false endorsements.
   - Strict document isolation enforcing single-document provenance boundaries per response.
   - Complete presentation-independence returning structured metadata for frontend UI rendering.
-  - Full test suite: **255 unit, integration, and regression tests** passing with 100% success rate.
+- **Query Understanding & Query Planning (Phase 11)**:
+  - Explicit intermediate typed `QueryPlan` contract mediating between user query and retrieval.
+  - Safe, non-destructive query normalization preserving technical symbols (`C++`), hyphenated compounds (`COVID-19`), ampersands (`R&D`), years, and numbers.
+  - 10-type query classification taxonomy (`FACTUAL`, `DEFINITION`, `LIST`, `COMPARISON`, `CAUSAL`, `PROCEDURAL`, `LOCATION`, `SUMMARY`, `MULTI_HOP`, `UNKNOWN`).
+  - Expected answer type inference (`PERSON/ENTITY`, `DATE/YEAR`, `LOCATION`, `NUMBER`, `EXPLANATION`, `LIST`, `COMPARISON`, `SUMMARY`, `DEFINITION`).
+  - Strict constraint detection for explicit attributes only (`chapter`, `year`, `page`, `page_range`, `quoted_phrases`, `named_entities`) with no invented constraints.
+  - Focused retrieval query generation: single query for simple questions, targeted multi-query decomposition (max 3) for comparisons and causal pairs.
+  - `QuerySearchService` multi-query execution with candidate merging, stable deduplication by `(document_id, chunk_id)`, and full provenance retention.
+  - Post-merge Cross-Encoder reranking over the unified candidate pool against the normalized query.
+  - Dedicated debug/planning endpoint: `POST /api/v1/query-plan` and automatic `query_plan` inclusion in `POST /api/v1/grounded-answer`.
+  - Full test suite: **297 unit, integration, and regression tests** passing with 100% success rate.
 
 
 ---
@@ -757,7 +767,106 @@ The backend intentionally does **not** hardcode Markdown citation syntax (e.g. `
 
 ---
 
-## 10. Configuration Settings
+## 10. Query Understanding & Query Planning (Phase 11)
+
+### The Core Architectural Principle
+> **"Query planning provides retrieval strategy metadata. It does not determine factual truth or replace answer validation."**
+
+In earlier phases, the raw user query was passed directly into vector search. For multi-faceted, comparative, or constrained questions, a single vector lookup often fails to retrieve complementary evidence scattered across different sections or chapters.
+
+Phase 11 introduces an explicit intermediate `QueryPlan` contract that decouples query understanding from retrieval execution:
+- **Query Understanding**: Validates input, safely normalizes formatting, conservatively classifies query taxonomy, detects explicit constraints (e.g. chapters, years, pages, quotes), and generates 1 to 3 targeted retrieval sub-queries.
+- **Query Search Orchestration**: Executes sub-queries independently against first-stage vector search, merges candidates, stably deduplicates by `(document_id, chunk_id)` while preserving provenance, and executes Cross-Encoder reranking over the merged candidate pool against the normalized user query.
+
+### End-to-End Pipeline
+```
+User Query
+    ↓
+QueryUnderstandingService (Validation & Safe Normalization)
+    ↓
+QueryPlan (Explicit typed contract: query_type, entities, constraints, retrieval_queries)
+    ↓
+QuerySearchService (Multi-Query Execution)
+    ├── Sub-Query 1 → SearchService (Dense FAISS Retrieval)
+    ├── Sub-Query 2 → SearchService (Dense FAISS Retrieval)
+    └── Sub-Query 3 → SearchService (Dense FAISS Retrieval)
+    ↓
+Candidate Merge & Deduplication (by document_id + chunk_id, preserving provenance)
+    ↓
+Final Cross-Encoder Reranking (ms-marco-MiniLM-L-6-v2 against normalized query)
+    ↓
+Retrieved Evidence Passages
+    ↓
+GenerationService (FLAN-T5 Abstractive Synthesis)
+    ↓
+ClaimDecomposer (Sentence-Level Claim Propositions)
+    ↓
+GroundingService (DeBERTa-v3 NLI Entailment / Contradiction Verification)
+    ↓
+CitationService (Deterministic Citation Object Construction)
+    ↓
+Final Grounded Answer + Citations + QueryPlan
+```
+
+### Query Type Taxonomy
+The system employs a conservative, deterministic taxonomy represented by `QueryType`:
+- `FACTUAL`: Specific facts, entities, or historical events (e.g., *"Who founded Google?"*).
+- `DEFINITION`: Conceptual explanations of terms or ideas (e.g., *"What is backpropagation?"*).
+- `LIST`: Enumerations of causes, reasons, or components (e.g., *"What are the primary reasons for inflation?"*).
+- `COMPARISON`: Contrast or side-by-side evaluation between two entities (e.g., *"Compare India and China population in 2020"*).
+- `CAUSAL`: Explanations of mechanisms, causes, or consequences (e.g., *"Why did the bridge collapse?"*).
+- `PROCEDURAL`: Step-by-step methods or algorithms (e.g., *"How do you train a neural network?"*).
+- `LOCATION`: Book- or manuscript-specific location queries (e.g., *"Where is gradient descent discussed in Chapter 3?"*).
+- `SUMMARY`: High-level overviews of chapters or documents (e.g., *"Summarize Chapter 4"*).
+- `MULTI_HOP`: Complex questions with multiple dependent retrieval hops (e.g., *"Who was the teacher of the philosopher who wrote The Republic?"*).
+- `UNKNOWN`: Unclassifiable or ambiguous questions, defaulting to conservative single-query retrieval.
+
+### Safe Query Normalization
+Normalization strips formatting artifacts without corrupting semantic tokens:
+- Normalizes non-breaking spaces (`\u00a0`), tabs, newlines, and repeated whitespace.
+- Preserves technical symbols and programming language names (e.g., `C++`, `C#`).
+- Preserves hyphens in compound words and medical terms (e.g., `COVID-19`, `state-of-the-art`).
+- Preserves ampersands and organizational abbreviations (e.g., `R&D`, `AT&T`).
+- Preserves numerical values, percentages, and years (e.g., `2019`, `2020`, `42%`).
+- Empty or whitespace-only inputs trigger an immediate `InvalidQueryError` (HTTP 400).
+
+### Constraint Detection (Zero-Hallucination)
+Constraints restrict or filter retrieval scope **only when explicitly present in the query**:
+- `chapter`: Extracted from phrases like *"in Chapter 7"* or *"chapter 4"*.
+- `year`: Extracted from 4-digit year mentions like *"in 2020"*.
+- `page` / `page_range`: Extracted from explicit page numbers like *"on page 42"* or *"pages 10-15"*.
+- `quoted_phrases`: Extracted verbatim from double or single quotes (e.g., *"'quantum entanglement'"*).
+- `named_entities`: Extracted from capitalized noun phrases (e.g., *"Alan Turing"*, *"French Revolution"*).
+
+> **Important**: The system **never** invents or assumes a constraint. A chapter constraint is not added simply because the retrieved chunks happen to be from that chapter.
+
+### Retrieval Query Generation
+- **Simple / Atomic Questions**: Generates exactly 1 retrieval query preserving the normalized question.
+- **Comparison Questions**: Decomposes the question into focused, entity-specific queries (e.g., *"Compare population of India and China in 2020"* → `["India population 2020", "China population 2020"]`).
+- **Causal Questions**: Decomposes multi-faceted questions into targeted sub-queries (e.g., *"What were the causes and consequences of the French Revolution?"* → `["causes of the French Revolution", "consequences of the French Revolution"]`).
+- **Ceiling**: Maximum of 3 retrieval queries per plan to prevent retrieval flooding.
+- **Deterministic**: Implemented with rule-based heuristics without invoking an external LLM for query rewriting.
+
+### Multi-Query Candidate Merging & Deduplication
+When a `QueryPlan` specifies multiple retrieval queries:
+1. Each query fetches an independent candidate pool from the FAISS vector index using first-stage dense retrieval (`enable_reranking=False`).
+2. Candidates are merged and deduplicated using the unique chunk identifier `(document_id, chunk_id)`.
+3. If a chunk is returned by multiple sub-queries, exactly one candidate is retained.
+4. Complete chunk provenance (`document_id`, `page_number`, `chunk_id`, `source_text`, `chunk_index`) strictly survives the merge.
+
+### Post-Merge Final Cross-Encoder Reranking
+In multi-query plans, individual candidate lists cannot be simply concatenated by raw vector similarity:
+- Candidate pools from different sub-queries are combined and deduplicated first.
+- The existing Phase 6 Cross-Encoder (`ms-marco-MiniLM-L-6-v2`) reranks the unified candidate pool against the user's `normalized_query`.
+- This ensures that candidates answering different facets of the user's inquiry are calibrated against the overall intent, assigning final sequential 1-based ranks.
+
+### Multi-Hop Handling & Known Limitations
+- When a query contains multi-hop signals (e.g., *"who was the mentor of the author of..."*), it is labeled `QueryType.MULTI_HOP`.
+- **Architectural Boundary**: In Phase 11, autonomous iterative reasoning or multi-step tool-calling loops are intentionally avoided. The system produces a conservative plan retaining the full query without hallucinating intermediate premises. Full agentic multi-hop retrieval is reserved for future phases.
+
+---
+
+## 11. Configuration Settings
 
 | Parameter | Default | Constraint | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -788,7 +897,7 @@ The backend intentionally does **not** hardcode Markdown citation syntax (e.g. `
 
 ---
 
-## 11. How to Run the Backend
+## 12. How to Run the Backend
 
 With the virtual environment activated:
 
@@ -803,7 +912,7 @@ Interactive API documentation:
 
 ---
 
-## 12. How to Run Tests
+## 13. How to Run Tests
 
 Run pytest from the `backend` directory:
 
@@ -812,7 +921,7 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **255 tests** will run, covering:
+All **297 tests** will run, covering:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
@@ -824,10 +933,11 @@ All **255 tests** will run, covering:
 - **Phase 8 (23 tests)**: FLAN-T5 abstractive generation, EvidenceBuilder budgeting, prompt formatting, empty-evidence handling, beam search.
 - **Phase 9 (34 tests)**: NLI model wrapper, dynamic id2label mapping, sentence-level claim decomposition, pairwise NLI validation, threshold boundaries, safe refusal decision policy, end-to-end orchestration, and API endpoints.
 - **Phase 10 (16 tests)**: Citation object creation, deduplication by chunk ID, many-to-many claim references, unsupported claim handling, contradiction/conflict diagnostics, determinism, exact source text preservation, document isolation enforcement, response schema validation, and FastAPI endpoint verification.
+- **Phase 11 (42 tests)**: Query normalization (whitespace, C++, COVID-19, R&D, years), 10-type query classification, expected answer type mapping, zero-hallucination constraint detection (chapter, year, page, quotes), retrieval query decomposition (max 3, non-redundant), candidate merging, stable deduplication, provenance retention, post-merge Cross-Encoder reranking, document isolation, orchestrator integration, semantic principles, and `POST /api/v1/query-plan` API endpoint.
 
 ---
 
-## 13. API Endpoints
+## 14. API Endpoints
 
 ### 1. Health Probe
 - **Method**: `GET`
@@ -848,44 +958,60 @@ All **255 tests** will run, covering:
 - **Path**: `/api/v1/answer`
 - **Request Body**: `{"query": "Explain how backpropagation computes gradients.", "top_k": 5}`
 
-### 5. Grounded Abstractive QA with Citations (Phase 9 & 10)
+### 5. Grounded Abstractive QA with Citations & QueryPlan (Phases 9–11)
 - **Method**: `POST`
 - **Path**: `/api/v1/grounded-answer`
 - **Request Body**:
 ```json
 {
-  "query": "How does backpropagation compute gradients in deep networks?",
+  "query": "Compare the population of India and China in 2020.",
   "top_k": 5,
   "require_all_claims_supported": true,
   "entailment_threshold": 0.80,
   "contradiction_threshold": 0.80
 }
 ```
-- **Example Grounded Response with Citations**:
+- **Example Grounded Response with Citations and QueryPlan**:
 ```json
 {
-  "query": "How does backpropagation compute gradients in deep networks?",
-  "answer": "Backpropagation computes gradient vectors through recursive application of the chain rule.",
+  "query": "Compare the population of India and China in 2020.",
+  "answer": "In 2020, China had approximately 1.41 billion people while India had approximately 1.38 billion.",
   "answerable": true,
   "grounded": true,
   "groundedness_score": 1.0,
   "grounding_status": "grounded",
+  "query_plan": {
+    "original_query": "Compare the population of India and China in 2020.",
+    "normalized_query": "Compare the population of India and China in 2020.",
+    "query_type": "comparison",
+    "entities": ["India", "China"],
+    "constraints": {
+      "year": 2020,
+      "named_entities": ["India", "China"]
+    },
+    "retrieval_queries": [
+      "India population 2020",
+      "China population 2020"
+    ],
+    "expected_answer_type": "comparison",
+    "requires_multiple_evidence": true
+  },
   "claims": [
     {
       "claim_index": 0,
-      "claim_text": "Backpropagation computes gradient vectors through recursive application of the chain rule.",
+      "claim_text": "In 2020, China had approximately 1.41 billion people while India had approximately 1.38 billion.",
       "status": "entailed",
       "grounding_status": "entailed",
-      "entailment_score": 0.95,
+      "entailment_score": 0.94,
       "contradiction_score": 0.01,
-      "neutral_score": 0.04,
+      "neutral_score": 0.05,
       "citations": [
         {
           "citation_id": "cite_1",
-          "document_id": "deep_learning_handbook",
-          "chunk_id": "deep_learning_handbook_p012_c0003",
-          "page_number": 12,
-          "chunk_index": 3,
+          "document_id": "demographics_handbook",
+          "chunk_id": "demographics_handbook_p045_c0002",
+          "page_number": 45,
+          "chunk_index": 2,
           "relation": "supports"
         }
       ]
@@ -894,13 +1020,13 @@ All **255 tests** will run, covering:
   "citations": [
     {
       "citation_id": "cite_1",
-      "document_id": "deep_learning_handbook",
-      "chunk_id": "deep_learning_handbook_p012_c0003",
-      "page_number": 12,
-      "chunk_index": 3,
-      "source_text": "Backpropagation computes gradient vectors of the loss function with respect to weights using recursive application of the chain rule.",
-      "similarity_score": 0.88,
-      "reranker_score": 0.94,
+      "document_id": "demographics_handbook",
+      "chunk_id": "demographics_handbook_p045_c0002",
+      "page_number": 45,
+      "chunk_index": 2,
+      "source_text": "In 2020, China recorded a population of 1.41 billion according to census data, whereas India reached approximately 1.38 billion.",
+      "similarity_score": 0.89,
+      "reranker_score": 0.96,
       "evidence_rank": 1
     }
   ],
@@ -910,9 +1036,38 @@ All **255 tests** will run, covering:
 }
 ```
 
+### 6. Query Plan Endpoint (Phase 11 Debug & Preview)
+- **Method**: `POST`
+- **Path**: `/api/v1/query-plan`
+- **Request Body**:
+```json
+{
+  "query": "Compare the population of India and China in 2020."
+}
+```
+- **Response Body**:
+```json
+{
+  "original_query": "Compare the population of India and China in 2020.",
+  "normalized_query": "Compare the population of India and China in 2020.",
+  "query_type": "comparison",
+  "entities": ["India", "China"],
+  "constraints": {
+    "year": 2020,
+    "named_entities": ["India", "China"]
+  },
+  "retrieval_queries": [
+    "India population 2020",
+    "China population 2020"
+  ],
+  "expected_answer_type": "comparison",
+  "requires_multiple_evidence": true
+}
+```
+
 ---
 
-## 14. Future Roadmap
+## 15. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -927,7 +1082,9 @@ All **255 tests** will run, covering:
 | **Phase 8** | Abstractive QA (Generation) | **Complete** | FLAN-T5 abstractive synthesis, EvidenceBuilder context budgeting, prompt grounding, `POST /api/v1/answer`. |
 | **Phase 9** | Groundedness & Evaluation | **Complete** | DeBERTa-v3 NLI model wrapper, dynamic id2label discovery, claim decomposition, safe decision policy, `POST /api/v1/grounded-answer`. |
 | **Phase 10** | Citation & Provenance Mapping | **Complete** | Deterministic citation IDs (`cite_1`), claim-evidence deduplication, many-to-many references, conflict diagnostics, document isolation. |
-| **Phase 11** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+| **Phase 11** | Query Understanding & Planning | **Complete** | Rule-based query taxonomy, safe normalization, zero-hallucination constraints, multi-query generation, candidate merge, post-merge Cross-Encoder reranking. |
+| **Phase 12** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+
 
 
 

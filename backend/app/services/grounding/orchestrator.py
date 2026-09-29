@@ -18,13 +18,15 @@ from app.services.generation.service import GenerationService
 from app.services.grounding.claims import ClaimDecomposer
 from app.services.grounding.exceptions import InvalidGroundingInputError
 from app.services.grounding.service import GroundingService
+from app.services.query_understanding.service import QueryUnderstandingService
+from app.services.search.query_search import QuerySearchService
 from app.services.search.service import SearchService
 
 logger = get_logger(__name__)
 
 
 class GroundedAnswerService:
-    """Orchestrates retrieval, generation, claim decomposition, NLI validation, safe decision policy, and citation mapping."""
+    """Orchestrates query planning, retrieval, generation, claim decomposition, NLI validation, safe decision policy, and citation mapping."""
 
     def __init__(
         self,
@@ -33,6 +35,8 @@ class GroundedAnswerService:
         grounding_service: Optional[GroundingService] = None,
         claim_decomposer: Optional[ClaimDecomposer] = None,
         citation_service: Optional[CitationService] = None,
+        query_understanding_service: Optional[QueryUnderstandingService] = None,
+        query_search_service: Optional[QuerySearchService] = None,
     ) -> None:
         """Initialize GroundedAnswerService with injected or lazily resolved components."""
         self._search_service = search_service
@@ -40,6 +44,22 @@ class GroundedAnswerService:
         self._grounding_service = grounding_service
         self._claim_decomposer = claim_decomposer
         self._citation_service = citation_service
+        self._query_understanding_service = query_understanding_service
+        self._query_search_service = query_search_service
+
+    @property
+    def query_understanding_service(self) -> QueryUnderstandingService:
+        """Return injected or default QueryUnderstandingService."""
+        if self._query_understanding_service is None:
+            self._query_understanding_service = QueryUnderstandingService()
+        return self._query_understanding_service
+
+    @property
+    def query_search_service(self) -> QuerySearchService:
+        """Return injected or default QuerySearchService."""
+        if self._query_search_service is None:
+            self._query_search_service = QuerySearchService(search_service=self.search_service)
+        return self._query_search_service
 
     @property
     def citation_service(self) -> CitationService:
@@ -99,9 +119,12 @@ class GroundedAnswerService:
             raw_grounding_name if isinstance(raw_grounding_name, str) else settings.GROUNDING_MODEL_NAME
         )
 
-        # 1. First & Second Stage Retrieval via SearchService
-        search_response = self.search_service.search(
-            query=query,
+        # 0. Query Understanding & Query Planning (Phase 11)
+        query_plan = self.query_understanding_service.analyze_query(query)
+
+        # 1. Plan-Driven Retrieval via QuerySearchService (Phase 11)
+        search_response = self.query_search_service.search_with_plan(
+            plan=query_plan,
             top_k=request.top_k,
             document_id=request.document_id,
             candidate_k=request.candidate_k,
@@ -120,6 +143,8 @@ class GroundedAnswerService:
                 grounding_status="empty",
                 claims=[],
                 evidence=[],
+                citations=[],
+                query_plan=query_plan,
                 reason="No relevant evidence was retrieved from the book index.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
@@ -147,6 +172,8 @@ class GroundedAnswerService:
                 grounding_status="empty",
                 claims=[],
                 evidence=gen_response.evidence,
+                citations=[],
+                query_plan=query_plan,
                 reason="Generation model could not synthesize an answer from the retrieved evidence.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
@@ -166,6 +193,8 @@ class GroundedAnswerService:
                 grounding_status="disabled",
                 claims=[],
                 evidence=gen_response.evidence,
+                citations=[],
+                query_plan=query_plan,
                 reason="Grounding validation is disabled in settings.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
@@ -186,6 +215,8 @@ class GroundedAnswerService:
                 grounding_status="empty",
                 claims=[],
                 evidence=gen_response.evidence,
+                citations=[],
+                query_plan=query_plan,
                 reason="Generated answer contains no substantive claims to validate.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
@@ -219,6 +250,7 @@ class GroundedAnswerService:
                 claims=grounding_report.claim_results,
                 evidence=gen_response.evidence,
                 citations=[],
+                query_plan=query_plan,
                 reason=f"Document isolation error: {exc}",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
@@ -251,6 +283,7 @@ class GroundedAnswerService:
                     claims=grounding_report.claim_results,
                     evidence=gen_response.evidence,
                     citations=citations,
+                    query_plan=query_plan,
                     reason=grounding_report.reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
@@ -277,6 +310,7 @@ class GroundedAnswerService:
                     claims=grounding_report.claim_results,
                     evidence=gen_response.evidence,
                     citations=citations,
+                    query_plan=query_plan,
                     reason=safe_reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
@@ -294,6 +328,7 @@ class GroundedAnswerService:
                 claims=grounding_report.claim_results,
                 evidence=gen_response.evidence,
                 citations=citations,
+                query_plan=query_plan,
                 reason=grounding_report.reason,
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,

@@ -766,6 +766,39 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Late import of Query Understanding exceptions
+    from app.services.query_understanding.exceptions import (
+        InvalidQueryError,
+        QueryUnderstandingError,
+    )
+
+    @app.exception_handler(InvalidQueryError)
+    async def invalid_query_error_handler(request: Request, exc: InvalidQueryError) -> JSONResponse:
+        """Handle empty or invalid query errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(QueryUnderstandingError)
+    async def query_understanding_error_handler(request: Request, exc: QueryUnderstandingError) -> JSONResponse:
+        """Handle general query understanding errors."""
+        logger.error("Query understanding error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""
