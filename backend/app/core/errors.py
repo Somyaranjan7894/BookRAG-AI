@@ -522,6 +522,111 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    from app.services.generation.exceptions import (
+        ContextBudgetExceededError,
+        GenerationError,
+        GenerationInferenceError,
+        GenerationModelLoadError,
+        InvalidGenerationConfigError,
+        InvalidGenerationEvidenceError,
+        InvalidGenerationQueryError,
+    )
+
+    @app.exception_handler(InvalidGenerationQueryError)
+    async def invalid_generation_query_handler(request: Request, exc: InvalidGenerationQueryError) -> JSONResponse:
+        """Handle invalid or empty generation query errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidGenerationEvidenceError)
+    async def invalid_generation_evidence_handler(request: Request, exc: InvalidGenerationEvidenceError) -> JSONResponse:
+        """Handle malformed generation evidence items."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(InvalidGenerationConfigError)
+    async def invalid_generation_config_handler(request: Request, exc: InvalidGenerationConfigError) -> JSONResponse:
+        """Handle invalid generation configuration parameters."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(ContextBudgetExceededError)
+    async def context_budget_exceeded_handler(request: Request, exc: ContextBudgetExceededError) -> JSONResponse:
+        """Handle prompt context budget exhaustion errors."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(GenerationModelLoadError)
+    async def generation_model_load_handler(request: Request, exc: GenerationModelLoadError) -> JSONResponse:
+        """Handle Seq2Seq generation model loading failures."""
+        logger.error("Generation model load error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "error": {
+                    "code": status.HTTP_503_SERVICE_UNAVAILABLE,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(GenerationInferenceError)
+    async def generation_inference_handler(request: Request, exc: GenerationInferenceError) -> JSONResponse:
+        """Handle FLAN-T5 generation forward pass or beam search failures."""
+        logger.error("Generation inference error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+    @app.exception_handler(GenerationError)
+    async def general_generation_error_handler(request: Request, exc: GenerationError) -> JSONResponse:
+        """Handle general abstractive generation domain errors."""
+        logger.error("General generation error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
+
 
 
 

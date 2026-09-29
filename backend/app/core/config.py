@@ -66,6 +66,18 @@ class Settings(BaseSettings):
     QA_DEVICE: str = "auto"
     QA_NO_ANSWER_THRESHOLD: float = 0.0
 
+    # Abstractive Question Answering / Generation (Phase 8)
+    GENERATION_MODEL_NAME: str = "google/flan-t5-base"
+    GENERATION_MAX_INPUT_TOKENS: int = 2048
+    GENERATION_MAX_NEW_TOKENS: int = 128
+    GENERATION_NUM_BEAMS: int = 4
+    GENERATION_DO_SAMPLE: bool = False
+    GENERATION_TEMPERATURE: float = 1.0
+    GENERATION_TOP_K_EVIDENCE: int = 5
+    GENERATION_ENABLED: bool = True
+    GENERATION_DEVICE: str = "auto"
+
+
 
 
 

@@ -253,7 +253,90 @@ Books contain long context passages that frequently exceed a transformer's maxim
 
 ---
 
-## 7. Technology Stack
+## 7. Abstractive Question Answering (Phase 8)
+
+Phase 8 introduces controlled abstractive text generation using `google/flan-t5-base`. While Phase 7 extracts verbatim substrings from the retrieved text, Phase 8 synthesizes fluent, comprehensive natural language answers that integrate evidence across multiple passages or reformulate complex explanations.
+
+### Architectural Pipeline
+
+```
+User Query
+    │
+    ▼
+EmbeddingService (Bi-Encoder: all-MiniLM-L6-v2)
+    │  Generates 384-d normalized query vector
+    ▼
+FAISS Dense Retrieval (Stage 1: High Recall)
+    │  Retrieves candidate_k candidate chunks (default: 20)
+    ▼
+Cross-Encoder Reranker (Stage 2: High Precision)
+    │  Joint query-passage transformer scoring (ms-marco-MiniLM-L-6-v2)
+    ▼
+Top Evidence Selection (Top-N Chunks)
+    │  Passes top_k reranked evidence chunks to Generation pipeline
+    ▼
+EvidenceBuilder (Context Budgeting & Grounding)
+    │  Enforces GENERATION_MAX_INPUT_TOKENS (default: 2048)
+    │  Formats passages with explicit boundaries: [Page X] <text>
+    │  Prioritizes higher-ranked chunks, carefully truncating oversized candidates
+    ▼
+FLAN-T5 Generation (Stage 3: Abstractive Synthesis)
+    │  Hugging Face AutoModelForSeq2SeqLM (google/flan-t5-base)
+    │  Controlled deterministic beam search (do_sample=False, num_beams=4)
+    ▼
+Synthesized Answer with Full Evidence Provenance
+    ├── answer: "Backpropagation computes gradient vectors through recursive application of the chain rule..."
+    ├── answerable: true
+    ├── model_name: "google/flan-t5-base"
+    ├── evidence: [ { rank, chunk_id, document_id, page_number, similarity_score, reranker_score, ... } ]
+    └── evidence_count: 2
+```
+
+### Extractive vs. Abstractive QA
+
+| Dimension | Extractive QA (Phase 7) | Abstractive QA (Phase 8) |
+| :--- | :--- | :--- |
+| **Model** | `deepset/roberta-base-squad2` | `google/flan-t5-base` |
+| **Model Type** | Encoder-only (`AutoModelForQuestionAnswering`) | Encoder-Decoder Seq2Seq (`AutoModelForSeq2SeqLM`) |
+| **Output Type** | Exact substring slice from source text | Synthesized natural language sentence/paragraph |
+| **Answer Boundary** | Fixed character offsets (`answer_start`, `answer_end`) | Newly generated token sequence |
+| **Multi-chunk Synthesis** | Selects best single span from highest-scoring chunk | Integrates and summarizes information across multiple chunks |
+| **Hallucination Risk** | Zero (impossible to output words not in evidence) | Non-zero (controlled via grounded prompt and evidence restriction) |
+| **Source of Truth** | Book evidence chunk | Book evidence chunk |
+
+### Prompt Grounding and Controlled Template
+To prevent the model from answering out of its pre-trained parametric memory, FLAN-T5 is conditioned with a deterministic prompt:
+
+```text
+Answer the question using only the provided context.
+
+Context:
+[Page 12] Rumelhart, Hinton, and Williams popularized backpropagation in 1986...
+
+[Page 15] Backpropagation enables training deep networks by computing gradients...
+
+Question:
+How did backpropagation impact neural network training?
+
+Answer:
+```
+
+### Context Budgeting & Token Management
+- `GENERATION_MAX_INPUT_TOKENS=2048`: Upper token limit on the combined prompt (template instructions + question + evidence context).
+- **Greedy Priority Ordering**: Evidence chunks are processed in descending rank order. As many complete chunks are accommodated as fit within the budget.
+- **Graceful Truncation**: If a single top-priority chunk exceeds the available budget, it is carefully truncated with an ellipsis while retaining its full provenance metadata (`chunk_id`, `page_number`, `similarity_score`, `reranker_score`).
+- **Empty Evidence Guard**: If no retrieved evidence is available, the system immediately returns a structured no-answer (`answerable=false`, `answer=null`) without invoking FLAN-T5.
+
+### Explicit Semantic Principles
+1. **The Book is the Source of Truth**: FLAN-T5 is an answer synthesis tool conditioned on retrieved text, NOT an independent factual authority.
+2. **Unsupported Statements**: While prompt constraints heavily reduce hallucination, generative models can still synthesize unsupported statements.
+3. **No False Confidence**: Generation output must never be interpreted as factual confidence or probability of truth.
+4. **Phase 9 Boundary**: Formal NLI-based groundedness verification and automated hallucination scoring are explicitly reserved for Phase 9.
+
+---
+
+## 8. Technology Stack
+
 
 ### Backend (Current Phase 6):
 - **Language**: Python 3.11+ (Tested on Python 3.13.7)
@@ -551,7 +634,8 @@ All **91 tests** will run, covering:
 | **Phase 5** | Semantic Search API | **Complete** | SearchService, Pydantic contracts, thin FastAPI endpoint `POST /api/v1/search`. |
 | **Phase 6** | Cross-Encoder Reranking | **Complete** | Precision reranker (`ms-marco-MiniLM-L-6-v2`), two-stage retrieval, candidate_k pool. |
 | **Phase 7** | Extractive Question Answering | **Complete** | RoBERTa SQuAD2 span extraction, sliding window, SQuAD 2.0 unanswerability, `POST /api/v1/qa`. |
-| **Phase 8** | Generative QA | Planned | FLAN-T5 abstractive synthesis, groundedness validation, hallucination checks. |
-| **Phase 9** | Question Generation & Eval | Planned | Chapter question generation, RAG benchmark metrics, Relevant Matching Board. |
+| **Phase 8** | Abstractive QA (Generation) | **Complete** | FLAN-T5 abstractive synthesis, EvidenceBuilder context budgeting, prompt grounding, `POST /api/v1/answer`. |
+| **Phase 9** | Groundedness & Evaluation | Planned | NLI-based groundedness validation, hallucination detection, RAG benchmark metrics. |
 | **Phase 10** | Production Hardening & UI | Planned | React frontend, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+
 
