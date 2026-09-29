@@ -799,6 +799,27 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+    # Phase 12: Question Generation Exception Handlers
+    from app.services.question_generation.exceptions import (
+        QuestionGenerationError,
+        QuestionModelLoadError,
+        QuestionInferenceError,
+    )
+
+    @app.exception_handler(QuestionGenerationError)
+    async def question_generation_error_handler(request: Request, exc: QuestionGenerationError) -> JSONResponse:
+        """Handle question generation failures."""
+        logger.error("Question generation error on %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": exc.message,
+                }
+            },
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected server errors without exposing internal traces to clients."""

@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 11 Complete
+## 4. Current Phase Scope: Phase 12 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, and **Phase 11 (Query Understanding & Query Planning)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, and **Phase 12 (Controlled Question Generation & Validation)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -155,7 +155,19 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - `QuerySearchService` multi-query execution with candidate merging, stable deduplication by `(document_id, chunk_id)`, and full provenance retention.
   - Post-merge Cross-Encoder reranking over the unified candidate pool against the normalized query.
   - Dedicated debug/planning endpoint: `POST /api/v1/query-plan` and automatic `query_plan` inclusion in `POST /api/v1/grounded-answer`.
-  - Full test suite: **297 unit, integration, and regression tests** passing with 100% success rate.
+- **Controlled Question Generation & Validation (Phase 12)**:
+  - Evidence-grounded, answer-first question generation conditioned on extracted answer candidate spans.
+  - Dedicated local model wrapper `iarfmoose/t5-base-question-generator` with singleton caching, input formatting `<answer> {answer} <context> {context}`, and deterministic beam search.
+  - Conservative `AnswerCandidateExtractor` extracting high-value answer candidates (entities, dates, years, numbers, technical terms) while strictly rejecting trivial stop words.
+  - Extractive QA verification using RoBERTa SQuAD2 (`deepset/roberta-base-squad2`) to independently answer each generated question from source evidence.
+  - Strict answer matching policy preserving numeric identity (e.g. 1998 != 1999) and rejecting unanswerable or conflicting candidates.
+  - Question taxonomy classification (10 types: `FACTUAL`, `WHO`, `WHAT`, `WHEN`, `WHERE`, `WHY`, `HOW`, `HOW_MANY`, `DEFINITION`, `COMPARISON`).
+  - Heuristic difficulty classification (`EASY`, `MEDIUM`, `HARD`).
+  - Normalized exact duplicate detection within requests and across candidates.
+  - Controlled count limits without fabrication: never fabricates questions if candidate pool is insufficient.
+  - Complete source provenance (`document_id`, `chunk_id`, `page_number`, `source_text`, `answer`).
+  - Dedicated public endpoint: `POST /api/v1/questions/generate`.
+  - Full test suite: **334 unit, integration, and regression tests** passing with 100% success rate.
 
 
 ---
@@ -866,7 +878,87 @@ In multi-query plans, individual candidate lists cannot be simply concatenated b
 
 ---
 
-## 11. Configuration Settings
+## 11. Controlled Question Generation & Validation (Phase 12)
+
+### The Core Architectural Principles
+> **"Question generation produces candidates. Validation determines whether a candidate is sufficiently supported and answerable from the book evidence."**
+
+> **"Difficulty is a heuristic classification, not an objective measure."**
+
+Most automated question generation systems suffer from severe hallucinations: models invent questions asking about unsubstantiated premises or generate plausible-sounding queries that cannot actually be answered from the book.
+
+Phase 12 implements an **evidence-first, answer-grounded question generation pipeline**:
+1. High-value answer candidate spans (named entities, dates, years, numbers, key noun phrases) are identified directly from source book passages.
+2. A dedicated local Seq2Seq question generation model (`iarfmoose/t5-base-question-generator`) generates targeted reading comprehension questions conditioned on `"<answer> {answer} <context> {context}"`.
+3. Candidate questions are deduplicated using normalized string keys.
+4. Every candidate question is validated by the existing Phase 7 Extractive QA model (`deepset/roberta-base-squad2`) executing over the exact source evidence chunk.
+5. If the QA model cannot answer the question or extracts an answer inconsistent with the expected candidate, the question is **rejected**.
+6. Questions are classified into a 10-type taxonomy and assigned heuristic difficulty levels (`EASY`, `MEDIUM`, `HARD`).
+
+### End-to-End Pipeline
+```
+Book Evidence Chunk
+    ↓
+AnswerCandidateExtractor (Entities, Dates, Years, Numbers, Technical Terms)
+    ↓
+Answer Candidates (Exact Spans + Provenance)
+    ↓
+QuestionGenerationModel (iarfmoose/t5-base-question-generator, Input: "<answer> {a} <context> {c}")
+    ↓
+Question Candidates
+    ↓
+QuestionDeduplicator (Normalized Exact Duplicate Detection)
+    ↓
+QuestionValidator (Extractive QA with RoBERTa SQuAD2 + Strict Answer Matching)
+    ↓
+Validated, Evidence-Grounded Questions with Full Book Provenance
+```
+
+### Answer Candidate Extraction
+The `AnswerCandidateExtractor` extracts answers grounded strictly in the source text:
+- **Capitalized Named Entities**: e.g., *"Guido van Rossum"*, *"Alan Turing"*, *"NASA"*.
+- **Temporal Anchors**: Dates and 4-digit years (e.g., *"1991"*, *"October 14, 1947"*).
+- **Quantities & Metrics**: Percentages and numeric values (e.g., *"42%"*, *"1.41 billion"*).
+- **Technical & Quoted Phrases**: Key domain terms in quotes or hyphens.
+- **Strict Quality Filters**: Rejects empty spans, trivial stop words, single punctuation, or spans covering the entire chunk.
+
+### Question Validation & Answer Matching Policy
+A candidate question is accepted **only** if it satisfies all validation stages:
+1. **Linguistic Quality**: Must be between 8 and 250 characters, end with a question mark, and cannot be identical to the source text or a circular restatement of the answer.
+2. **Grounding**: The target answer must physically appear within the source evidence.
+3. **Independent Answerability**: The Phase 7 Extractive QA model (`deepset/roberta-base-squad2`) must independently extract an answer span from the evidence with a score above threshold.
+4. **Strict Answer Matching**:
+   - Exact normalized equality passes immediately.
+   - **Numeric Invariance**: Numeric values must match strictly (e.g. 1998 $\neq$ 1999).
+   - High token overlap (Jaccard similarity $\ge 0.5$) with consistent numeric tokens is permitted for extended phrases.
+   - If the QA model fails or produces an incompatible answer, the question is rejected.
+
+### Question Taxonomy & Difficulty Heuristics
+- **Question Types**: `FACTUAL`, `WHO`, `WHAT`, `WHEN`, `WHERE`, `WHY`, `HOW`, `HOW_MANY`, `DEFINITION`, `COMPARISON`.
+- **Difficulty Heuristics**:
+  - `EASY`: Direct factual answers with short spans ($\le 4$ words) answering *Who*, *When*, *Where*, or *How many*.
+  - `MEDIUM`: Multi-token answers (5–15 words) or passages requiring wider context.
+  - `HARD`: Explanations (*Why*, *How*), comparisons, or multi-clause conceptual definitions.
+
+### Controlled Count Limits & Zero-Fabrication Guardrail
+When the client requests $N$ questions:
+- A candidate pool multiplier (`QUESTION_GEN_CANDIDATE_MULTIPLIER = 3`) generates $3N$ candidates to allow for rejection attrition.
+- If fewer than $N$ questions pass validation, the system returns **only the verified questions**. Missing questions are **never fabricated**.
+
+### Provenance Retention
+Every `GeneratedQuestion` maintains permanent book grounding:
+- `document_id`: Source book document.
+- `chunk_id`: Durable chunk ID (`{document_id}_p{page:03d}_c{index:04d}`).
+- `page_number`: 1-based page number where evidence appears.
+- `source_text`: The exact, unedited passage supporting the question and answer.
+- `answer`: The target answer span.
+- `start_offset` and `end_offset`: Exact character offsets in `source_text`.
+- `qa_predicted_answer`: The answer independently extracted by the QA validator.
+- `qa_confidence_score`: The extractive QA model score.
+
+---
+
+## 12. Configuration Settings
 
 | Parameter | Default | Constraint | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -894,10 +986,17 @@ In multi-query plans, individual candidate lists cannot be simply concatenated b
 | `GROUNDING_TOP_K_EVIDENCE` | `5` | `gt=0` | Number of top evidence passages evaluated per claim. |
 | `GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED` | `True` | boolean | Enforces strict safe refusal if any claim is ungrounded. |
 | `GROUNDING_MIN_CLAIM_LENGTH` | `3` | `gt=0` | Minimum character length for extracted claim sentences. |
+| `QUESTION_GEN_MODEL_NAME` | `iarfmoose/t5-base-question-generator` | Valid HF model ID | Question generation Seq2Seq model repository. |
+| `QUESTION_GEN_DEVICE` | `"auto"` | `"auto"`, `"cpu"`, `"cuda"` | Execution device for question generator inference. |
+| `QUESTION_GEN_MAX_INPUT_LENGTH` | `512` | `gt=0` | Maximum input tokens for question generation. |
+| `QUESTION_GEN_MAX_NEW_TOKENS` | `64` | `gt=0` | Maximum generated tokens for question generation. |
+| `QUESTION_GEN_NUM_BEAMS` | `2` | `gt=0` | Beam search width for deterministic question generation. |
+| `QUESTION_GEN_CANDIDATE_MULTIPLIER` | `3` | `gt=0` | Multiplier for target candidate pool size. |
+| `QUESTION_GEN_QA_THRESHOLD` | `0.20` | `float` | Minimum QA confidence score for validated questions. |
 
 ---
 
-## 12. How to Run the Backend
+## 13. How to Run the Backend
 
 With the virtual environment activated:
 
@@ -912,7 +1011,7 @@ Interactive API documentation:
 
 ---
 
-## 13. How to Run Tests
+## 14. How to Run Tests
 
 Run pytest from the `backend` directory:
 
@@ -921,7 +1020,7 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **297 tests** will run, covering:
+All **334 tests** will run, covering:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
@@ -934,10 +1033,11 @@ All **297 tests** will run, covering:
 - **Phase 9 (34 tests)**: NLI model wrapper, dynamic id2label mapping, sentence-level claim decomposition, pairwise NLI validation, threshold boundaries, safe refusal decision policy, end-to-end orchestration, and API endpoints.
 - **Phase 10 (16 tests)**: Citation object creation, deduplication by chunk ID, many-to-many claim references, unsupported claim handling, contradiction/conflict diagnostics, determinism, exact source text preservation, document isolation enforcement, response schema validation, and FastAPI endpoint verification.
 - **Phase 11 (42 tests)**: Query normalization (whitespace, C++, COVID-19, R&D, years), 10-type query classification, expected answer type mapping, zero-hallucination constraint detection (chapter, year, page, quotes), retrieval query decomposition (max 3, non-redundant), candidate merging, stable deduplication, provenance retention, post-merge Cross-Encoder reranking, document isolation, orchestrator integration, semantic principles, and `POST /api/v1/query-plan` API endpoint.
+- **Phase 12 (37 tests)**: Answer candidate extraction (person, date, year, number, organization, stop word rejection, provenance), question generation formatting, answer conditioning, batch generation, question validation, answer matching (exact, case, whitespace, numeric mismatch, date mismatch, partial overlap), source grounding, duplicate detection, count control without fabrication, document isolation, `POST /api/v1/questions/generate` API endpoint, semantic principles, taxonomy classification, and real model integration.
 
 ---
 
-## 14. API Endpoints
+## 15. API Endpoints
 
 ### 1. Health Probe
 - **Method**: `GET`
@@ -961,113 +1061,58 @@ All **297 tests** will run, covering:
 ### 5. Grounded Abstractive QA with Citations & QueryPlan (Phases 9–11)
 - **Method**: `POST`
 - **Path**: `/api/v1/grounded-answer`
-- **Request Body**:
-```json
-{
-  "query": "Compare the population of India and China in 2020.",
-  "top_k": 5,
-  "require_all_claims_supported": true,
-  "entailment_threshold": 0.80,
-  "contradiction_threshold": 0.80
-}
-```
-- **Example Grounded Response with Citations and QueryPlan**:
-```json
-{
-  "query": "Compare the population of India and China in 2020.",
-  "answer": "In 2020, China had approximately 1.41 billion people while India had approximately 1.38 billion.",
-  "answerable": true,
-  "grounded": true,
-  "groundedness_score": 1.0,
-  "grounding_status": "grounded",
-  "query_plan": {
-    "original_query": "Compare the population of India and China in 2020.",
-    "normalized_query": "Compare the population of India and China in 2020.",
-    "query_type": "comparison",
-    "entities": ["India", "China"],
-    "constraints": {
-      "year": 2020,
-      "named_entities": ["India", "China"]
-    },
-    "retrieval_queries": [
-      "India population 2020",
-      "China population 2020"
-    ],
-    "expected_answer_type": "comparison",
-    "requires_multiple_evidence": true
-  },
-  "claims": [
-    {
-      "claim_index": 0,
-      "claim_text": "In 2020, China had approximately 1.41 billion people while India had approximately 1.38 billion.",
-      "status": "entailed",
-      "grounding_status": "entailed",
-      "entailment_score": 0.94,
-      "contradiction_score": 0.01,
-      "neutral_score": 0.05,
-      "citations": [
-        {
-          "citation_id": "cite_1",
-          "document_id": "demographics_handbook",
-          "chunk_id": "demographics_handbook_p045_c0002",
-          "page_number": 45,
-          "chunk_index": 2,
-          "relation": "supports"
-        }
-      ]
-    }
-  ],
-  "citations": [
-    {
-      "citation_id": "cite_1",
-      "document_id": "demographics_handbook",
-      "chunk_id": "demographics_handbook_p045_c0002",
-      "page_number": 45,
-      "chunk_index": 2,
-      "source_text": "In 2020, China recorded a population of 1.41 billion according to census data, whereas India reached approximately 1.38 billion.",
-      "similarity_score": 0.89,
-      "reranker_score": 0.96,
-      "evidence_rank": 1
-    }
-  ],
-  "reason": "All 1 claims are fully grounded in the retrieved book evidence.",
-  "model_name": "google/flan-t5-base",
-  "grounding_model_name": "cross-encoder/nli-deberta-v3-base"
-}
-```
+- **Request Body**: `{"query": "Compare the population of India and China in 2020.", "top_k": 5}`
 
 ### 6. Query Plan Endpoint (Phase 11 Debug & Preview)
 - **Method**: `POST`
 - **Path**: `/api/v1/query-plan`
+- **Request Body**: `{"query": "Compare the population of India and China in 2020."}`
+
+### 7. Controlled Question Generation (Phase 12)
+- **Method**: `POST`
+- **Path**: `/api/v1/questions/generate`
 - **Request Body**:
 ```json
 {
-  "query": "Compare the population of India and China in 2020."
+  "document_id": "deep_learning_handbook",
+  "count": 5,
+  "difficulty": "medium"
 }
 ```
 - **Response Body**:
 ```json
 {
-  "original_query": "Compare the population of India and China in 2020.",
-  "normalized_query": "Compare the population of India and China in 2020.",
-  "query_type": "comparison",
-  "entities": ["India", "China"],
-  "constraints": {
-    "year": 2020,
-    "named_entities": ["India", "China"]
-  },
-  "retrieval_queries": [
-    "India population 2020",
-    "China population 2020"
-  ],
-  "expected_answer_type": "comparison",
-  "requires_multiple_evidence": true
+  "document_id": "deep_learning_handbook",
+  "requested_count": 5,
+  "generated_candidates": 15,
+  "validated_count": 7,
+  "returned_count": 5,
+  "questions": [
+    {
+      "question": "Who created Python?",
+      "answer": "Guido van Rossum",
+      "question_type": "who",
+      "difficulty": "easy",
+      "document_id": "deep_learning_handbook",
+      "chunk_id": "deep_learning_handbook_p004_c0002",
+      "page_number": 4,
+      "source_text": "Python was originally developed by Guido van Rossum in the late 1980s and officially released in 1991.",
+      "start_offset": 35,
+      "end_offset": 51,
+      "qa_predicted_answer": "Guido van Rossum",
+      "qa_confidence_score": 0.96,
+      "metadata": {
+        "qa_score": 0.96,
+        "no_answer_score": 0.01
+      }
+    }
+  ]
 }
 ```
 
 ---
 
-## 15. Future Roadmap
+## 16. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1083,7 +1128,9 @@ All **297 tests** will run, covering:
 | **Phase 9** | Groundedness & Evaluation | **Complete** | DeBERTa-v3 NLI model wrapper, dynamic id2label discovery, claim decomposition, safe decision policy, `POST /api/v1/grounded-answer`. |
 | **Phase 10** | Citation & Provenance Mapping | **Complete** | Deterministic citation IDs (`cite_1`), claim-evidence deduplication, many-to-many references, conflict diagnostics, document isolation. |
 | **Phase 11** | Query Understanding & Planning | **Complete** | Rule-based query taxonomy, safe normalization, zero-hallucination constraints, multi-query generation, candidate merge, post-merge Cross-Encoder reranking. |
-| **Phase 12** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+| **Phase 12** | Question Generation & Validation | **Complete** | Answer-first candidate extraction, T5 question generator (`iarfmoose/t5-base-question-generator`), extractive QA verification, strict answer matching, zero-fabrication count control. |
+| **Phase 13** | Production Hardening & UI | Planned | React frontend, Matching Board UI, PostgreSQL + pgvector, Redis task queues, Docker deployment. |
+
 
 
 

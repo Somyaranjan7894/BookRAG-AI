@@ -89,6 +89,15 @@ class Settings(BaseSettings):
     GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED: bool = True
     GROUNDING_MIN_CLAIM_LENGTH: int = 3
 
+    # Phase 12: Question Generation & Validation
+    QUESTION_GEN_MODEL_NAME: str = "iarfmoose/t5-base-question-generator"
+    QUESTION_GEN_DEVICE: str = "auto"
+    QUESTION_GEN_MAX_INPUT_LENGTH: int = 512
+    QUESTION_GEN_MAX_NEW_TOKENS: int = 64
+    QUESTION_GEN_NUM_BEAMS: int = 2
+    QUESTION_GEN_CANDIDATE_MULTIPLIER: int = 3
+    QUESTION_GEN_QA_THRESHOLD: float = 0.20
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

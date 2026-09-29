@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     health,
     qa,
     query_plan,
+    question_generation,
     retrieval,
     search,
 )
@@ -26,6 +27,7 @@ api_router.include_router(qa.router)
 api_router.include_router(generation.router)
 api_router.include_router(grounded_answer.router)
 api_router.include_router(query_plan.router)
+api_router.include_router(question_generation.router)
 
 
 
