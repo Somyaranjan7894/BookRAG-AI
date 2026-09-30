@@ -1028,7 +1028,7 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **334 tests** will run, covering:
+All **352 tests** will run, covering:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
@@ -1042,6 +1042,8 @@ All **334 tests** will run, covering:
 - **Phase 10 (16 tests)**: Citation object creation, deduplication by chunk ID, many-to-many claim references, unsupported claim handling, contradiction/conflict diagnostics, determinism, exact source text preservation, document isolation enforcement, response schema validation, and FastAPI endpoint verification.
 - **Phase 11 (42 tests)**: Query normalization (whitespace, C++, COVID-19, R&D, years), 10-type query classification, expected answer type mapping, zero-hallucination constraint detection (chapter, year, page, quotes), retrieval query decomposition (max 3, non-redundant), candidate merging, stable deduplication, provenance retention, post-merge Cross-Encoder reranking, document isolation, orchestrator integration, semantic principles, and `POST /api/v1/query-plan` API endpoint.
 - **Phase 12 (37 tests)**: Answer candidate extraction (person, date, year, number, organization, stop word rejection, provenance), question generation formatting, answer conditioning, batch generation, question validation, answer matching (exact, case, whitespace, numeric mismatch, date mismatch, partial overlap), source grounding, duplicate detection, count control without fabrication, document isolation, `POST /api/v1/questions/generate` API endpoint, semantic principles, taxonomy classification, and real model integration.
+- **Phase 13 (18 tests)**: Document/Page/Chunk ORM models, field definitions, status lifecycle, check constraints, foreign keys with cascade deletion, composite uniqueness constraints, DocumentRepository/PageRepository/ChunkRepository CRUD operations, atomic transactional persistence with rollback guarantees, Alembic schema migrations, and REST API document persistence and query endpoints.
+
 
 ---
 
