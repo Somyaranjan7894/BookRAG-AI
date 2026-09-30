@@ -56,21 +56,33 @@ class DocumentPersistenceService:
             # Check for existing document
             existing = self.doc_repo.get_by_id(document.document_id)
             if existing is not None:
-                raise DocumentAlreadyExistsError(
-                    f"Document with ID '{document.document_id}' already exists in persistence.",
-                    details={"document_id": document.document_id},
+                if existing.status == DocumentStatus.PROCESSED.value:
+                    raise DocumentAlreadyExistsError(
+                        f"Document with ID '{document.document_id}' already exists in persistence.",
+                        details={"document_id": document.document_id},
+                    )
+                # Reuse and update existing record (from UPLOADED / QUEUED / FAILED)
+                doc_record = existing
+                doc_record.filename = document.filename
+                doc_record.title = getattr(document, "title", None) or getattr(document.metadata, "title", None)
+                doc_record.author = getattr(document, "author", None) or getattr(document.metadata, "author", None)
+                doc_record.page_count = document.page_count
+                doc_record.status = DocumentStatus.PROCESSING.value
+                # Clean up any partial pages/chunks from a previous failed attempt
+                self.session.query(Chunk).filter(Chunk.document_id == document.document_id).delete()
+                self.session.query(Page).filter(Page.document_id == document.document_id).delete()
+                self.session.flush()
+            else:
+                # 1. Create Document record in PROCESSING status
+                doc_record = Document(
+                    document_id=document.document_id,
+                    filename=document.filename,
+                    title=getattr(document, "title", None) or getattr(document.metadata, "title", None),
+                    author=getattr(document, "author", None) or getattr(document.metadata, "author", None),
+                    page_count=document.page_count,
+                    status=DocumentStatus.PROCESSING.value,
                 )
-
-            # 1. Create Document record in PROCESSING status
-            doc_record = Document(
-                document_id=document.document_id,
-                filename=document.filename,
-                title=getattr(document, "title", None) or getattr(document.metadata, "title", None),
-                author=getattr(document, "author", None) or getattr(document.metadata, "author", None),
-                page_count=document.page_count,
-                status=DocumentStatus.PROCESSING.value,
-            )
-            self.doc_repo.create(doc_record)
+                self.doc_repo.create(doc_record)
 
             # 2. Create Page records
             page_records: List[Page] = []

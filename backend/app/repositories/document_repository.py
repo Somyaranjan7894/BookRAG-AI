@@ -29,12 +29,18 @@ class DocumentRepository:
         self,
         document_id: str,
         status: Union[DocumentStatus, str],
+        stage: Optional[str] = None,
+        error_message: Optional[str] = None,
     ) -> Optional[Document]:
-        """Update the lifecycle status of an existing Document."""
+        """Update the lifecycle status of an existing Document, with optional stage and error message."""
         doc = self.get_by_id(document_id)
         if doc is None:
             return None
         doc.status = status.value if isinstance(status, DocumentStatus) else str(status)
+        if stage is not None:
+            doc.processing_stage = stage
+        if error_message is not None:
+            doc.error_message = error_message
         self.session.flush()
         return doc
 

@@ -18,6 +18,7 @@ class DocumentStatus(str, Enum):
     """Enumeration of persistent document lifecycle states."""
 
     UPLOADED = "uploaded"
+    QUEUED = "queued"
     PROCESSING = "processing"
     PROCESSED = "processed"
     FAILED = "failed"
@@ -61,6 +62,16 @@ class Document(Base):
         default=DocumentStatus.UPLOADED.value,
         index=True,
         doc="Current document lifecycle processing state.",
+    )
+    processing_stage: Mapped[Optional[str]] = mapped_column(
+        String(64),
+        nullable=True,
+        doc="Coarse background processing stage (ingestion, chunking, persistence, embedding, indexing, completed).",
+    )
+    error_message: Mapped[Optional[str]] = mapped_column(
+        String(512),
+        nullable=True,
+        doc="Sanitized error description if document processing fails.",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 14 Complete
+## 4. Current Phase Scope: Phase 15 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, and **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, and **Phase 15 (Redis + Celery Background Processing)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -1341,7 +1341,66 @@ Downgrades cleanly remove the index, drop the column, and drop the extension.
 
 ---
 
-## 18. Future Roadmap
+## 18. Phase 15: Redis + Celery Background Processing
+
+Phase 15 introduces asynchronous background processing using Redis as the message broker and Celery as the task execution worker. Long-running document ingestion, cleaning, chunking, embedding generation, and vector persistence are completely decoupled from the synchronous HTTP request lifecycle.
+
+```
+User / HTTP Client
+       │
+       ▼
+    FastAPI (POST /api/v1/documents)
+       │
+       ├─────────────────────────────────┐
+       ▼                                 ▼
+PostgreSQL (State: QUEUED)         Redis (Message Broker)
+                                         │
+                                         ▼
+                                   Celery Worker (process_document_task)
+                                         │
+                                         ▼
+                             DocumentProcessingService
+                                ├── 1. Validation
+                                ├── 2. State: PROCESSING
+                                ├── 3. PDF Ingestion (PyMuPDF)
+                                ├── 4. Text Cleaning & Chunking
+                                ├── 5. PostgreSQL Persistence (Pages/Chunks)
+                                ├── 6. Vector Indexing (pgvector / FAISS)
+                                └── 7. State: PROCESSED
+```
+
+### Why Background Processing Was Introduced
+Ingesting books and complex multi-page PDF documents involves CPU-intensive operations (PDF extraction, regex normalization, sentence tokenization) and GPU/CPU-heavy ML inference (SentenceTransformer vector generation). Executing these operations inside an HTTP request handler leads to:
+* HTTP request timeouts on large books.
+* Starvation of web server worker threads.
+* Inability to recover from transient infrastructure drops during long processing jobs.
+
+With Redis and Celery:
+* `POST /api/v1/documents` accepts the upload or path reference, records the document in PostgreSQL as `QUEUED`, enqueues a Celery task, and immediately returns **HTTP 202 Accepted** with a `task_id` and `document_id`.
+* The Celery worker picks up the job asynchronously from Redis and executes `DocumentProcessingService`.
+
+### Architecture & Service Decoupling
+* **Thin Celery Task**: `process_document_task` contains zero business or ML logic. It receives stable identifiers (`document_id`, `file_path`) and delegates entirely to `DocumentProcessingService`.
+* **Durable State in PostgreSQL**: Document lifecycle (`QUEUED` → `PROCESSING` → `PROCESSED` or `FAILED`), coarse processing stages (`ingestion`, `chunking`, `persistence`, `embedding`, `indexing`, `completed`), and sanitized failure messages are stored in PostgreSQL. Celery transient state does not replace the database system of record.
+* **Bounded Retries**: Transient failures (e.g. database connection timeouts) trigger bounded retries with exponential/linear backoff (`max_retries=3`). Deterministic failures (missing files, corrupt PDFs, invalid schema) fail immediately without endless retries.
+* **Strict Idempotency**: Duplicate task executions check document state and chunk counts; if already processed, the task exits cleanly without duplicating pages, chunks, or vectors.
+* **Shared Storage**: The API and Celery workers access source PDFs via shared upload storage (`data/uploads`).
+* **Vector Backend Agnostic**: `DocumentProcessingService` respects `VECTOR_BACKEND=pgvector` (database-native vector persistence) or `VECTOR_BACKEND=faiss` (local FAISS index construction).
+
+### Worker Startup Command
+```bash
+# Start Celery worker locally (Windows recommended: solo pool)
+celery -A app.workers.celery_app worker --loglevel=info --pool=solo
+```
+
+### Docker Infrastructure
+`docker-compose.yml` provides:
+* `db`: PostgreSQL 16 + pgvector on port `5432`
+* `redis`: Redis 7 Alpine on port `6379`
+
+---
+
+## 19. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1360,7 +1419,8 @@ Downgrades cleanly remove the index, drop the column, and drop the extension.
 | **Phase 12** | Question Generation & Validation | **Complete** | Answer-first candidate extraction, T5 question generator (`iarfmoose/t5-base-question-generator`), extractive QA verification, strict answer matching, zero-fabrication count control. |
 | **Phase 13** | PostgreSQL Persistent Application Data | **Complete** | PostgreSQL system of record, SQLAlchemy 2.x, Alembic migrations, Documents/Pages/Chunks models, transactional persistence, repository layer. |
 | **Phase 14** | pgvector Persistence & Vector Search | **Complete** | PostgreSQL pgvector extension, vector column migrations, VectorSearchBackend abstraction, PGVectorRepository, HNSW cosine index, dual FAISS/pgvector support. |
-| **Phase 15** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Redis task queues, Celery workers, Docker deployment. |
+| **Phase 15** | Redis + Celery Background Processing | **Complete** | Redis broker, Celery worker, DocumentProcessingService pipeline orchestration, async 202 upload API, durable PostgreSQL progress tracking, bounded retries, idempotency. |
+| **Phase 16** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Docker deployment, production server architecture. |
 
 
 

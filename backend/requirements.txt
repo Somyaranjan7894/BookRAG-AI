@@ -25,6 +25,10 @@ psycopg[binary]>=3.2.0
 # Vector Storage & Retrieval (Phase 14)
 pgvector>=0.3.0,<1.0.0
 
+# Background Processing & Storage (Phase 15)
+celery>=5.3.0,<6.0.0
+redis>=5.0.0,<6.0.0
+
 # Testing
 pytest>=8.3.0,<9.0.0
 httpx>=0.28.0,<1.0.0

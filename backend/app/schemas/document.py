@@ -65,8 +65,26 @@ class PersistedDocumentResponse(BaseModel):
     author: Optional[str] = None
     page_count: int
     status: str
+    processing_stage: Optional[str] = None
+    error_message: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
+
+class DocumentUploadRequest(BaseModel):
+    """Request payload for path-based asynchronous document processing."""
+
+    file_path: str = Field(description="Filesystem path to source PDF file")
+    document_id: Optional[str] = Field(default=None, description="Optional custom document ID")
+
+
+class DocumentUploadResponse(BaseModel):
+    """Response payload for asynchronous document upload and enqueue endpoint."""
+
+    document_id: str = Field(description="Deterministic document identifier")
+    task_id: Optional[str] = Field(default=None, description="Celery background task ID")
+    status: str = Field(description="Initial processing status (e.g. 'queued')")
+    message: str = Field(default="Document processing task enqueued successfully.", description="Status message")
 
 
 class DocumentListResponse(BaseModel):

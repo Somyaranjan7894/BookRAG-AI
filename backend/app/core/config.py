@@ -5,7 +5,7 @@ and pydantic-settings.
 """
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -106,6 +106,25 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     DB_POOL_TIMEOUT: float = 30.0
+
+    # Phase 15: Background Processing & Storage (Redis + Celery)
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CELERY_BROKER_URL: Optional[str] = None
+    CELERY_RESULT_BACKEND: Optional[str] = None
+    CELERY_TASK_MAX_RETRIES: int = 3
+    CELERY_TASK_DEFAULT_RETRY_DELAY: int = 5
+    CELERY_TASK_ALWAYS_EAGER: bool = False
+    UPLOAD_STORAGE_DIR: str = "data/uploads"
+
+    @property
+    def celery_broker_url(self) -> str:
+        """Resolve Celery broker URL, falling back to REDIS_URL."""
+        return self.CELERY_BROKER_URL or self.REDIS_URL
+
+    @property
+    def celery_result_backend(self) -> str:
+        """Resolve Celery result backend URL, falling back to REDIS_URL."""
+        return self.CELERY_RESULT_BACKEND or self.REDIS_URL
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
