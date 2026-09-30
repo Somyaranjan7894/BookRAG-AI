@@ -14,9 +14,9 @@
 
 version: "3.8"
 services:
-  # PostgreSQL persistent system of record (Phase 13)
+  # PostgreSQL persistent system of record + pgvector (Phase 13 / 14)
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: bookrag_postgres
     restart: unless-stopped
     environment:

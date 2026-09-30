@@ -22,6 +22,9 @@ sqlalchemy>=2.0.0,<3.0.0
 alembic>=1.13.0,<2.0.0
 psycopg[binary]>=3.2.0
 
+# Vector Storage & Retrieval (Phase 14)
+pgvector>=0.3.0,<1.0.0
+
 # Testing
 pytest>=8.3.0,<9.0.0
 httpx>=0.28.0,<1.0.0

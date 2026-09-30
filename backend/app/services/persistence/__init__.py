@@ -7,6 +7,7 @@ from app.services.persistence.exceptions import (
     PersistenceError,
     ReferentialIntegrityError,
 )
+from app.services.persistence.embedding_service import EmbeddingPersistenceService
 from app.services.persistence.service import DocumentPersistenceService
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "DocumentAlreadyExistsError",
     "DocumentNotFoundError",
     "DocumentPersistenceService",
+    "EmbeddingPersistenceService",
     "PersistenceError",
     "ReferentialIntegrityError",
 ]

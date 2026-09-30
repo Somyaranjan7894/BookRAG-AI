@@ -20,6 +20,12 @@ from app.schemas.search import (
 from app.services.embeddings.service import EmbeddingService
 from app.services.reranking.exceptions import RerankingError
 from app.services.reranking.service import RerankerService
+from app.services.retrieval.backend import (
+    FAISSVectorBackend,
+    PGVectorBackend,
+    VectorSearchBackend,
+    create_vector_backend,
+)
 from app.services.retrieval.exceptions import IndexNotFoundError
 from app.services.retrieval.service import RetrievalService
 from app.services.search.exceptions import (
@@ -42,6 +48,8 @@ class SearchService:
         embedding_service: Optional[EmbeddingService] = None,
         retrieval_service: Optional[RetrievalService] = None,
         reranker_service: Optional[RerankerService] = None,
+        vector_backend: Optional[VectorSearchBackend] = None,
+        backend_type: Optional[str] = None,
         max_top_k: int = MAX_TOP_K,
         default_candidate_k: int = DEFAULT_CANDIDATE_K,
         enable_reranking: Optional[bool] = None,
@@ -52,6 +60,8 @@ class SearchService:
             embedding_service: Phase 3 service generating dense vector embeddings.
             retrieval_service: Phase 4 service managing FAISS indexes and candidate retrieval.
             reranker_service: Phase 6 service performing Cross-Encoder precision reranking.
+            vector_backend: Phase 14 pluggable VectorSearchBackend (FAISS or pgvector).
+            backend_type: Optional backend type override ("faiss" or "pgvector").
             max_top_k: Maximum allowed candidate limit (bounds computational overhead).
             default_candidate_k: Default first-stage candidate pool size before reranking.
             enable_reranking: Whether reranking is active by default (None = auto-detect).
@@ -62,6 +72,17 @@ class SearchService:
         self.max_top_k = max_top_k
         self.default_candidate_k = default_candidate_k
         self._enable_reranking_override = enable_reranking
+
+        # Resolve vector search backend (FAISS or pgvector)
+        if vector_backend is not None:
+            self.backend = vector_backend
+        elif retrieval_service is not None or (backend_type or settings.VECTOR_BACKEND).lower() == "faiss":
+            self.backend = FAISSVectorBackend(retrieval_service=self.retrieval_service)
+        else:
+            self.backend = create_vector_backend(
+                backend_type=backend_type or settings.VECTOR_BACKEND,
+                retrieval_service=self.retrieval_service,
+            )
 
     @property
     def is_reranking_enabled(self) -> bool:
@@ -133,9 +154,9 @@ class SearchService:
                 raise InvalidSearchQueryError("document_id cannot be whitespace-only if provided.")
             clean_doc_id = document_id.strip()
 
-        # 2. Resolve index and verify document existence
+        # 2. Check empty index / vector store state
         try:
-            target_index = self.retrieval_service.get_index(index_id)
+            total_vecs = self.backend.total_vectors(index_id=index_id)
         except IndexNotFoundError as exc:
             logger.warning("Search failed: no vector index found (index_id=%s).", index_id)
             raise IndexNotInitializedError(
@@ -143,12 +164,12 @@ class SearchService:
             ) from exc
 
         # Check empty index state
-        if target_index.total_vectors == 0:
+        if total_vecs == 0:
             if clean_doc_id is not None:
                 raise DocumentNotFoundError(
                     f"Document '{clean_doc_id}' was not found in the search index."
                 )
-            logger.debug("Search executed on empty index '%s'. Returning empty results.", target_index.index_id)
+            logger.debug("Search executed on empty vector backend. Returning empty results.")
             return SearchResponse(
                 query=clean_query,
                 results=[],
@@ -159,13 +180,8 @@ class SearchService:
 
         # Check document isolation validity
         if clean_doc_id is not None:
-            known_docs = set(target_index.metadata.document_ids)
-            has_doc_index = (
-                hasattr(self.retrieval_service, "_indices")
-                and clean_doc_id in self.retrieval_service._indices
-            )
-            if clean_doc_id not in known_docs and not has_doc_index:
-                logger.info("Requested document '%s' does not exist in index catalog.", clean_doc_id)
+            if not self.backend.has_document(clean_doc_id, index_id=index_id):
+                logger.info("Requested document '%s' does not exist in search index.", clean_doc_id)
                 raise DocumentNotFoundError(
                     f"Document '{clean_doc_id}' was not found in the search index."
                 )
@@ -194,22 +210,14 @@ class SearchService:
                 details=str(exc),
             ) from exc
 
-        # 6. First-Stage FAISS Vector Retrieval (High-Recall Candidate Pool)
+        # 6. First-Stage Vector Retrieval via VectorSearchBackend (High-Recall Candidate Pool)
         try:
-            if hasattr(self.retrieval_service, "search_by_vector"):
-                raw_results = self.retrieval_service.search_by_vector(
-                    query_vector=query_vector,
-                    top_k=effective_candidate_k,
-                    document_id=clean_doc_id,
-                    index_id=index_id,
-                )
-            else:
-                raw_results = self.retrieval_service.search(
-                    query=clean_query,
-                    top_k=effective_candidate_k,
-                    document_id=clean_doc_id,
-                    index_id=index_id,
-                )
+            raw_results = self.backend.search(
+                query_vector=query_vector,
+                top_k=effective_candidate_k,
+                document_id=clean_doc_id,
+                index_id=index_id,
+            )
         except (IndexNotFoundError, DocumentNotFoundError):
             raise
         except Exception as exc:

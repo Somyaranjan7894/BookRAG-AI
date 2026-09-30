@@ -1,8 +1,9 @@
 """Chunk ORM model representing text chunks for retrieval and question answering."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Sequence
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
@@ -16,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.config import settings
 from app.db.base import Base
 
 if TYPE_CHECKING:
@@ -79,6 +81,11 @@ class Chunk(Base):
         nullable=False,
         doc="Timestamp when the chunk was persisted.",
     )
+    embedding: Mapped[Optional[List[float]]] = mapped_column(
+        Vector(settings.EMBEDDING_DIMENSION),
+        nullable=True,
+        doc="Dense semantic vector embedding generated from chunk text.",
+    )
 
     # Relationships
     document: Mapped["Document"] = relationship(
@@ -115,6 +122,13 @@ class Chunk(Base):
             "document_id",
             "page_number",
             "chunk_index",
+        ),
+        Index(
+            "ix_chunks_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
     )
 

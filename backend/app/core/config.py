@@ -43,7 +43,8 @@ class Settings(BaseSettings):
     EMBEDDING_DEVICE: str = "auto"
     EMBEDDING_DIMENSION: int = 384
 
-    # Vector Retrieval (Phase 4)
+    # Vector Retrieval (Phase 4 / Phase 14)
+    VECTOR_BACKEND: Literal["faiss", "pgvector"] = "faiss"
     RETRIEVAL_DEFAULT_TOP_K: int = 5
     RETRIEVAL_MAX_TOP_K: int = 100
     INDEX_STORAGE_DIR: str = "data/indexes"
