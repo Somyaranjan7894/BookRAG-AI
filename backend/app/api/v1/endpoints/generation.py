@@ -1,27 +1,17 @@
 """FastAPI Abstractive Question Answering endpoint for BookRAG AI.
 
-Provides the public POST /api/v1/answer endpoint, orchestrating dense FAISS retrieval,
+Provides the public POST /api/v1/answer endpoint, orchestrating dense vector retrieval,
 Cross-Encoder precision reranking, context budgeting, and FLAN-T5 answer generation.
 """
 
 from fastapi import APIRouter, Depends, status
 
-from app.api.v1.endpoints.search import get_search_service
+from app.api.v1.dependencies import get_generation_service, get_search_service
 from app.schemas.generation import GenerationRequest, GenerationResponse
 from app.services.generation.service import GenerationService
 from app.services.search.service import SearchService
 
 router = APIRouter(tags=["Answer Generation"])
-
-_generation_service: GenerationService | None = None
-
-
-def get_generation_service() -> GenerationService:
-    """Dependency provider for GenerationService with singleton model caching."""
-    global _generation_service
-    if _generation_service is None:
-        _generation_service = GenerationService()
-    return _generation_service
 
 
 @router.post(
@@ -32,7 +22,7 @@ def get_generation_service() -> GenerationService:
     description=(
         "Ask a natural language question against indexed book documents and receive an abstractive answer "
         "synthesized strictly from retrieved and reranked evidence using FLAN-T5. "
-        "Pipeline: Query -> FAISS Dense Retrieval -> Candidate Pool -> Cross-Encoder Reranking -> "
+        "Pipeline: Query -> Dense Retrieval -> Candidate Pool -> Cross-Encoder Reranking -> "
         "Evidence Context Budgeting -> FLAN-T5 Grounded Generation -> Structured Answer with Provenance. "
         "The retrieved evidence remains the sole source of truth; if evidence is unavailable or empty, "
         "the service returns a structured unanswerable response rather than hallucinating from world knowledge."

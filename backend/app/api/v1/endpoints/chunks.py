@@ -1,18 +1,16 @@
 """Development and testing endpoints for text cleaning and intelligent chunking."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_chunker, get_text_cleaner
 from app.schemas.chunk import (
     ChunkPageRequest,
     ChunkPageResponse,
-    DocumentChunksResponse,
     TextCleanRequest,
     TextCleanResponse,
 )
-from app.services.pdf.ingestion import PDFIngestionService
 from app.services.text.chunker import Chunker
 from app.services.text.cleaner import TextCleaner
-from app.services.text.processor import TextProcessingService
 
 router = APIRouter(prefix="/chunks", tags=["Chunks"])
 
@@ -24,9 +22,12 @@ router = APIRouter(prefix="/chunks", tags=["Chunks"])
     summary="Clean Text",
     description="Development endpoint to test conservative text cleaning and normalization.",
 )
-async def clean_text(payload: TextCleanRequest) -> TextCleanResponse:
+async def clean_text(
+    payload: TextCleanRequest,
+    cleaner: type[TextCleaner] = Depends(get_text_cleaner),
+) -> TextCleanResponse:
     """Apply deterministic text cleaner to raw text."""
-    cleaned = TextCleaner.clean(payload.text)
+    cleaned = cleaner.clean(payload.text)
     return TextCleanResponse(
         original_length=len(payload.text),
         cleaned_length=len(cleaned),
@@ -41,9 +42,11 @@ async def clean_text(payload: TextCleanRequest) -> TextCleanResponse:
     summary="Chunk Single Page",
     description="Development endpoint to chunk a single page's text into structured Chunks.",
 )
-async def chunk_single_page(payload: ChunkPageRequest) -> ChunkPageResponse:
+async def chunk_single_page(
+    payload: ChunkPageRequest,
+    chunker: Chunker = Depends(get_chunker),
+) -> ChunkPageResponse:
     """Generate structured Chunks for a single page with provenance."""
-    chunker = Chunker()
     chunks = chunker.chunk_text(
         text=payload.text,
         document_id=payload.document_id,

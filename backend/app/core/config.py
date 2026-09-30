@@ -21,7 +21,7 @@ class Settings(BaseSettings):
         "application for asking questions about complete books."
     )
     ENVIRONMENT: Literal["development", "staging", "production", "test"] = "development"
-    DEBUG: bool = True
+    DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
 
     # API Configuration

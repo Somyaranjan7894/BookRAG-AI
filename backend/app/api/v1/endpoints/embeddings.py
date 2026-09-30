@@ -1,7 +1,8 @@
 """Development and testing endpoints for semantic vector embedding generation."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_embedding_service
 from app.schemas.chunk import Chunk
 from app.schemas.embedding import (
     EmbedChunkRequest,
@@ -21,7 +22,10 @@ router = APIRouter(prefix="/embeddings", tags=["Embeddings"])
     summary="Embed Single Chunk",
     description="Development endpoint to generate a dense semantic vector for a single text chunk.",
 )
-async def embed_single_chunk(payload: EmbedChunkRequest) -> EmbeddingRecord:
+async def embed_single_chunk(
+    payload: EmbedChunkRequest,
+    service: EmbeddingService = Depends(get_embedding_service),
+) -> EmbeddingRecord:
     """Generate an embedding for a single chunk with provenance retention."""
     chunk = Chunk(
         chunk_id=payload.chunk_id,
@@ -32,7 +36,6 @@ async def embed_single_chunk(payload: EmbedChunkRequest) -> EmbeddingRecord:
         char_count=len(payload.text),
         word_count=len(payload.text.split()),
     )
-    service = EmbeddingService()
     return service.embed_chunk(chunk, config=payload.config)
 
 
@@ -43,7 +46,10 @@ async def embed_single_chunk(payload: EmbedChunkRequest) -> EmbeddingRecord:
     summary="Embed Batch of Chunks",
     description="Development endpoint to batch-embed multiple text chunks.",
 )
-async def embed_batch_chunks(payload: EmbedChunksRequest) -> EmbedChunksResponse:
+async def embed_batch_chunks(
+    payload: EmbedChunksRequest,
+    service: EmbeddingService = Depends(get_embedding_service),
+) -> EmbedChunksResponse:
     """Generate embeddings for a batch of serialized chunks."""
     chunks = [
         Chunk(
@@ -57,7 +63,6 @@ async def embed_batch_chunks(payload: EmbedChunksRequest) -> EmbedChunksResponse
         )
         for idx, c in enumerate(payload.chunks)
     ]
-    service = EmbeddingService()
     records = service.embed_chunks(chunks, config=payload.config)
 
     dimension = records[0].dimension if records else 384

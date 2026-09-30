@@ -1,27 +1,17 @@
 """FastAPI Extractive Question Answering endpoint for BookRAG AI.
 
-Provides a clean API layer orchestrating two-stage retrieval (FAISS + Cross-Encoder)
+Provides a clean API layer orchestrating two-stage retrieval (FAISS/pgvector + Cross-Encoder)
 and extractive answer span selection (RoBERTa SQuAD2) over indexed documents.
 """
 
 from fastapi import APIRouter, Depends, status
 
-from app.api.v1.endpoints.search import get_search_service
+from app.api.v1.dependencies import get_qa_service, get_search_service
 from app.schemas.qa import QARequest, QAResponse
 from app.services.qa.service import QAService
 from app.services.search.service import SearchService
 
 router = APIRouter(tags=["Question Answering"])
-
-_qa_service: QAService | None = None
-
-
-def get_qa_service() -> QAService:
-    """Dependency provider for QAService with singleton model caching."""
-    global _qa_service
-    if _qa_service is None:
-        _qa_service = QAService()
-    return _qa_service
 
 
 @router.post(
@@ -31,7 +21,7 @@ def get_qa_service() -> QAService:
     summary="Extractive Question Answering",
     description=(
         "Ask a natural language question against indexed books and extract the best supported answer span. "
-        "Pipeline: Dense FAISS Retrieval -> Candidate Pool -> Cross-Encoder Reranker -> Top Evidence -> "
+        "Pipeline: Dense Retrieval -> Candidate Pool -> Cross-Encoder Reranker -> Top Evidence -> "
         "RoBERTa SQuAD2 Extractive QA -> Best Answer Span with complete source provenance. "
         "The model extracts text spans from the evidence; it does NOT generate or hallucinate new facts. "
         "If evidence is insufficient or unanswerable, returns a structured no-answer response."

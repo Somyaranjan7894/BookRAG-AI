@@ -1,15 +1,24 @@
 """Application logging configuration for BookRAG AI.
 
-Provides consistent, sanitized, and level-configurable standard logging.
+Provides consistent, sanitized, and level-configurable standard logging with request correlation.
 """
 
 import logging
 import sys
 from typing import Optional
 
-
-LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s:%(funcName)s:%(lineno)d - %(message)s"
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | [%(request_id)s] %(name)s:%(funcName)s:%(lineno)d - %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
+class CorrelationIdFilter(logging.Filter):
+    """Filter that injects the current request correlation ID into log records."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        from app.core.correlation import get_request_id
+
+        record.request_id = get_request_id() or "-"
+        return True
 
 
 def setup_logging(log_level: Optional[str] = None) -> None:
@@ -32,6 +41,7 @@ def setup_logging(log_level: Optional[str] = None) -> None:
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(numeric_level)
+    console_handler.addFilter(CorrelationIdFilter())
     formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=DATE_FORMAT)
     console_handler.setFormatter(formatter)
     root_logger.addHandler(console_handler)
@@ -42,4 +52,5 @@ def setup_logging(log_level: Optional[str] = None) -> None:
 
 def get_logger(name: str) -> logging.Logger:
     """Retrieve a configured logger instance with the given module name."""
-    return logging.getLogger(name)
+    logger = logging.getLogger(name)
+    return logger

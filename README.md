@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 15 Complete
+## 4. Current Phase Scope: Phase 16 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, and **Phase 15 (Redis + Celery Background Processing)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, **Phase 15 (Redis + Celery Background Processing)**, and **Phase 16 (Production FastAPI Architecture)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -1400,7 +1400,69 @@ celery -A app.workers.celery_app worker --loglevel=info --pool=solo
 
 ---
 
-## 19. Future Roadmap
+## 19. Phase 16: Production FastAPI Architecture
+
+Phase 16 refactors the FastAPI application into a robust, production-oriented modular architecture. It reinforces architectural boundaries without modifying domain or ML logic, establishing centralized dependency injection, request correlation, structured sanitized exception handling, and thin API controllers.
+
+```
+Client Request (with optional X-Request-ID)
+       │
+       ▼
+[ CorrelationIdMiddleware ] (Pure ASGI)
+       ├── Extracts or generates UUID4 request ID
+       ├── Injects into ContextVar & request.state.request_id
+       ├── Measures response latency (X-Process-Time)
+       └── Emits structured access log with request ID
+       │
+       ▼
+[ Thin FastAPI Routers (/api/v1/*) ]
+       │  Pydantic request validation only; no business or SQL logic
+       │
+       ▼ (FastAPI Depends)
+[ Centralized Dependency Injection (app/api/v1/dependencies.py) ]
+       ├── Database sessions (request-scoped, connection pool management)
+       ├── Repositories (DocumentRepository)
+       ├── Document Persistence & Ingestion Services
+       ├── ML Service Singletons (cached model wrappers)
+       └── Async Document Upload Service
+       │
+       ▼
+[ Domain Services & Repositories ]
+       ├── DocumentUploadService ──► Redis / Celery Background Worker
+       ├── SearchService ──► VectorSearchBackend (pgvector / FAISS) + Reranker
+       ├── QAService / GenerationService / GroundedAnswerService
+       └── DocumentPersistenceService ──► PostgreSQL (SQLAlchemy 2.x)
+       │
+       ▼
+[ Centralized Exception Handlers (app/core/errors.py) ]
+       ├── Maps domain exceptions to standard HTTP status codes
+       ├── Embeds request_id in all structured error envelopes
+       ├── Sanitizes 500 errors (zero traceback/credential leakage)
+       └── Attaches X-Request-ID response header
+```
+
+### Key Architectural Improvements:
+1. **Thin API Routers**: Routers under `/api/v1` are strictly responsible for request parsing, dependency resolution, invoking services, and building responses. No SQL or domain processing resides inside endpoint handlers.
+2. **Centralized Dependency Injection (`app/api/v1/dependencies.py`)**: All service factories and database providers are declared centrally. Heavyweight ML models (`sentence-transformers`, `CrossEncoder`, `FLAN-T5`, `RoBERTa`, `DeBERTa`) are managed as cached singletons, preventing redundant instantiations across requests while facilitating unit testing via `app.dependency_overrides`.
+3. **Request Correlation Tracking (`CorrelationIdMiddleware`)**: Pure ASGI middleware intercepts every request, sanitizes or creates an `X-Request-ID`, stores it in a thread-safe `ContextVar`, attaches timing headers (`X-Process-Time`), and injects the identifier into log records and error envelopes.
+4. **Sanitized Exception Handling (`app/core/errors.py`)**: All application and domain exceptions are mapped to standard HTTP status codes (`400`, `404`, `409`, `422`, `500`, `503`) with a consistent JSON envelope:
+   ```json
+   {
+     "error": {
+       "code": 404,
+       "message": "Document 'doc_123' not found in database",
+       "request_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+       "error_type": "NOT_FOUND"
+     }
+   }
+   ```
+   Internal stack traces, filesystem paths, database credentials, and secrets are never leaked to clients.
+5. **OpenAPI Documentation**: Enhanced with endpoint family tags (`Health`, `Documents`, `Search`, `Question Answering`, `Answer Generation`, `Grounded Answer`, `Question Generation`, `Query Planning`, `Chunks`, `Embeddings`, `Retrieval`).
+6. **Preserved Background Processing & Vector Backends**: Document uploads continue returning **HTTP 202 Accepted** with asynchronous Celery enqueueing, and both `VECTOR_BACKEND=faiss` and `VECTOR_BACKEND=pgvector` operate seamlessly.
+
+---
+
+## 20. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1420,7 +1482,8 @@ celery -A app.workers.celery_app worker --loglevel=info --pool=solo
 | **Phase 13** | PostgreSQL Persistent Application Data | **Complete** | PostgreSQL system of record, SQLAlchemy 2.x, Alembic migrations, Documents/Pages/Chunks models, transactional persistence, repository layer. |
 | **Phase 14** | pgvector Persistence & Vector Search | **Complete** | PostgreSQL pgvector extension, vector column migrations, VectorSearchBackend abstraction, PGVectorRepository, HNSW cosine index, dual FAISS/pgvector support. |
 | **Phase 15** | Redis + Celery Background Processing | **Complete** | Redis broker, Celery worker, DocumentProcessingService pipeline orchestration, async 202 upload API, durable PostgreSQL progress tracking, bounded retries, idempotency. |
-| **Phase 16** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Docker deployment, production server architecture. |
+| **Phase 16** | Production FastAPI Architecture | **Complete** | Thin routers, centralized DI (`dependencies.py`), correlation ID middleware (`X-Request-ID`), structured sanitized error responses, OpenAPI metadata, service/repository boundaries. |
+| **Phase 17** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Docker deployment, production server architecture. |
 
 
 

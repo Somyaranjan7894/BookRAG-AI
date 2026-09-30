@@ -1,7 +1,8 @@
 """Development and testing endpoints for semantic vector retrieval with FAISS."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_dev_retrieval_service
 from app.schemas.embedding import EmbeddingRecord
 from app.schemas.retrieval import (
     BuildIndexRequest,
@@ -13,14 +14,6 @@ from app.services.retrieval.service import RetrievalService
 
 router = APIRouter(prefix="/retrieval", tags=["Retrieval"])
 
-# Global development service instance for holding in-memory test indexes
-_dev_retrieval_service = RetrievalService()
-
-
-def get_dev_retrieval_service() -> RetrievalService:
-    """Retrieve the shared development RetrievalService instance."""
-    return _dev_retrieval_service
-
 
 @router.post(
     "/index",
@@ -29,10 +22,12 @@ def get_dev_retrieval_service() -> RetrievalService:
     summary="Build Vector Index (Dev)",
     description="Development endpoint to populate a FAISS IndexFlatIP instance from EmbeddingRecords.",
 )
-async def build_index(payload: BuildIndexRequest) -> BuildIndexResponse:
+async def build_index(
+    payload: BuildIndexRequest,
+    service: RetrievalService = Depends(get_dev_retrieval_service),
+) -> BuildIndexResponse:
     """Build a FAISS vector index from serialized embedding records."""
     records = [EmbeddingRecord(**r) for r in payload.records]
-    service = get_dev_retrieval_service()
     idx = service.build_index_from_records(
         records=records,
         index_id=payload.index_id or payload.document_id or "default",
@@ -55,9 +50,11 @@ async def build_index(payload: BuildIndexRequest) -> BuildIndexResponse:
     summary="Search Vector Index",
     description="Development endpoint to perform top-K cosine similarity search with optional document isolation.",
 )
-async def search_index(payload: RetrievalQueryRequest) -> RetrievalQueryResponse:
+async def search_index(
+    payload: RetrievalQueryRequest,
+    service: RetrievalService = Depends(get_dev_retrieval_service),
+) -> RetrievalQueryResponse:
     """Search the FAISS vector index for top-K candidate chunks."""
-    service = get_dev_retrieval_service()
     results = service.search(
         query=payload.query,
         top_k=payload.top_k,

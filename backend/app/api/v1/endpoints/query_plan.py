@@ -6,20 +6,11 @@ and previewing deterministic retrieval execution plans.
 
 from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_query_understanding_service
 from app.schemas.query_plan import QueryPlan, QueryPlanRequest
 from app.services.query_understanding.service import QueryUnderstandingService
 
 router = APIRouter(tags=["Query Planning"])
-
-_query_understanding_service: QueryUnderstandingService | None = None
-
-
-def get_query_understanding_service() -> QueryUnderstandingService:
-    """Dependency provider for QueryUnderstandingService."""
-    global _query_understanding_service
-    if _query_understanding_service is None:
-        _query_understanding_service = QueryUnderstandingService()
-    return _query_understanding_service
 
 
 @router.post(

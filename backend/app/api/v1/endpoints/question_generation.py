@@ -1,8 +1,8 @@
 """FastAPI endpoint for Phase 12 Question Generation in BookRAG AI."""
 
-from typing import Optional
 from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_question_generation_service
 from app.core.logging import get_logger
 from app.schemas.question_generation import (
     QuestionGenerationRequest,
@@ -13,16 +13,6 @@ from app.services.question_generation.service import QuestionGenerationService
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/questions", tags=["Question Generation"])
-
-_qg_service: Optional[QuestionGenerationService] = None
-
-
-def get_question_generation_service() -> QuestionGenerationService:
-    """Dependency provider for QuestionGenerationService with singleton model caching."""
-    global _qg_service
-    if _qg_service is None:
-        _qg_service = QuestionGenerationService()
-    return _qg_service
 
 
 @router.post(

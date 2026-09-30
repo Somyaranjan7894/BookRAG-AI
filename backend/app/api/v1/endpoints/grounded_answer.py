@@ -1,26 +1,17 @@
 """FastAPI Grounded Answer Generation endpoint for BookRAG AI Phase 9.
 
-Provides the public POST /api/v1/grounded-answer endpoint, orchestrating dense FAISS retrieval,
+Provides the public POST /api/v1/grounded-answer endpoint, orchestrating dense vector retrieval,
 Cross-Encoder precision reranking, FLAN-T5 abstractive generation, deterministic claim decomposition,
 NLI groundedness validation (cross-encoder/nli-deberta-v3-base), and safe decision policy.
 """
 
 from fastapi import APIRouter, Depends, status
 
+from app.api.v1.dependencies import get_grounded_answer_service
 from app.schemas.grounding import GroundedAnswerRequest, GroundedAnswerResponse
 from app.services.grounding.orchestrator import GroundedAnswerService
 
 router = APIRouter(tags=["Grounded Answer"])
-
-_grounded_answer_service: GroundedAnswerService | None = None
-
-
-def get_grounded_answer_service() -> GroundedAnswerService:
-    """Dependency provider for GroundedAnswerService with cached singleton components."""
-    global _grounded_answer_service
-    if _grounded_answer_service is None:
-        _grounded_answer_service = GroundedAnswerService()
-    return _grounded_answer_service
 
 
 @router.post(
@@ -32,7 +23,7 @@ def get_grounded_answer_service() -> GroundedAnswerService:
         "Ask a natural language question against indexed book documents and receive a verified, "
         "grounded answer synthesized strictly from retrieved evidence, validated using NLI, and mapped "
         "to exact deterministic book citations. "
-        "Pipeline: Query -> FAISS Retrieval -> Cross-Encoder Reranker -> FLAN-T5 Generation -> "
+        "Pipeline: Query -> Vector Retrieval -> Cross-Encoder Reranker -> FLAN-T5 Generation -> "
         "Sentence-level Claim Decomposition -> DeBERTa-v3 NLI Verification -> Citation Mapping -> Safe Decision Policy. "
         "Verified citations contain exact book page numbers, chunk identifiers, and unedited source passages. "
         "If any substantive claims are unsupported, contradicted, or conflicting under the safe policy, "
