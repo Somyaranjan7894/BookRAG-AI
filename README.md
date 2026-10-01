@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 16 Complete
+## 4. Current Phase Scope: Phase 17 Complete
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, **Phase 15 (Redis + Celery Background Processing)**, and **Phase 16 (Production FastAPI Architecture)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, **Phase 15 (Redis + Celery Background Processing)**, **Phase 16 (Production FastAPI Architecture)**, and **Phase 17 (React Frontend & Product UI)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -174,9 +174,24 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - `DocumentPersistenceService` orchestrating atomic transactions with strict status lifecycle (`processing -> processed`), automatic rollback on failure, and zero partial/dirty state.
   - Reproducible Alembic migration workflow (`alembic upgrade head`, `alembic downgrade base`) managing schema versioning independently of application startup.
   - Public endpoints: `POST /api/v1/documents/ingest` (with transactional DB persistence), `GET /api/v1/documents`, `GET /api/v1/documents/{id}`, `GET /api/v1/documents/{id}/pages`, `GET /api/v1/documents/{id}/chunks`, and `DELETE /api/v1/documents/{id}`.
-  - Full test suite: **352 unit, integration, and regression tests** passing with 100% success rate.
-
-
+- **pgvector Persistent Vector Storage & Retrieval (Phase 14)**:
+  - Database-native vector search via PostgreSQL `pgvector` extension and HNSW cosine distance index.
+  - Abstract `VectorSearchBackend` providing interchangeable runtime backends (`faiss` and `pgvector`).
+  - Seamless persistence of 384-dimensional chunk embeddings into PostgreSQL `chunks.embedding`.
+- **Redis + Celery Background Processing (Phase 15)**:
+  - Asynchronous document ingestion with Redis broker and Celery worker.
+  - HTTP 202 Accepted upload lifecycle with durable status tracking (`queued -> processing -> processed/failed`).
+  - Coarse processing stage tracking (`ingestion`, `chunking`, `persistence`, `embedding`, `indexing`, `completed`).
+- **Production FastAPI Architecture (Phase 16)**:
+  - Centralized dependency injection (`dependencies.py`) with cached ML singletons and request-scoped sessions.
+  - ASGI Correlation ID middleware (`X-Request-ID`), structured sanitized error envelopes, and zero traceback leaks.
+  - Thin API controllers and OpenAPI grouping.
+- **React Frontend & Product UI (Phase 17)**:
+  - Production-ready React 18 + TypeScript + Vite + Tailwind CSS single-page application.
+  - End-to-end user journey: Document library dashboard, drag-and-drop PDF upload with HTTP 202 async acceptance, live status polling, book detail view, and grounded question answering.
+  - Rich RAG display: Groundedness badge, NLI verification score, citation provenance tags, and expandable source evidence passages.
+  - Strict error boundaries, user-friendly error banners with request ID details, keyboard accessibility (WCAG 2.1 AA), and responsive mobile/desktop layout.
+  - 15 frontend unit and integration tests passing with 100% success rate.
 
 ---
 
@@ -1462,7 +1477,83 @@ Client Request (with optional X-Request-ID)
 
 ---
 
-## 20. Future Roadmap
+## 20. Phase 17: React Frontend & Product UI
+
+Phase 17 implements a production-grade, highly responsive web interface built with **React 18**, **TypeScript**, **Vite**, and **Tailwind CSS**. It connects to the FastAPI backend API and Celery background workers to provide an intuitive, end-to-end user journey for uploading books, monitoring background ingestion, inspecting document structures, and asking grounded questions with complete citation provenance.
+
+```
+[ User Browser / Desktop / Mobile ]
+               │
+               ▼
+[ React 18 + Vite SPA Client (frontend/) ]
+  ├── Centralized API Client (api/client.ts with correlation ID & timeout)
+  ├── Lightweight Client Router (router/index.tsx)
+  │
+  ├── Pages:
+  │   ├── Dashboard (pages/Dashboard.tsx)
+  │   └── Book Detail & QA (pages/BookDetail.tsx)
+  │
+  └── Component Families:
+      ├── upload/ (PDFUploadZone.tsx with drag-and-drop & HTTP 202 handling)
+      ├── processing/ (ProcessingProgress.tsx, ProcessingStatusBadge.tsx with polling)
+      ├── books/ (BookCard.tsx, BookList.tsx, BookEmptyState.tsx)
+      ├── qa/ (QuestionInput.tsx, AnswerDisplay.tsx, GroundingBadge.tsx, CitationList.tsx, EvidenceCards.tsx)
+      └── common/ (Header.tsx, ErrorAlert.tsx, LoadingSpinner.tsx, Badge.tsx)
+               │
+               ▼ (HTTP / REST)
+[ FastAPI Backend API (/api/v1/*) ]
+```
+
+### Key Capabilities & User Journey:
+1. **Document Library Dashboard (`/`)**:
+   - Displays all persisted books with title/filename, page counts, chunk counts, and processing badges.
+   - Shows clean empty states with upload call-to-actions when no documents exist.
+   - Live search filter to find books by filename or document ID.
+2. **Drag-and-Drop PDF Upload with HTTP 202 Acceptance**:
+   - Rejects non-PDF files client-side before transmission.
+   - Transmits multipart/form-data to `POST /api/v1/documents`.
+   - Distinctly communicates **"Upload Accepted ≠ Processing Complete"** upon receiving HTTP 202, displaying the Celery task ID and auto-transitioning to status polling.
+3. **Live Processing Status Polling**:
+   - Polls `GET /api/v1/documents/{id}` at an adaptive 2-second interval.
+   - Renders backend pipeline stages: `ingestion` (parsing PDF) → `chunking` (tokenizing) → `persistence` (PostgreSQL) → `embedding` (generating 384d vectors) → `indexing` (pgvector/FAISS) → `completed`.
+   - Polling ceases immediately upon reaching terminal state (`processed` or `failed`) or component unmount.
+4. **Book Detail & Grounded Question Answering (`/books/:id`)**:
+   - Displays book metadata (filename, page count, chunk count, creation date).
+   - Validates non-empty question input and disables controls during search and generation.
+   - Dispatches to `POST /api/v1/grounded-answer` (with fallback to `POST /api/v1/qa` for extractive mode).
+   - Displays groundedness badge (`GROUNDED` with high confidence, `CONTRADICTED`, `UNGROUNDED`).
+   - Renders exact citation references (`cite_1`, `cite_2`) linked to source evidence passages with page numbers and relevance ranks.
+5. **Sanitized Error Handling**:
+   - Aligns with Phase 16 standardized error envelopes (`error.code`, `error.message`, `error.request_id`, `error.error_type`).
+   - Never leaks Python stack traces, internal paths, or credentials to end users.
+   - Renders friendly error alerts with collapsible technical request ID details.
+6. **Accessibility & Responsive Design**:
+   - Semantic HTML5 landmark structure (`header`, `main`, `section`, `article`).
+   - Full keyboard navigability with visible focus indicators.
+   - ARIA live regions for async status updates and screen-reader announcements.
+   - Fully responsive layout spanning mobile viewports to ultra-wide displays.
+
+### Running the Frontend:
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies (if not already installed)
+npm install
+
+# Run Vite development server (proxies /api to http://127.0.0.1:8000)
+npm run dev
+
+# Run automated Vitest test suite (15 tests)
+npm test
+
+# Run TypeScript type check and production build
+npm run build
+```
+
+---
+
+## 21. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1483,7 +1574,9 @@ Client Request (with optional X-Request-ID)
 | **Phase 14** | pgvector Persistence & Vector Search | **Complete** | PostgreSQL pgvector extension, vector column migrations, VectorSearchBackend abstraction, PGVectorRepository, HNSW cosine index, dual FAISS/pgvector support. |
 | **Phase 15** | Redis + Celery Background Processing | **Complete** | Redis broker, Celery worker, DocumentProcessingService pipeline orchestration, async 202 upload API, durable PostgreSQL progress tracking, bounded retries, idempotency. |
 | **Phase 16** | Production FastAPI Architecture | **Complete** | Thin routers, centralized DI (`dependencies.py`), correlation ID middleware (`X-Request-ID`), structured sanitized error responses, OpenAPI metadata, service/repository boundaries. |
-| **Phase 17** | Production Hardening & UI | Planned | React frontend, Matching Board UI, Docker deployment, production server architecture. |
+| **Phase 17** | React Frontend & Product UI | **Complete** | React 18, TypeScript, Vite, Tailwind CSS, async 202 upload, stage polling, book detail, grounded QA & citations. |
+| **Phase 18** | Relevant Matching Board UI | Planned | Interactive cross-attention heatmap, candidate ranking visualization, token matching transparency. |
+
 
 
 
