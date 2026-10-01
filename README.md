@@ -191,7 +191,15 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - End-to-end user journey: Document library dashboard, drag-and-drop PDF upload with HTTP 202 async acceptance, live status polling, book detail view, and grounded question answering.
   - Rich RAG display: Groundedness badge, NLI verification score, citation provenance tags, and expandable source evidence passages.
   - Strict error boundaries, user-friendly error banners with request ID details, keyboard accessibility (WCAG 2.1 AA), and responsive mobile/desktop layout.
-  - 15 frontend unit and integration tests passing with 100% success rate.
+- **Matching Board & Retrieval Transparency (Phase 18)**:
+  - First-class retrieval transparency UI allowing users to inspect the internal mechanics of dense vector retrieval and Cross-Encoder precision reranking.
+  - Transparent candidate-to-evidence progression: Displays exact user query, total candidates retrieved in Stage 1 (`candidate_count`), and final evidence passages selected in Stage 2.
+  - Granular result cards displaying final rank, original retrieval rank, page number, semantic relevance score (vector cosine similarity), Cross-Encoder reranker score, and expandable passage text.
+  - Deterministic ranking movement metric: $\Delta_{\text{rank}} = \text{original\_rank} - \text{final\_rank}$ indicating upward ($\uparrow$), downward ($\downarrow$), or unchanged position shifts caused by Cross-Encoder cross-attention.
+  - Evidence-to-Answer provenance connection: Modal and inline triggers ("View Matching Board" / "Why these sources?") allowing users to trace generated answers directly to retrieved passages without executing duplicate backend retrieval.
+  - Strict score semantics: Pure numeric representation with neutral labels ("Semantic relevance" and "Reranker relevance") preventing misleading percentage conversions or false "truth/accuracy" claims.
+  - Accessible, responsive UI featuring KPI summary counters, filter tabs (All, Used in Answer, Promoted $\uparrow$), keyboard-navigable dialogs, and ARIA attributes.
+  - Full test coverage: 16 frontend test cases and 3 backend transparency tests covering metadata preservation, ranking movement, score semantics, and zero regression.
 
 ---
 

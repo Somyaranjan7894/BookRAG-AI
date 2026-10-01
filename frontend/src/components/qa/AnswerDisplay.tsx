@@ -1,9 +1,10 @@
-import React from 'react';
-import { Sparkles, HelpCircle, AlertOctagon, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, HelpCircle, AlertOctagon, BookOpen, ArrowRightLeft } from 'lucide-react';
 import { GroundedAnswerResponse, QAResponse } from '@/types/qa';
 import { GroundingBadge } from './GroundingBadge';
 import { CitationList } from './CitationList';
 import { EvidenceCards } from './EvidenceCards';
+import { MatchingBoardModal } from '@/components/matching/MatchingBoardModal';
 
 export interface AnswerDisplayProps {
   query: string;
@@ -18,6 +19,8 @@ export const AnswerDisplay: React.FC<AnswerDisplayProps> = ({
   extractiveResult,
   className = '',
 }) => {
+  const [isMatchingBoardOpen, setIsMatchingBoardOpen] = useState<boolean>(false);
+
   if (!groundedResult && !extractiveResult) {
     return null;
   }
@@ -96,6 +99,44 @@ export const AnswerDisplay: React.FC<AnswerDisplayProps> = ({
             )}
           </div>
         </div>
+
+        {/* Step 3.5: Retrieval Transparency Action Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-purple-50/80 to-indigo-50/80 border border-purple-200/80 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <ArrowRightLeft className="w-4 h-4" aria-hidden="true" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-purple-950">Retrieval & Reranking Transparency</h4>
+              <p className="text-[11px] text-purple-700">
+                {groundedResult.candidate_count
+                  ? `${groundedResult.candidate_count} candidates retrieved • ${evidence?.length || 0} evaluated after reranking`
+                  : `${evidence?.length || 0} evidence passages evaluated after reranking`}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsMatchingBoardOpen(true)}
+            aria-haspopup="dialog"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white text-purple-700 hover:text-purple-900 hover:bg-purple-50 border border-purple-200 transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-purple-500 self-start sm:self-auto"
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>View Matching Board</span>
+          </button>
+        </div>
+
+        {/* Matching Board Modal */}
+        <MatchingBoardModal
+          isOpen={isMatchingBoardOpen}
+          onClose={() => setIsMatchingBoardOpen(false)}
+          query={query}
+          evidence={evidence}
+          citations={citations}
+          candidateCount={groundedResult.candidate_count}
+          rerankingApplied={groundedResult.reranking_applied}
+        />
 
         {/* Step 4: Citations */}
         {citations && citations.length > 0 && (

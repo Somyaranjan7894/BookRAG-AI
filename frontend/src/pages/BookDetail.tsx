@@ -5,6 +5,7 @@ import { useDocument } from '@/hooks/useDocument';
 import { useAskQuestion } from '@/hooks/useAskQuestion';
 import { QuestionInput } from '@/components/qa/QuestionInput';
 import { AnswerDisplay } from '@/components/qa/AnswerDisplay';
+import { MatchingBoard } from '@/components/matching/MatchingBoard';
 import { ProcessingStatusBadge } from '@/components/processing/ProcessingStatusBadge';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
@@ -21,6 +22,7 @@ export const BookDetail: React.FC = () => {
     error: qaError,
     groundedResult,
     extractiveResult,
+    searchResult,
     setMode,
     ask,
   } = useAskQuestion({ documentId });
@@ -29,7 +31,7 @@ export const BookDetail: React.FC = () => {
 
   const handleAsk = async (questionText: string) => {
     setHasAsked(true);
-    await ask(questionText);
+    await ask(questionText, mode);
   };
 
   if (isDocLoading && !document) {
@@ -163,6 +165,17 @@ export const BookDetail: React.FC = () => {
               >
                 Extractive QA (RoBERTa)
               </button>
+              <button
+                type="button"
+                onClick={() => setMode('matching')}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition ${
+                  mode === 'matching'
+                    ? 'bg-white text-indigo-700 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Matching Board
+              </button>
             </div>
           </div>
 
@@ -171,7 +184,11 @@ export const BookDetail: React.FC = () => {
             <QuestionInput
               onSubmit={handleAsk}
               isLoading={isQuestionLoading}
-              placeholder={`Ask a question about "${document.title || document.filename}"...`}
+              placeholder={
+                mode === 'matching'
+                  ? `Search semantic candidates & inspect reranking for "${document.title || document.filename}"...`
+                  : `Ask a question about "${document.title || document.filename}"...`
+              }
             />
           </div>
 
@@ -179,23 +196,42 @@ export const BookDetail: React.FC = () => {
           {qaError && (
             <ErrorAlert
               error={qaError}
-              title="Failed to Answer Question"
+              title={mode === 'matching' ? 'Failed to Search Book' : 'Failed to Answer Question'}
               onRetry={() => query && handleAsk(query)}
             />
           )}
 
-          {/* Active Question Loading State */}
+          {/* Active Question / Search Loading State */}
           {isQuestionLoading && (
             <div className="p-8 rounded-2xl border border-indigo-100 bg-white shadow-2xs text-center">
-              <LoadingSpinner size="lg" label="Searching semantic chunks & verifying claims..." />
+              <LoadingSpinner
+                size="lg"
+                label={
+                  mode === 'matching'
+                    ? 'Retrieving candidate pool & running Cross-Encoder reranking...'
+                    : 'Searching semantic chunks & verifying claims...'
+                }
+              />
               <p className="mt-3 text-xs text-slate-500">
-                Evaluating vector similarity, applying cross-encoder reranking, and running DeBERTa NLI grounding...
+                {mode === 'matching'
+                  ? 'Evaluating dense vector similarity (FAISS/pgvector) and computing full cross-attention transformer scores...'
+                  : 'Evaluating vector similarity, applying cross-encoder reranking, and running DeBERTa NLI grounding...'}
               </p>
             </div>
           )}
 
-          {/* Answer Display */}
-          {(groundedResult || extractiveResult) && !isQuestionLoading && (
+          {/* Standalone Matching Board Display */}
+          {mode === 'matching' && searchResult && !isQuestionLoading && (
+            <MatchingBoard
+              query={query}
+              results={searchResult.results}
+              candidateCount={searchResult.candidate_count}
+              rerankingApplied={searchResult.reranking_applied}
+            />
+          )}
+
+          {/* Answer Display (Grounded / Extractive) */}
+          {mode !== 'matching' && (groundedResult || extractiveResult) && !isQuestionLoading && (
             <AnswerDisplay
               query={query}
               groundedResult={groundedResult}
@@ -203,15 +239,19 @@ export const BookDetail: React.FC = () => {
             />
           )}
 
-          {/* Empty State before any question */}
-          {!hasAsked && !groundedResult && !extractiveResult && !isQuestionLoading && (
+          {/* Empty State before any question or search */}
+          {!hasAsked && !groundedResult && !extractiveResult && !searchResult && !isQuestionLoading && (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center">
               <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
                 <HelpCircle className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-semibold text-slate-900">No questions asked yet</h3>
+              <h3 className="text-sm font-semibold text-slate-900">
+                {mode === 'matching' ? 'No search executed yet' : 'No questions asked yet'}
+              </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                Type a question above to retrieve context-backed answers, claim verification scores, and page citations.
+                {mode === 'matching'
+                  ? 'Submit a search query above to inspect candidate retrieval pool sizes, Cross-Encoder reranking movements, and page provenance.'
+                  : 'Type a question above to retrieve context-backed answers, claim verification scores, and page citations.'}
               </p>
             </div>
           )}

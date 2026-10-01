@@ -171,8 +171,10 @@ class EvidenceBuilder:
         """Convert various chunk input types into a standardized GenerationEvidenceItem."""
         try:
             if isinstance(chunk, dict):
+                orig_rank = chunk.get("original_rank")
                 return GenerationEvidenceItem(
                     rank=rank,
+                    original_rank=int(orig_rank) if orig_rank is not None else None,
                     chunk_id=str(chunk.get("chunk_id", f"chunk_{rank}")),
                     document_id=str(chunk.get("document_id", "unknown")),
                     page_number=int(chunk.get("page_number", 1)),
@@ -182,8 +184,10 @@ class EvidenceBuilder:
                     reranker_score=float(chunk["reranker_score"]) if chunk.get("reranker_score") is not None else None,
                 )
             # SearchResult or object
+            orig_rank = getattr(chunk, "original_rank", None)
             return GenerationEvidenceItem(
                 rank=rank,
+                original_rank=int(orig_rank) if orig_rank is not None else None,
                 chunk_id=str(getattr(chunk, "chunk_id", f"chunk_{rank}")),
                 document_id=str(getattr(chunk, "document_id", "unknown")),
                 page_number=int(getattr(chunk, "page_number", 1)),

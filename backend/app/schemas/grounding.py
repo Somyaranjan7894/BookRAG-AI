@@ -289,3 +289,12 @@ class GroundedAnswerResponse(BaseModel):
         default=None,
         description="NLI model identifier (e.g. cross-encoder/nli-deberta-v3-base).",
     )
+    candidate_count: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Total candidate pool size retrieved during first-stage dense retrieval before reranking.",
+    )
+    reranking_applied: bool = Field(
+        default=True,
+        description="Whether second-stage Cross-Encoder reranking was applied to the retrieval candidates.",
+    )

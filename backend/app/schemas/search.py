@@ -133,3 +133,8 @@ class SearchResponse(BaseModel):
         default=False,
         description="Whether second-stage Cross-Encoder reranking was applied to these results",
     )
+    candidate_count: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Total candidate pool size retrieved during first-stage dense retrieval before reranking.",
+    )

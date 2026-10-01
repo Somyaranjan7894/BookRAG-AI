@@ -20,10 +20,9 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const currentVal = textareaRef.current ? textareaRef.current.value : question;
-    const trimmed = currentVal.trim();
-    if (trimmed && !isLoading) {
-      onSubmit(trimmed);
+    const currentVal = question.trim() || (textareaRef.current ? textareaRef.current.value.trim() : '');
+    if (currentVal && !isLoading) {
+      onSubmit(currentVal);
     }
   };
 

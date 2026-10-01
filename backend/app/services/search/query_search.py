@@ -146,6 +146,7 @@ class QuerySearchService:
                 total_results=0,
                 document_id=document_id,
                 reranking_applied=False,
+                candidate_count=0,
             )
 
         # Check whether reranking should be applied
@@ -191,4 +192,5 @@ class QuerySearchService:
             total_results=len(final_results),
             document_id=document_id,
             reranking_applied=reranking_applied,
+            candidate_count=len(candidate_pool),
         )

@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import { qaApi } from '@/api/qa';
+import { searchApi } from '@/api/search';
 import { GroundedAnswerResponse, QAResponse } from '@/types/qa';
+import { SearchResponse } from '@/types/search';
 import { ApiError } from '@/types/api';
 
-export type QAMode = 'grounded' | 'extractive';
+export type QAMode = 'grounded' | 'extractive' | 'matching';
 
 export interface UseAskQuestionOptions {
   documentId?: string | null;
@@ -20,6 +22,7 @@ export interface UseAskQuestionReturn {
   error: ApiError | null;
   groundedResult: GroundedAnswerResponse | null;
   extractiveResult: QAResponse | null;
+  searchResult: SearchResponse | null;
   setMode: (mode: QAMode) => void;
   ask: (questionText: string, overrideMode?: QAMode) => Promise<boolean>;
   clear: () => void;
@@ -40,12 +43,14 @@ export function useAskQuestion(options: UseAskQuestionOptions = {}): UseAskQuest
   const [error, setError] = useState<ApiError | null>(null);
   const [groundedResult, setGroundedResult] = useState<GroundedAnswerResponse | null>(null);
   const [extractiveResult, setExtractiveResult] = useState<QAResponse | null>(null);
+  const [searchResult, setSearchResult] = useState<SearchResponse | null>(null);
 
   const clear = useCallback(() => {
     setQuery('');
     setError(null);
     setGroundedResult(null);
     setExtractiveResult(null);
+    setSearchResult(null);
   }, []);
 
   const ask = useCallback(
@@ -82,7 +87,8 @@ export function useAskQuestion(options: UseAskQuestionOptions = {}): UseAskQuest
           });
           setGroundedResult(res);
           setExtractiveResult(null);
-        } else {
+          setSearchResult(null);
+        } else if (activeMode === 'extractive') {
           const res = await qaApi.askExtractiveQuestion({
             query: trimmed,
             document_id: documentId || undefined,
@@ -92,6 +98,19 @@ export function useAskQuestion(options: UseAskQuestionOptions = {}): UseAskQuest
           });
           setExtractiveResult(res);
           setGroundedResult(null);
+          setSearchResult(null);
+        } else {
+          // Matching Board transparency search mode
+          const res = await searchApi.search({
+            query: trimmed,
+            document_id: documentId || undefined,
+            top_k: topK,
+            candidate_k: candidateK,
+            enable_reranking: enableReranking,
+          });
+          setSearchResult(res);
+          setGroundedResult(null);
+          setExtractiveResult(null);
         }
         return true;
       } catch (err) {
@@ -121,6 +140,7 @@ export function useAskQuestion(options: UseAskQuestionOptions = {}): UseAskQuest
     error,
     groundedResult,
     extractiveResult,
+    searchResult,
     setMode,
     ask,
     clear,

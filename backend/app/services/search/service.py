@@ -176,6 +176,7 @@ class SearchService:
                 total_results=0,
                 document_id=clean_doc_id,
                 reranking_applied=False,
+                candidate_count=0,
             )
 
         # Check document isolation validity
@@ -303,4 +304,5 @@ class SearchService:
             total_results=len(search_results),
             document_id=clean_doc_id,
             reranking_applied=reranking_applied,
+            candidate_count=len(raw_results),
         )

@@ -131,6 +131,11 @@ class GroundedAnswerService:
             enable_reranking=request.enable_reranking,
         )
 
+        cand_count = getattr(search_response, "candidate_count", None)
+        if cand_count is None:
+            cand_count = len(search_response.results) if search_response else 0
+        rerank_applied = getattr(search_response, "reranking_applied", True)
+
         # Edge case: No evidence retrieved from index
         if not search_response.results:
             logger.info("No evidence retrieved for query '%s'. Returning safe unanswerable response.", query)
@@ -148,6 +153,8 @@ class GroundedAnswerService:
                 reason="No relevant evidence was retrieved from the book index.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )
 
         # 2. Abstractive Generation via GenerationService
@@ -177,6 +184,8 @@ class GroundedAnswerService:
                 reason="Generation model could not synthesize an answer from the retrieved evidence.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )
 
         raw_answer = gen_response.answer.strip()
@@ -198,6 +207,8 @@ class GroundedAnswerService:
                 reason="Grounding validation is disabled in settings.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )
 
         # 3. Decompose Answer into Claims
@@ -220,6 +231,8 @@ class GroundedAnswerService:
                 reason="Generated answer contains no substantive claims to validate.",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )
 
         # 4. NLI Claim-Level Validation via GroundingService
@@ -254,6 +267,8 @@ class GroundedAnswerService:
                 reason=f"Document isolation error: {exc}",
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )
 
         # 6. Safe Decision Policy
@@ -287,6 +302,8 @@ class GroundedAnswerService:
                     reason=grounding_report.reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
+                    candidate_count=cand_count,
+                    reranking_applied=rerank_applied,
                 )
             else:
                 # Safe refusal: suppress ungrounded answer to prevent misleading the user
@@ -314,6 +331,8 @@ class GroundedAnswerService:
                     reason=safe_reason,
                     model_name=model_name,
                     grounding_model_name=grounding_model_name,
+                    candidate_count=cand_count,
+                    reranking_applied=rerank_applied,
                 )
         else:
             # Permissive mode: return generated text alongside grounding metadata
@@ -332,4 +351,6 @@ class GroundedAnswerService:
                 reason=grounding_report.reason,
                 model_name=model_name,
                 grounding_model_name=grounding_model_name,
+                candidate_count=cand_count,
+                reranking_applied=rerank_applied,
             )

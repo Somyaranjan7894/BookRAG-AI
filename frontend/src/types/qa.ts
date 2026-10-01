@@ -55,6 +55,7 @@ export interface ClaimResult {
 
 export interface GenerationEvidenceItem {
   rank: number;
+  original_rank?: number | null;
   chunk_id: string;
   document_id: string;
   page_number: number;
@@ -85,6 +86,8 @@ export interface GroundedAnswerResponse {
   reason?: string | null;
   model_name?: string | null;
   grounding_model_name?: string | null;
+  candidate_count?: number | null;
+  reranking_applied?: boolean;
 }
 
 export interface QARequest {

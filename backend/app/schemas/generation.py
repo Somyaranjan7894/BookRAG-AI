@@ -111,6 +111,11 @@ class GenerationEvidenceItem(BaseModel):
     """Retrieved evidence passage used as grounded context for FLAN-T5 generation."""
 
     rank: int = Field(ge=1, description="1-based ranking position of the chunk in the evidence set")
+    original_rank: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="Original 1-based candidate ranking position from first-stage retrieval before reranking.",
+    )
     chunk_id: str = Field(description="Unique source chunk identifier")
     document_id: str = Field(description="Source document identifier")
     page_number: int = Field(ge=1, description="1-based page number where the chunk appears")
