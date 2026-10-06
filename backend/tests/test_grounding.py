@@ -665,6 +665,33 @@ class TestSafeDecisionPolicy:
 class TestServiceOrchestration:
     """Verify pipeline orchestration and edge case handling."""
 
+    def test_ambiguous_query_is_refused_before_retrieval_or_generation(self) -> None:
+        mock_search = MagicMock(spec=SearchService)
+        mock_gen = MagicMock(spec=GenerationService)
+        mock_gen.model = MagicMock(model_name="google/flan-t5-base")
+        mock_grounding = MagicMock(spec=GroundingService)
+        mock_grounding.model = MagicMock(model_name="cross-encoder/nli-deberta-v3-base")
+
+        orchestrator = GroundedAnswerService(
+            search_service=mock_search,
+            generation_service=mock_gen,
+            grounding_service=mock_grounding,
+        )
+        response = orchestrator.answer_with_grounding(
+            GroundedAnswerRequest(
+                query="What is the single best machine learning algorithm and learning rate for all artificial intelligence problems?"
+            )
+        )
+
+        assert response.query_plan.query_type.value == "ambiguous"
+        assert response.answer is None
+        assert response.answerable is False
+        assert response.citations == []
+        assert response.completeness_status == "ambiguous"
+        mock_search.search.assert_not_called()
+        mock_gen.generate_answer.assert_not_called()
+        mock_grounding.validate_claims.assert_not_called()
+
     def test_empty_evidence_from_search(self) -> None:
         mock_search = MagicMock(spec=SearchService)
         mock_search.search.return_value = SearchResponse(
@@ -732,7 +759,7 @@ class TestServiceOrchestration:
             grounding_service=mock_grounding,
         )
 
-        with patch.object(settings, "GROUNDING_ENABLED", False):
+        with patch("app.services.grounding.orchestrator.settings.GROUNDING_ENABLED", False):
             resp = orchestrator.answer_with_grounding(GroundedAnswerRequest(query="test"))
             assert resp.answer == "Unvalidated raw answer."
             assert resp.grounding_status == "disabled"
@@ -1014,7 +1041,7 @@ class TestGroundedAnswerAPI:
 
         app.dependency_overrides[get_grounded_answer_service] = lambda: test_service
         try:
-            with patch.object(settings, "GROUNDING_ENABLED", False):
+            with patch("app.services.grounding.orchestrator.settings.GROUNDING_ENABLED", False):
                 response = client.post(
                     "/api/v1/grounded-answer",
                     json={"query": "test"},

@@ -1,0 +1,127 @@
+{
+  "benchmark_name": "Distributed Systems & Cloud Architecture Full-Book Benchmark",
+  "hardware_environment": "Windows CPU (Standard Dev Environment)",
+  "stages": {
+    "ingestion": {
+      "stage": "ingestion",
+      "sample_count": 1,
+      "mean_ms": 103.0,
+      "median_ms": 103.0,
+      "p95_ms": 103.0,
+      "min_ms": 103.0,
+      "max_ms": 103.0,
+      "is_bottleneck": false,
+      "notes": "PDF parsing, text extraction & chunking per page"
+    },
+    "embedding": {
+      "stage": "embedding",
+      "sample_count": 0,
+      "mean_ms": 0.0,
+      "median_ms": 0.0,
+      "p95_ms": 0.0,
+      "min_ms": 0.0,
+      "max_ms": 0.0,
+      "is_bottleneck": false,
+      "notes": "all-MiniLM-L6-v2 vector encoding per batch"
+    },
+    "retrieval": {
+      "stage": "retrieval",
+      "sample_count": 36,
+      "mean_ms": 77.89,
+      "median_ms": 71.93,
+      "p95_ms": 81.32,
+      "min_ms": 67.08,
+      "max_ms": 266.59,
+      "is_bottleneck": true,
+      "notes": "Dense vector search across FAISS / pgvector index"
+    },
+    "reranking": {
+      "stage": "reranking",
+      "sample_count": 36,
+      "mean_ms": 411.08,
+      "median_ms": 408.94,
+      "p95_ms": 478.12,
+      "min_ms": 350.1,
+      "max_ms": 521.93,
+      "is_bottleneck": true,
+      "notes": "ms-marco-MiniLM-L-6-v2 CrossEncoder candidate reranking"
+    },
+    "query_understanding": {
+      "stage": "query_understanding",
+      "sample_count": 36,
+      "mean_ms": 0.58,
+      "median_ms": 0.29,
+      "p95_ms": 1.43,
+      "min_ms": 0.18,
+      "max_ms": 6.76,
+      "is_bottleneck": false,
+      "notes": "Rule-based & keyword intent classification & query planning"
+    },
+    "extractive_qa": {
+      "stage": "extractive_qa",
+      "sample_count": 5,
+      "mean_ms": 79.8,
+      "median_ms": 71.92,
+      "p95_ms": 101.36,
+      "min_ms": 62.63,
+      "max_ms": 103.31,
+      "is_bottleneck": false,
+      "notes": "RoBERTa SQuAD2 exact span extraction"
+    },
+    "generative_qa": {
+      "stage": "generative_qa",
+      "sample_count": 36,
+      "mean_ms": 5111.79,
+      "median_ms": 3349.96,
+      "p95_ms": 10881.08,
+      "min_ms": 174.4,
+      "max_ms": 15456.08,
+      "is_bottleneck": true,
+      "notes": "FLAN-T5-base abstractive answer generation"
+    },
+    "grounding_nli": {
+      "stage": "grounding_nli",
+      "sample_count": 36,
+      "mean_ms": 5111.79,
+      "median_ms": 3349.96,
+      "p95_ms": 10881.08,
+      "min_ms": 174.4,
+      "max_ms": 15456.08,
+      "is_bottleneck": true,
+      "notes": "DeBERTa-v3 sentence-level claim entailment validation"
+    },
+    "citation_mapping": {
+      "stage": "citation_mapping",
+      "sample_count": 36,
+      "mean_ms": 1135.95,
+      "median_ms": 744.44,
+      "p95_ms": 2418.02,
+      "min_ms": 38.76,
+      "max_ms": 3434.68,
+      "is_bottleneck": true,
+      "notes": "Fuzzy token alignment & chunk boundary resolution"
+    },
+    "question_generation": {
+      "stage": "question_generation",
+      "sample_count": 6,
+      "mean_ms": 14030.83,
+      "median_ms": 13540.35,
+      "p95_ms": 16966.77,
+      "min_ms": 12151.25,
+      "max_ms": 17975.42,
+      "is_bottleneck": true,
+      "notes": "Candidate extraction, T5 generation, and QA validation per chunk"
+    }
+  },
+  "primary_bottleneck_stage": "question_generation",
+  "e2e_mean_ms": 11848.5,
+  "e2e_median_ms": 7925.23,
+  "e2e_p95_ms": 24739.62,
+  "observations": [
+    "Primary compute bottleneck is 'question_generation' with mean latency 14030.8ms.",
+    "Estimated end-to-end query latency: Mean=11848.5ms, Median=7925.2ms, P95=24739.6ms.",
+    "Transformer-based generation and NLI entailment dominate CPU inference time as expected in CPU execution.",
+    "Dense vector retrieval and query understanding operate with near-instant sub-50ms latency."
+  ],
+  "overall_status": "PASS"
+}

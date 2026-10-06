@@ -125,8 +125,10 @@ class QAModel:
         if self._model is None:
             raise QAModelLoadError("QA model is not loaded.")
 
+        from app.core.device import inference_context
+
         try:
-            with torch.inference_mode():
+            with inference_context(self.target_device):
                 device_input_ids = input_ids.to(self.target_device)
                 device_attention_mask = attention_mask.to(self.target_device)
 

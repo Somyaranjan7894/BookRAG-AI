@@ -55,6 +55,13 @@ class QueryPlanner:
         """Classify query intent taxonomy and expected answer type using conservative rules."""
         lower = query.lower().strip()
 
+        # 0. Ambiguous / Ungrounded superlatives or underspecified queries
+        if (
+            re.search(r"\b(single\s+best|best.*for\s+all|worst.*for\s+all)\b", lower)
+            or (re.search(r"^how\s+do\s+\w+\s+perform\??$", lower))
+        ):
+            return QueryType.AMBIGUOUS, ExpectedAnswerType.EXPLANATION.value
+
         # 1. Multi-hop indicators (compositional dependent reasoning)
         if (
             re.search(r"\b(mother|father|founder|inventor|author|creator|advisor|teacher)\s+of\s+the\s+(founder|inventor|author|creator)\b", lower)
@@ -64,7 +71,25 @@ class QueryPlanner:
         ):
             return QueryType.MULTI_HOP, ExpectedAnswerType.EXPLANATION.value
 
-        # 2. Comparison queries
+        # 2. Multi-part queries (coordinated clauses or multi-question requests)
+        if (
+            re.search(r",\s*and\s+(how|what|why|which|where)\b", lower)
+            or re.search(r"\band\s+how\s+does\b", lower)
+            or len([p for p in query.split("?") if p.strip()]) >= 2
+        ):
+            # If it spans multiple retrieval topics / pages like encoders and MRR
+            if re.search(r"\brelate\s+to\b", lower) or re.search(r"\btrade-?offs?\b", lower):
+                return QueryType.MULTI_PAGE, ExpectedAnswerType.EXPLANATION.value
+            return QueryType.MULTI_PART, ExpectedAnswerType.EXPLANATION.value
+
+        # 3. Multi-page synthesis queries
+        if (
+            re.search(r"\bpages?\s+\d+.*(?:and|to|-).*\d+\b", lower)
+            or (re.search(r"\brelate\s+to\b", lower) and re.search(r"\b(metrics?|evaluation|latency)\b", lower))
+        ):
+            return QueryType.MULTI_PAGE, ExpectedAnswerType.EXPLANATION.value
+
+        # 4. Comparison queries
         if (
             re.search(r"\bcompare\b", lower)
             or re.search(r"\b(difference|differences)\s+between\b", lower)
@@ -73,7 +98,14 @@ class QueryPlanner:
         ):
             return QueryType.COMPARISON, ExpectedAnswerType.COMPARISON.value
 
-        # 3. Summary queries
+        # 5. Numerical fact / Exact formula queries
+        if (
+            re.search(r"\b(exact\s+derivative|derivative\s+of|derivative|formula\s+for|formula\s+to)\b", lower)
+            or re.search(r"\bwhat\s+is\s+the\s+(formula|exact\s+value|value|ratio|percentage|fraction)\b", lower)
+        ):
+            return QueryType.NUMERICAL_FACT, ExpectedAnswerType.NUMBER.value
+
+        # 6. Summary queries
         if (
             re.search(r"^summarize\b", lower)
             or re.search(r"\b(summary|overview|synopsis)\s+(of|for)\b", lower)
@@ -81,7 +113,7 @@ class QueryPlanner:
         ):
             return QueryType.SUMMARY, ExpectedAnswerType.SUMMARY.value
 
-        # 4. Procedural queries
+        # 7. Procedural queries
         if (
             re.search(r"^how\s+(do|can|does|to|would)\s+(you|one|we)?\s*(perform|implement|calculate|compute|train|build|create|derive|evaluate|run|execute|use)\b", lower)
             or re.search(r"^how\s+to\s+", lower)
@@ -89,7 +121,7 @@ class QueryPlanner:
         ):
             return QueryType.PROCEDURAL, ExpectedAnswerType.PROCEDURE.value
 
-        # 5. Causal queries
+        # 8. Causal queries
         if (
             re.search(r"^why\b", lower)
             or re.search(r"\b(causes?|reasons?)\s+(of|for|behind)\b", lower)
@@ -98,7 +130,7 @@ class QueryPlanner:
         ):
             return QueryType.CAUSAL, ExpectedAnswerType.EXPLANATION.value
 
-        # 6. List queries
+        # 9. List queries
         if (
             re.search(r"^list\b", lower)
             or re.search(r"\b(name|list)\s+(the|all|some)\b", lower)
@@ -106,18 +138,22 @@ class QueryPlanner:
         ):
             return QueryType.LIST, ExpectedAnswerType.LIST.value
 
-        # 7. Definition queries
+        # 10. Definition queries
         if (
             re.search(r"^what\s+(is|are|was|were)\s+(a|an|the)?\s*[\w\s\+\-\*]+(?:\?|\.|$)", lower)
-            and not re.search(r"\b(causes?|reasons?|difference|steps?|procedure|chapter|page)\b", lower)
+            and not re.search(r"\b(causes?|reasons?|difference|steps?|procedure|chapter|page|role)\b", lower)
         ) or re.search(r"^define\b", lower) or re.search(r"^what\s+does\s+.*\s+mean\b", lower):
             return QueryType.DEFINITION, ExpectedAnswerType.DEFINITION.value
 
-        # 8. Location queries
+        # 11. Location queries
         if re.search(r"^where\b", lower) or re.search(r"\bwhich\s+(chapter|page|section)\b", lower):
             return QueryType.LOCATION, ExpectedAnswerType.LOCATION.value
 
-        # 9. Factual queries
+        # 12. Explanation queries
+        if re.search(r"^(why|how\s+does|how\s+do|how\s+did)\b", lower):
+            return QueryType.EXPLANATION, ExpectedAnswerType.EXPLANATION.value
+
+        # 13. Factual queries
         if re.search(r"^who\b", lower):
             return QueryType.FACTUAL, ExpectedAnswerType.PERSON_ENTITY.value
 
@@ -130,7 +166,7 @@ class QueryPlanner:
         if re.search(r"^(which|what|did|does|is|was|were|has|have)\b", lower):
             return QueryType.FACTUAL, ExpectedAnswerType.EXPLANATION.value
 
-        # 10. Unknown / Ambiguous fallback
+        # 14. Unknown fallback
         return QueryType.UNKNOWN, ExpectedAnswerType.EXPLANATION.value
 
     def extract_constraints(self, query: str) -> QueryConstraints:
@@ -246,6 +282,76 @@ class QueryPlanner:
 
         return entities
 
+    def extract_comparison_aspects(self, query: str) -> List[str]:
+        """Extract the two subjects A and B being compared.
+
+        Supports patterns like:
+        - "difference between A and B in terms of C"
+        - "compare A and B"
+        - "A vs B"
+        - "how does A differ from B"
+        """
+        # Pattern 1: difference between A and B [in terms of C]
+        diff_match = re.search(
+            r"(?:difference|differences)\s+between\s+(.+?)\s+(?:and|vs\.?|versus)\s+(.+?)(?:\s+in\s+terms\s+of|\s+in\s+|\s+during\s+|\?|\.|$)",
+            query,
+            re.IGNORECASE,
+        )
+        if diff_match:
+            sub_a = diff_match.group(1).strip().rstrip("?.!")
+            sub_b = diff_match.group(2).strip().rstrip("?.!")
+            sub_a = re.sub(r"^(?:the|a|an)\s+", "", sub_a, flags=re.IGNORECASE).strip()
+            sub_b = re.sub(r"^(?:the|a|an)\s+", "", sub_b, flags=re.IGNORECASE).strip()
+            if sub_a and sub_b and sub_a.lower() != sub_b.lower():
+                return [sub_a, sub_b]
+
+        # Pattern 2: compare [the aspect of] A and B
+        comp_match = re.search(
+            r"compare\s+(?:the\s+)?(?:[a-zA-Z\s]+\s+of\s+)?(.+?)\s+(?:and|vs\.?|versus)\s+(.+?)(?:\s+in\s+|\s+during\s+|\?|\.|$)",
+            query,
+            re.IGNORECASE,
+        )
+        if comp_match:
+            sub_a = comp_match.group(1).strip().rstrip("?.!")
+            sub_b = comp_match.group(2).strip().rstrip("?.!")
+            sub_a = re.sub(r"^(?:the|a|an)\s+", "", sub_a, flags=re.IGNORECASE).strip()
+            sub_b = re.sub(r"^(?:the|a|an)\s+", "", sub_b, flags=re.IGNORECASE).strip()
+            if sub_a and sub_b and sub_a.lower() != sub_b.lower():
+                return [sub_a, sub_b]
+
+        # Pattern 3: A vs B
+        vs_match = re.search(r"\b(.+?)\s+(?:vs\.?|versus)\s+(.+?)(?:\?|\.|$)", query, re.IGNORECASE)
+        if vs_match:
+            sub_a = vs_match.group(1).strip().rstrip("?.!")
+            sub_b = vs_match.group(2).strip().rstrip("?.!")
+            sub_a = re.sub(r"^(?:the|a|an)\s+", "", sub_a, flags=re.IGNORECASE).strip()
+            sub_b = re.sub(r"^(?:the|a|an)\s+", "", sub_b, flags=re.IGNORECASE).strip()
+            if sub_a and sub_b and sub_a.lower() != sub_b.lower():
+                return [sub_a, sub_b]
+
+        return []
+
+    def extract_sub_questions(self, query: str) -> List[str]:
+        """Extract multi-part question components."""
+        # Split on coordinated question patterns
+        parts = re.split(r",?\s*\band\s+(?:how|what|why|which|where)\b", query, flags=re.IGNORECASE)
+        if len(parts) >= 2:
+            sub_qs = []
+            for p in parts:
+                clean_p = p.strip().rstrip("?.!")
+                clean_p = re.sub(r"^(?:and|how|what|why|which|where)\s+", "", clean_p, flags=re.IGNORECASE).strip()
+                if clean_p and len(clean_p) > 3:
+                    sub_qs.append(clean_p)
+            if len(sub_qs) >= 2:
+                return sub_qs[:3]
+
+        # Check for multiple question marks
+        q_marks = [p.strip().rstrip("?.!") for p in query.split("?") if p.strip()]
+        if len(q_marks) >= 2:
+            return q_marks[:3]
+
+        return []
+
     def generate_retrieval_queries(
         self,
         normalized_query: str,
@@ -267,6 +373,15 @@ class QueryPlanner:
 
         # 1. Comparison Queries: Compare A and B [in Y]
         if query_type == QueryType.COMPARISON:
+            aspects = self.extract_comparison_aspects(normalized_query)
+            if len(aspects) >= 2:
+                q1 = f"{aspects[0]}"
+                q2 = f"{aspects[1]}"
+                if constraints.year:
+                    q1 += f" {constraints.year}"
+                    q2 += f" {constraints.year}"
+                return [q1, q2]
+
             comp_match = re.search(
                 r"(?:compare\s+(?:the\s+)?(?:[a-zA-Z\s]+\s+of\s+)?|difference\s+between\s+)(.+?)\s+(?:and|vs\.?|versus)\s+(.+?)(?:\s+in\s+|\s+during\s+|\?|\.|$)",
                 normalized_query,
@@ -275,26 +390,19 @@ class QueryPlanner:
             if comp_match:
                 sub_a = comp_match.group(1).strip().rstrip("?.!")
                 sub_b = comp_match.group(2).strip().rstrip("?.!")
-
-                # Extract aspect (e.g. population) if present
-                aspect_match = re.search(
-                    r"compare\s+(?:the\s+)?([a-zA-Z]+)\s+of\b",
-                    normalized_query,
-                    re.IGNORECASE,
-                )
-                aspect = aspect_match.group(1) if aspect_match else ""
-
-                year_suffix = f" {constraints.year}" if constraints.year else ""
-                aspect_suffix = f" {aspect}" if aspect else ""
-
-                q1 = f"{sub_a}{aspect_suffix}{year_suffix}".strip()
-                q2 = f"{sub_b}{aspect_suffix}{year_suffix}".strip()
-
+                q1 = f"{sub_a}".strip()
+                q2 = f"{sub_b}".strip()
                 if q1 and q2 and q1.lower() != q2.lower():
                     return [q1, q2]
 
-        # 2. Dual-aspect Causal/Consequence: causes and consequences of X
-        if query_type in (QueryType.CAUSAL, QueryType.LIST, QueryType.FACTUAL):
+        # 2. Multi-part / Multi-page Queries
+        if query_type in (QueryType.MULTI_PART, QueryType.MULTI_PAGE):
+            sub_qs = self.extract_sub_questions(normalized_query)
+            if len(sub_qs) >= 2:
+                return [sub_qs[0], sub_qs[1]]
+
+        # 3. Dual-aspect Causal/Consequence: causes and consequences of X
+        if query_type in (QueryType.CAUSAL, QueryType.LIST, QueryType.FACTUAL, QueryType.DIRECT_FACT):
             cause_eff_match = re.search(
                 r"(?:causes?\s+and\s+(?:consequences?|effects?|impacts?)|(?:consequences?|effects?|impacts?)\s+and\s+causes?)\s+(?:of\s+)?(.+?)(?:\?|\.|$)",
                 normalized_query,
@@ -323,6 +431,21 @@ class QueryPlanner:
             constraints=constraints,
         )
 
+        comparison_aspects = (
+            self.extract_comparison_aspects(normalized)
+            if q_type == QueryType.COMPARISON
+            else []
+        )
+        sub_questions = (
+            self.extract_sub_questions(normalized)
+            if q_type in (QueryType.MULTI_PART, QueryType.MULTI_PAGE)
+            else []
+        )
+        is_num = (
+            q_type == QueryType.NUMERICAL_FACT
+            or bool(re.search(r"\b(derivative|formula|value|rate|ratio|percentage|how\s+many|how\s+much)\b", normalized.lower()))
+        )
+
         # Enforce max 3 retrieval queries and deduplicate
         deduped_retrieval_queries: List[str] = []
         for rq in retrieval_queries:
@@ -337,7 +460,14 @@ class QueryPlanner:
 
         requires_multi_evidence = (
             len(deduped_retrieval_queries) > 1
-            or q_type in (QueryType.COMPARISON, QueryType.LIST, QueryType.MULTI_HOP, QueryType.SUMMARY)
+            or q_type in (
+                QueryType.COMPARISON,
+                QueryType.LIST,
+                QueryType.MULTI_HOP,
+                QueryType.SUMMARY,
+                QueryType.MULTI_PART,
+                QueryType.MULTI_PAGE,
+            )
         )
 
         return QueryPlan(
@@ -349,4 +479,7 @@ class QueryPlanner:
             retrieval_queries=deduped_retrieval_queries,
             expected_answer_type=expected_ans,
             requires_multiple_evidence=requires_multi_evidence,
+            comparison_aspects=comparison_aspects,
+            sub_questions=sub_questions,
+            is_numerical=is_num,
         )

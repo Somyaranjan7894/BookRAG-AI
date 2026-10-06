@@ -15,7 +15,8 @@ export interface RequestOptions extends RequestInit {
  * Central HTTP client with error sanitization and structured ApiError mapping.
  */
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const { timeoutMs = 60000, headers = {}, ...rest } = options;
+  const { timeoutMs = 600000, headers = {}, ...rest } = options;
+
 
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 

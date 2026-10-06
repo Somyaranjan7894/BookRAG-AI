@@ -1,0 +1,471 @@
+{
+  "dataset_name": "Machine Learning & Neural Networks Golden Benchmark",
+  "dataset_version": "1.0.0",
+  "dataset_type": "golden",
+  "verification_status": "VERIFIED",
+  "target_document": "Foundations of Machine Learning & Neural Networks",
+  "document_id": "doc_ai_handbook_01",
+  "total_questions": 10,
+  "answerable_questions": 7,
+  "unanswerable_questions": 3,
+  "average_generation_and_validation_ms": 10521.7,
+  "claims_summary": {
+    "total_claims": 9,
+    "supported_claims": 8,
+    "unsupported_claims": 1,
+    "contradicted_claims": 0,
+    "conflicted_claims": 0,
+    "overall_claim_support_rate": 0.8889,
+    "answerable_claim_support_rate": 1.0
+  },
+  "answer_quality_summary": {
+    "mean_answer_correctness_f1": 0.427,
+    "answerable_success_rate": 1.0
+  },
+  "refusal_summary": {
+    "unanswerable_questions": 3,
+    "successful_refusals": 3,
+    "incorrect_unanswerable_answers": 0,
+    "refusal_precision": 1.0,
+    "false_refusal_count": 0,
+    "over_refusal_rate": 0.0
+  },
+  "citation_summary": {
+    "mean_citation_precision": 1.0,
+    "mean_citation_recall": 0.9286
+  },
+  "category_breakdown": {
+    "direct_fact": {
+      "total_questions": 2,
+      "answerable": 2,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "definition": {
+      "total_questions": 1,
+      "answerable": 1,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "explanation": {
+      "total_questions": 1,
+      "answerable": 1,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "multi_page": {
+      "total_questions": 1,
+      "answerable": 1,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "comparison": {
+      "total_questions": 1,
+      "answerable": 1,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "numerical_fact": {
+      "total_questions": 1,
+      "answerable": 1,
+      "unanswerable": 0,
+      "claim_support_rate": 1.0,
+      "success_rate": 1.0
+    },
+    "unanswerable": {
+      "total_questions": 2,
+      "answerable": 0,
+      "unanswerable": 2,
+      "claim_support_rate": 0.0,
+      "success_rate": 1.0
+    },
+    "ambiguous": {
+      "total_questions": 1,
+      "answerable": 0,
+      "unanswerable": 1,
+      "claim_support_rate": 0.0,
+      "success_rate": 1.0
+    }
+  },
+  "semantic_disclaimer": "Claim support rate measures premise-hypothesis NLI logical consistency under the retrieved evidence set; it is strictly NOT an epistemic truth probability. Retrieval relevance != correctness; reranker score != probability; model confidence != factual correctness.",
+  "per_query_evaluations": [
+    {
+      "query_id": "gold_q01",
+      "query": "How does the backpropagation algorithm compute gradients across network layers?",
+      "is_answerable_gold": true,
+      "category": "direct_fact",
+      "expected_answer": "The backpropagation algorithm computes gradients of a scalar loss function with respect to all trainable network weights by recursively applying the multivariate chain rule across nodes of a computational graph, propagating errors backward layer by layer from output activations to input features.",
+      "generated_answer": "recursively applying the multivariate chain rule across the nodes of a computational graph",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.4167,
+      "is_answer_correct": true,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "recursively applying the multivariate chain rule across the nodes of a computational graph",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p002_c0002",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q02",
+      "query": "What are the three fundamental semantic categories defined in Natural Language Inference (NLI)?",
+      "is_answerable_gold": true,
+      "category": "definition",
+      "expected_answer": "Natural Language Inference (NLI) classifies the semantic relationship between a premise text and a hypothesis proposition into three fundamental categories: entailment, contradiction, and neutral.",
+      "generated_answer": "entailment, contradiction, and neutral",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.32,
+      "is_answer_correct": false,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "entailment, contradiction, and neutral",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p007_c0007",
+          "page_number": 7
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q03",
+      "query": "Why does scaled dot-product attention divide query-key dot products by the square root of the key dimension?",
+      "is_answerable_gold": true,
+      "category": "explanation",
+      "expected_answer": "Dividing query-key dot products by the square root of the key dimension counteracts exponential magnitude growth in high-dimensional vector spaces, preventing the softmax function from being pushed into regions with near-zero vanishing gradients.",
+      "generated_answer": "to counteract exponential magnitude growth in high-dimensional vector spaces",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.359,
+      "is_answer_correct": true,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "to counteract exponential magnitude growth in high-dimensional vector spaces",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p005_c0005",
+          "page_number": 5
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q04",
+      "query": "How do the latency and discrimination trade-offs between bi-encoders and cross-encoders relate to information retrieval evaluation metrics like Mean Reciprocal Rank?",
+      "is_answerable_gold": true,
+      "category": "multi_page",
+      "expected_answer": "Bi-encoders encode queries and passages independently for sub-millisecond approximate nearest-neighbor retrieval, while cross-encoders perform full token cross-attention for sharper relevance discrimination at higher latency; ranking quality across both is evaluated by metrics such as Mean Reciprocal Rank (MRR), which measures the reciprocal of the rank position of the first relevant retrieved passage.",
+      "generated_answer": "cross-encoders concatenate the query and candidate passage into a single unified sequence, allowing full bidirectional token cross-attention across all layers to achieve significantly sharper relevance discrimination at the cost of higher per-query inference latency.",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.35,
+      "is_answer_correct": true,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 0.5,
+      "claims_breakdown": [
+        {
+          "claim_text": "cross-encoders concatenate the query and candidate passage into a single unified sequence, allowing full bidirectional token cross-attention across all layers to achieve significantly sharper relevance discrimination at the cost of higher per-query inference latency.",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p006_c0006",
+          "page_number": 6
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q05",
+      "query": "What is the primary difference between supervised learning and unsupervised learning in terms of training targets?",
+      "is_answerable_gold": true,
+      "category": "comparison",
+      "expected_answer": "Supervised learning algorithms optimize predictive models using explicit pairs of input features and ground-truth target labels, whereas unsupervised learning algorithms discover latent structures, cluster partitions, and manifold representations without external supervisory guidance or target labels.",
+      "generated_answer": "Supervised learning algorithms optimize parametric predictive models using explicit pairs of input features and ground-truth target labels. In contrast, unsupervised learning algorithms discover latent structures, cluster partitions, and manifold representations without external supervisory guidance or target labels.",
+      "grounding_status": "grounded",
+      "total_claims": 2,
+      "supported_claims": 2,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.9444,
+      "is_answer_correct": true,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "Supervised learning algorithms optimize parametric predictive models using explicit pairs of input features and ground-truth target labels.",
+          "classification": "entailed"
+        },
+        {
+          "claim_text": "In contrast, unsupervised learning algorithms discover latent structures, cluster partitions, and manifold representations without external supervisory guidance or target labels.",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p001_c0001",
+          "page_number": 1
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q06",
+      "query": "What is the exact derivative of the Rectified Linear Unit (ReLU) activation function for all positive inputs?",
+      "is_answerable_gold": true,
+      "category": "numerical_fact",
+      "expected_answer": "The derivative of the Rectified Linear Unit (ReLU) activation function is a constant 1 for all positive inputs.",
+      "generated_answer": "a constant 1",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.2353,
+      "is_answer_correct": false,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "a constant 1",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p003_c0003",
+          "page_number": 3
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q07",
+      "query": "How do Convolutional Neural Networks exploit spatial hierarchies in image grids?",
+      "is_answerable_gold": true,
+      "category": "direct_fact",
+      "expected_answer": "CNNs exploit local spatial geometry and translation invariance through weight sharing and localized receptive field convolution kernels, with subsampling and pooling layers compressing spatial dimensions while expanding channel capacity from low-level edges to semantic object representations.",
+      "generated_answer": "weight sharing and localized receptive field convolution kernels",
+      "grounding_status": "grounded",
+      "total_claims": 1,
+      "supported_claims": 1,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 0.3636,
+      "is_answer_correct": true,
+      "refusal_triggered": false,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": true,
+      "total_citations": 1,
+      "valid_citations": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "weight sharing and localized receptive field convolution kernels",
+          "classification": "entailed"
+        }
+      ],
+      "citations": [
+        {
+          "citation_id": "cite_1",
+          "document_id": "doc_ai_handbook_01",
+          "chunk_id": "doc_ai_handbook_01_p004_c0004",
+          "page_number": 4
+        }
+      ]
+    },
+    {
+      "query_id": "gold_q08",
+      "query": "What is the traditional culinary recipe, hydration ratio, and baking temperature for artisanal French sourdough bread?",
+      "is_answerable_gold": false,
+      "category": "unanswerable",
+      "expected_answer": null,
+      "generated_answer": null,
+      "grounding_status": "unsupported",
+      "total_claims": 0,
+      "supported_claims": 0,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 1.0,
+      "is_answer_correct": true,
+      "refusal_triggered": true,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": false,
+      "total_citations": 0,
+      "valid_citations": 0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [],
+      "citations": []
+    },
+    {
+      "query_id": "gold_q09",
+      "query": "What are the cryogenic cooling specifications and dilution refrigerator requirements for superconducting transmon qubits?",
+      "is_answerable_gold": false,
+      "category": "unanswerable",
+      "expected_answer": null,
+      "generated_answer": null,
+      "grounding_status": "unsupported",
+      "total_claims": 0,
+      "supported_claims": 0,
+      "unsupported_claims": 0,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 1.0,
+      "answer_correctness_f1": 1.0,
+      "is_answer_correct": true,
+      "refusal_triggered": true,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": false,
+      "total_citations": 0,
+      "valid_citations": 0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [],
+      "citations": []
+    },
+    {
+      "query_id": "gold_q10",
+      "query": "What is the single best machine learning algorithm and learning rate for all artificial intelligence problems?",
+      "is_answerable_gold": false,
+      "category": "ambiguous",
+      "expected_answer": null,
+      "generated_answer": null,
+      "grounding_status": "unsupported",
+      "total_claims": 1,
+      "supported_claims": 0,
+      "unsupported_claims": 1,
+      "contradicted_claims": 0,
+      "conflicted_claims": 0,
+      "claim_support_rate": 0.0,
+      "answer_correctness_f1": 1.0,
+      "is_answer_correct": true,
+      "refusal_triggered": true,
+      "refusal_correct": true,
+      "is_false_refusal": false,
+      "is_incorrect_answer_to_unanswerable": false,
+      "is_answerable_success": false,
+      "total_citations": 0,
+      "valid_citations": 0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "claims_breakdown": [
+        {
+          "claim_text": "Adam",
+          "classification": "unsupported"
+        }
+      ],
+      "citations": []
+    }
+  ]
+}

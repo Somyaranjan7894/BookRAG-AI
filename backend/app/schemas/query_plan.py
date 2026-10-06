@@ -9,16 +9,23 @@ factual truth or replace answer validation.
 
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class QueryType(str, Enum):
     """Taxonomy of user query intents for retrieval and reasoning planning."""
 
+    DIRECT_FACT = "direct_fact"
     FACTUAL = "factual"
     DEFINITION = "definition"
-    LIST = "list"
+    EXPLANATION = "explanation"
     COMPARISON = "comparison"
+    MULTI_PART = "multi_part"
+    NUMERICAL_FACT = "numerical_fact"
+    MULTI_PAGE = "multi_page"
+    UNANSWERABLE = "unanswerable"
+    AMBIGUOUS = "ambiguous"
+    LIST = "list"
     CAUSAL = "causal"
     PROCEDURAL = "procedural"
     LOCATION = "location"
@@ -88,10 +95,20 @@ class QueryPlan(BaseModel):
         description="Unmodified raw user query string.",
         examples=["Compare the population of India and China in 2020."],
     )
-    normalized_query: str = Field(
+    normalized_query: Optional[str] = Field(
+        default=None,
         description="Safely normalized query string preserving technical symbols and numbers.",
         examples=["Compare the population of India and China in 2020."],
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_defaults(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if not data.get("normalized_query"):
+                data["normalized_query"] = data.get("original_query", "")
+        return data
+
     query_type: QueryType = Field(
         description="Classified query taxonomy intent.",
         examples=[QueryType.COMPARISON],
@@ -118,6 +135,18 @@ class QueryPlan(BaseModel):
     requires_multiple_evidence: bool = Field(
         default=False,
         description="Whether answering the query likely requires evidence across multiple chunks.",
+    )
+    comparison_aspects: List[str] = Field(
+        default_factory=list,
+        description="Extracted comparison subjects [A, B] for comparison queries.",
+    )
+    sub_questions: List[str] = Field(
+        default_factory=list,
+        description="Extracted sub-question components for multi-part queries.",
+    )
+    is_numerical: bool = Field(
+        default=False,
+        description="Whether query asks for a numerical value, derivative, or formula.",
     )
 
 

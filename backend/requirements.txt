@@ -3,6 +3,7 @@ fastapi>=0.115.0,<1.0.0
 uvicorn[standard]>=0.32.0,<1.0.0
 pydantic>=2.10.0,<3.0.0
 pydantic-settings>=2.6.0,<3.0.0
+python-multipart>=0.0.12,<1.0.0
 
 # Document Ingestion (Phase 1)
 pymupdf>=1.25.0,<2.0.0
@@ -33,5 +34,7 @@ redis>=5.0.0,<6.0.0
 pytest>=8.3.0,<9.0.0
 httpx>=0.28.0,<1.0.0
 
-
-
+# Deep Learning Inference & Acceleration (Phase 24 GPU Activation)
+# Note: For CUDA 12.6 / NVIDIA RTX 3050 Laptop GPU (and Ampere/Ada/Blackwell GPUs), install PyTorch via:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+# On CPU-only environments (e.g. standard Docker Linux containers), standard PyPI torch is used automatically.

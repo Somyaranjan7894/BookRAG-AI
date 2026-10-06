@@ -77,6 +77,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.ENVIRONMENT,
         settings.VECTOR_BACKEND,
     )
+    from app.core.device import get_device_manager
+    get_device_manager().log_diagnostics()
     yield
     logger.info("Shutting down %s", settings.APP_NAME)
 
@@ -97,6 +99,16 @@ def create_application() -> FastAPI:
 
     # Register pure ASGI correlation middleware first for full request lifecycle coverage
     application.add_middleware(CorrelationIdMiddleware)
+
+    # Register CORS middleware for secure frontend cross-origin requests
+    from fastapi.middleware.cors import CORSMiddleware
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Register centralized exception handlers
     setup_exception_handlers(application)

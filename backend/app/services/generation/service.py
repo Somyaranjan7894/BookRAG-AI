@@ -110,6 +110,9 @@ class GenerationService:
         num_beams: Optional[int] = None,
         do_sample: Optional[bool] = None,
         temperature: Optional[float] = None,
+        prompt_instruction: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+        query_type: Optional[Any] = None,
     ) -> GenerationResponse:
         """Synthesize an abstractive answer from retrieved evidence chunks using FLAN-T5.
 
@@ -130,6 +133,9 @@ class GenerationService:
             num_beams: Optional override for beam count.
             do_sample: Optional override for sampling flag.
             temperature: Optional override for temperature.
+            prompt_instruction: Optional targeted prompt instruction (e.g. for controlled regeneration).
+            prompt_template: Optional complete prompt template override.
+            query_type: Optional classified query type to select specialized prompt templates.
 
         Returns:
             GenerationResponse containing generated text or structured no-answer.
@@ -154,9 +160,21 @@ class GenerationService:
             )
 
         # 3. Assemble prompt and budget evidence context
+        from app.services.generation.evidence import COMPARISON_PROMPT_TEMPLATE, MULTI_PART_PROMPT_TEMPLATE
+
+        resolved_template = prompt_template
+        if resolved_template is None and prompt_instruction is None and query_type is not None:
+            qt_str = str(getattr(query_type, "value", query_type)).lower()
+            if qt_str == "comparison":
+                resolved_template = COMPARISON_PROMPT_TEMPLATE
+            elif qt_str in ("multi_part", "multi_page"):
+                resolved_template = MULTI_PART_PROMPT_TEMPLATE
+
         built_prompt: BuiltPrompt = self.evidence_builder.build_prompt(
             question=clean_query,
             evidence=evidence,
+            prompt_template=resolved_template,
+            instruction=prompt_instruction,
         )
 
         if not built_prompt.included_evidence:

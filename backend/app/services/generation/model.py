@@ -125,8 +125,10 @@ class GenerationModel:
         if self._model is None or self._tokenizer is None:
             raise GenerationModelLoadError("Generation model is not loaded.")
 
+        from app.core.device import inference_context
+
         try:
-            with torch.inference_mode():
+            with inference_context(self.target_device):
                 inputs = self._tokenizer(prompt, return_tensors="pt").to(self.target_device)
 
                 gen_kwargs = {

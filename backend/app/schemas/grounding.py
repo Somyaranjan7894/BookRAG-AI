@@ -9,7 +9,7 @@ The groundedness validation in this system evaluates:
 It does NOT determine whether the book itself is objectively or factually true in the real world.
 """
 
-from typing import List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.schemas.citation import Citation, ClaimCitationRef
@@ -28,6 +28,7 @@ class ExtractedClaim(BaseModel):
 
     claim_index: int = Field(ge=0, description="0-based sequential index of the claim in the answer.")
     claim_text: str = Field(min_length=1, description="Normalized text of the extracted claim sentence.")
+    claim_form: str = Field(default="declarative", description="Syntactic form: declarative, noun_phrase, list, numerical, short_span.")
 
 
 class ClaimEvidenceProvenance(BaseModel):
@@ -297,4 +298,24 @@ class GroundedAnswerResponse(BaseModel):
     reranking_applied: bool = Field(
         default=True,
         description="Whether second-stage Cross-Encoder reranking was applied to the retrieval candidates.",
+    )
+    regeneration_attempted: bool = Field(
+        default=False,
+        description="Whether controlled regeneration was triggered for this query.",
+    )
+    regeneration_reason: Optional[str] = Field(
+        default=None,
+        description="Deterministic reason for controlled regeneration if triggered.",
+    )
+    completeness_status: Optional[str] = Field(
+        default=None,
+        description="Outcome of answer completeness check (e.g. complete, incomplete_comparison, incomplete_multi_part).",
+    )
+    latency_breakdown_ms: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Structured latency breakdown in milliseconds across pipeline stages.",
+    )
+    device_info: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Execution device diagnostics including device type and CUDA status.",
     )

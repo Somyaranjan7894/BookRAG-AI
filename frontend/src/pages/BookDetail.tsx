@@ -10,6 +10,8 @@ import { ProcessingStatusBadge } from '@/components/processing/ProcessingStatusB
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
 
+import { QuestionGenerator } from '@/components/questions/QuestionGenerator';
+
 export const BookDetail: React.FC = () => {
   const { params } = useRouter();
   const documentId = params.id;
@@ -27,6 +29,7 @@ export const BookDetail: React.FC = () => {
     ask,
   } = useAskQuestion({ documentId });
 
+  const [activeTab, setActiveTab] = useState<'grounded' | 'extractive' | 'matching' | 'qgen'>('grounded');
   const [hasAsked, setHasAsked] = useState<boolean>(false);
 
   const handleAsk = async (questionText: string) => {
@@ -126,7 +129,7 @@ export const BookDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Q&A Section */}
+      {/* Q&A / Exploration Section */}
       {isProcessed ? (
         <div className="space-y-6">
           {/* Controls & Mode Selection */}
@@ -134,20 +137,25 @@ export const BookDetail: React.FC = () => {
             <div>
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-indigo-600" />
-                Ask This Book
+                {activeTab === 'qgen' ? 'Question Generator' : 'Ask This Book'}
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Query full document contents with verifiable citation provenance
+                {activeTab === 'qgen'
+                  ? 'Generate controlled, evidence-grounded reading comprehension questions from this book'
+                  : 'Query full document contents with verifiable citation provenance'}
               </p>
             </div>
 
-            {/* QA Mode Switcher */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs">
+            {/* QA & Tool Mode Switcher */}
+            <div className="flex flex-wrap items-center p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs max-w-full">
               <button
                 type="button"
-                onClick={() => setMode('grounded')}
+                onClick={() => {
+                  setActiveTab('grounded');
+                  setMode('grounded');
+                }}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                  mode === 'grounded'
+                  activeTab === 'grounded'
                     ? 'bg-white text-indigo-700 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
@@ -156,9 +164,12 @@ export const BookDetail: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setMode('extractive')}
+                onClick={() => {
+                  setActiveTab('extractive');
+                  setMode('extractive');
+                }}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                  mode === 'extractive'
+                  activeTab === 'extractive'
                     ? 'bg-white text-indigo-700 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
@@ -167,93 +178,122 @@ export const BookDetail: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setMode('matching')}
+                onClick={() => {
+                  setActiveTab('matching');
+                  setMode('matching');
+                }}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                  mode === 'matching'
+                  activeTab === 'matching'
                     ? 'bg-white text-indigo-700 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Matching Board
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('qgen')}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition ${
+                  activeTab === 'qgen'
+                    ? 'bg-white text-indigo-700 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Generate Questions
+              </button>
             </div>
           </div>
 
-          {/* Question Input */}
-          <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm">
-            <QuestionInput
-              onSubmit={handleAsk}
-              isLoading={isQuestionLoading}
-              placeholder={
-                mode === 'matching'
-                  ? `Search semantic candidates & inspect reranking for "${document.title || document.filename}"...`
-                  : `Ask a question about "${document.title || document.filename}"...`
-              }
+          {/* Tab Content */}
+          {activeTab === 'qgen' ? (
+            <QuestionGenerator
+              documentId={document.document_id}
+              bookTitle={document.title || document.filename}
+              onAskQuestion={(qText) => {
+                setActiveTab('grounded');
+                setMode('grounded');
+                handleAsk(qText);
+              }}
             />
-          </div>
-
-          {/* Error Banner */}
-          {qaError && (
-            <ErrorAlert
-              error={qaError}
-              title={mode === 'matching' ? 'Failed to Search Book' : 'Failed to Answer Question'}
-              onRetry={() => query && handleAsk(query)}
-            />
-          )}
-
-          {/* Active Question / Search Loading State */}
-          {isQuestionLoading && (
-            <div className="p-8 rounded-2xl border border-indigo-100 bg-white shadow-2xs text-center">
-              <LoadingSpinner
-                size="lg"
-                label={
-                  mode === 'matching'
-                    ? 'Retrieving candidate pool & running Cross-Encoder reranking...'
-                    : 'Searching semantic chunks & verifying claims...'
-                }
-              />
-              <p className="mt-3 text-xs text-slate-500">
-                {mode === 'matching'
-                  ? 'Evaluating dense vector similarity (FAISS/pgvector) and computing full cross-attention transformer scores...'
-                  : 'Evaluating vector similarity, applying cross-encoder reranking, and running DeBERTa NLI grounding...'}
-              </p>
-            </div>
-          )}
-
-          {/* Standalone Matching Board Display */}
-          {mode === 'matching' && searchResult && !isQuestionLoading && (
-            <MatchingBoard
-              query={query}
-              results={searchResult.results}
-              candidateCount={searchResult.candidate_count}
-              rerankingApplied={searchResult.reranking_applied}
-            />
-          )}
-
-          {/* Answer Display (Grounded / Extractive) */}
-          {mode !== 'matching' && (groundedResult || extractiveResult) && !isQuestionLoading && (
-            <AnswerDisplay
-              query={query}
-              groundedResult={groundedResult}
-              extractiveResult={extractiveResult}
-            />
-          )}
-
-          {/* Empty State before any question or search */}
-          {!hasAsked && !groundedResult && !extractiveResult && !searchResult && !isQuestionLoading && (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center">
-              <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
-                <HelpCircle className="w-6 h-6" />
+          ) : (
+            <>
+              {/* Question Input */}
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm">
+                <QuestionInput
+                  onSubmit={handleAsk}
+                  isLoading={isQuestionLoading}
+                  placeholder={
+                    mode === 'matching'
+                      ? `Search semantic candidates & inspect reranking for "${document.title || document.filename}"...`
+                      : `Ask a question about "${document.title || document.filename}"...`
+                  }
+                />
               </div>
-              <h3 className="text-sm font-semibold text-slate-900">
-                {mode === 'matching' ? 'No search executed yet' : 'No questions asked yet'}
-              </h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                {mode === 'matching'
-                  ? 'Submit a search query above to inspect candidate retrieval pool sizes, Cross-Encoder reranking movements, and page provenance.'
-                  : 'Type a question above to retrieve context-backed answers, claim verification scores, and page citations.'}
-              </p>
-            </div>
+
+              {/* Error Banner */}
+              {qaError && (
+                <ErrorAlert
+                  error={qaError}
+                  title={mode === 'matching' ? 'Failed to Search Book' : 'Failed to Answer Question'}
+                  onRetry={() => query && handleAsk(query)}
+                />
+              )}
+
+              {/* Active Question / Search Loading State */}
+              {isQuestionLoading && (
+                <div className="p-8 rounded-2xl border border-indigo-100 bg-white shadow-2xs text-center">
+                  <LoadingSpinner
+                    size="lg"
+                    label={
+                      mode === 'matching'
+                        ? 'Retrieving candidate pool & running Cross-Encoder reranking...'
+                        : 'Searching semantic chunks & verifying claims...'
+                    }
+                  />
+                  <p className="mt-3 text-xs text-slate-500">
+                    {mode === 'matching'
+                      ? 'Evaluating dense vector similarity (FAISS/pgvector) and computing full cross-attention transformer scores...'
+                      : 'Evaluating vector similarity, applying cross-encoder reranking, and running DeBERTa NLI grounding...'}
+                  </p>
+                </div>
+              )}
+
+              {/* Standalone Matching Board Display */}
+              {mode === 'matching' && searchResult && !isQuestionLoading && (
+                <MatchingBoard
+                  query={query}
+                  results={searchResult.results}
+                  candidateCount={searchResult.candidate_count}
+                  rerankingApplied={searchResult.reranking_applied}
+                />
+              )}
+
+              {/* Answer Display (Grounded / Extractive) */}
+              {mode !== 'matching' && (groundedResult || extractiveResult) && !isQuestionLoading && (
+                <AnswerDisplay
+                  query={query}
+                  groundedResult={groundedResult}
+                  extractiveResult={extractiveResult}
+                />
+              )}
+
+              {/* Empty State before any question or search */}
+              {!hasAsked && !groundedResult && !extractiveResult && !searchResult && !isQuestionLoading && (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-10 text-center">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
+                    <HelpCircle className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {mode === 'matching' ? 'No search executed yet' : 'No questions asked yet'}
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                    {mode === 'matching'
+                      ? 'Submit a search query above to inspect candidate retrieval pool sizes, Cross-Encoder reranking movements, and page provenance.'
+                      : 'Type a question above to retrieve context-backed answers, claim verification scores, and page citations.'}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       ) : (

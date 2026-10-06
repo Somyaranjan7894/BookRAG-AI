@@ -1,5 +1,5 @@
-"""Document ingestion, upload enqueueing, and persistent document management endpoints."""
-
+import tempfile
+from pathlib import Path
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -12,6 +12,7 @@ from app.api.v1.dependencies import (
     get_pdf_ingestion_service,
     get_text_processing_service,
 )
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.document import (
     DocumentIngestRequest,
@@ -70,7 +71,19 @@ async def ingest_document(
     text_service: TextProcessingService = Depends(get_text_processing_service),
     persistence: Optional[DocumentPersistenceService] = Depends(get_optional_persistence_service),
 ) -> DocumentIngestResponse:
-    """Ingest a PDF from a local filesystem path and return structured document representation."""
+    # Security: restrict file_path access to approved directories (upload storage and temp directory)
+    resolved_path = Path(payload.file_path.strip()).resolve()
+    allowed_dirs = [Path(settings.UPLOAD_STORAGE_DIR).resolve(), Path(tempfile.gettempdir()).resolve()]
+    is_allowed = any(
+        resolved_path == d or d in resolved_path.parents
+        for d in allowed_dirs
+    )
+    if not is_allowed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: file_path must be within an approved directory",
+        )
+
     document = pdf_service.ingest_pdf(
         file_path=payload.file_path,
         document_id=payload.document_id,

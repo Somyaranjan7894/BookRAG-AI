@@ -76,13 +76,13 @@ class SearchService:
         # Resolve vector search backend (FAISS or pgvector)
         if vector_backend is not None:
             self.backend = vector_backend
-        elif retrieval_service is not None or (backend_type or settings.VECTOR_BACKEND).lower() == "faiss":
-            self.backend = FAISSVectorBackend(retrieval_service=self.retrieval_service)
-        else:
+        elif (backend_type or settings.VECTOR_BACKEND).lower() == "pgvector":
             self.backend = create_vector_backend(
-                backend_type=backend_type or settings.VECTOR_BACKEND,
+                backend_type="pgvector",
                 retrieval_service=self.retrieval_service,
             )
+        else:
+            self.backend = FAISSVectorBackend(retrieval_service=self.retrieval_service)
 
     @property
     def is_reranking_enabled(self) -> bool:

@@ -67,9 +67,9 @@ The target end-to-end architecture is structured as a modular monolith:
 
 ---
 
-## 4. Current Phase Scope: Phase 17 Complete
+## 4. Current Phase Scope: Phase 20 Complete (Production RAG Quality & Evaluation)
 
-This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, **Phase 15 (Redis + Celery Background Processing)**, **Phase 16 (Production FastAPI Architecture)**, and **Phase 17 (React Frontend & Product UI)**.
+This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion)**, **Phase 2 (Text Cleaning & Chunking)**, **Phase 3 (Semantic Embeddings)**, **Phase 4 (Vector Retrieval with FAISS)**, **Phase 5 (Semantic Search Service & API)**, **Phase 6 (Cross-Encoder Reranking)**, **Phase 7 (Extractive Question Answering)**, **Phase 8 (Abstractive QA with FLAN-T5)**, **Phase 9 (Groundedness & Hallucination Control)**, **Phase 10 (Citation & Provenance Mapping Layer)**, **Phase 11 (Query Understanding & Query Planning)**, **Phase 12 (Controlled Question Generation & Validation)**, **Phase 13 (PostgreSQL Persistent Application Data)**, **Phase 14 (pgvector Persistent Vector Storage & Database-Native Vector Retrieval)**, **Phase 15 (Redis + Celery Background Processing)**, **Phase 16 (Production FastAPI Architecture)**, **Phase 17 (React Frontend & Product UI)**, **Phase 18 (Matching Board & Retrieval Transparency)**, **Phase 19 (End-to-End Hardening & Deployment Packaging)**, and **Phase 20 (Production RAG Quality & Evaluation)**.
 
 ### What is implemented:
 - **Repository & Runtime Foundation (Phase 0)**:
@@ -200,6 +200,14 @@ This repository has completed **Phase 0 (Foundation)**, **Phase 1 (PDF Ingestion
   - Strict score semantics: Pure numeric representation with neutral labels ("Semantic relevance" and "Reranker relevance") preventing misleading percentage conversions or false "truth/accuracy" claims.
   - Accessible, responsive UI featuring KPI summary counters, filter tabs (All, Used in Answer, Promoted $\uparrow$), keyboard-navigable dialogs, and ARIA attributes.
   - Full test coverage: 16 frontend test cases and 3 backend transparency tests covering metadata preservation, ranking movement, score semantics, and zero regression.
+- **Production Architecture Hardening & Deployment Packaging (Phase 19)**:
+  - **Fast-Failing Readiness Probe**: Refactored `GET /api/v1/health/ready` with bounded socket timeouts (`connect_timeout=2s`) via `asyncio.to_thread` for PostgreSQL and explicit probe timeouts for Redis and vector backends, preventing event loop thread starvation when dependencies are offline.
+  - **HTTP Upload Security Hardening**: Strict multipart filename sanitization enforcing safe basenames (`Path.name`) and canonical directory boundary enforcement (`realpath().startswith()`), eliminating directory traversal vulnerabilities (`../../evil.pdf`).
+  - **File Extension Boundary Validation**: Rejects non-PDF file uploads (`.txt`, `.exe`, `.zip`) at the HTTP boundary before writing to storage.
+  - **Host Filesystem Path Protection**: Restricted JSON `file_path` ingestion to approved upload/data and temporary directories, preventing arbitrary filesystem access.
+  - **Python Environment Drift Fix**: Harmonized `backend/.venv` dependencies with `backend/requirements.txt` (`pgvector`, `redis`, `celery`, `python-multipart`, `pytest-timeout`).
+  - **Docker Multi-Service Architecture & Live Verification**: Complete containerization with `docker-compose.yml`, `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx.conf`, and `.dockerignore` defining `db` (PostgreSQL + pgvector), `redis`, `backend` (FastAPI), `worker` (Celery), and `frontend` (React SPA + Nginx) with container healthchecks, persistent volumes, and explicit dependency orchestration. Fully verified live end-to-end with live document upload via Nginx proxy, asynchronous Celery ingestion, PostgreSQL persistence, and pgvector semantic retrieval.
+  - **Automated Pipeline Evaluation Subsystem**: Dedicated benchmarking runner (`evaluation/runner.py`) computing retrieval metrics (MRR, Recall@K, Precision@K), generation quality, NLI claim support rates, and safe refusal accuracy. Clearly labeled as a **Development / Sample Benchmark** (`dev_sample.json`, 10 queries).
 
 ---
 
@@ -1051,7 +1059,7 @@ cd backend
 .\.venv\Scripts\pytest.exe -v
 ```
 
-All **352 tests** will run, covering:
+All **422 backend tests** collected across 19 suites:
 - **Phase 0 (5 tests)**: FastAPI initialization, settings, logging, health check probe.
 - **Phase 1 (16 tests)**: PDF opening, page counts, 1-based page numbers, text extraction, empty/low-text diagnostics, error handling.
 - **Phase 2 (27 tests)**: Conservative cleaning, safe dehyphenation, paragraph preservation, sentence-aware chunking, overlap control, chunk immutability.
@@ -1066,6 +1074,28 @@ All **352 tests** will run, covering:
 - **Phase 11 (42 tests)**: Query normalization (whitespace, C++, COVID-19, R&D, years), 10-type query classification, expected answer type mapping, zero-hallucination constraint detection (chapter, year, page, quotes), retrieval query decomposition (max 3, non-redundant), candidate merging, stable deduplication, provenance retention, post-merge Cross-Encoder reranking, document isolation, orchestrator integration, semantic principles, and `POST /api/v1/query-plan` API endpoint.
 - **Phase 12 (37 tests)**: Answer candidate extraction (person, date, year, number, organization, stop word rejection, provenance), question generation formatting, answer conditioning, batch generation, question validation, answer matching (exact, case, whitespace, numeric mismatch, date mismatch, partial overlap), source grounding, duplicate detection, count control without fabrication, document isolation, `POST /api/v1/questions/generate` API endpoint, semantic principles, taxonomy classification, and real model integration.
 - **Phase 13 (18 tests)**: Document/Page/Chunk ORM models, field definitions, status lifecycle, check constraints, foreign keys with cascade deletion, composite uniqueness constraints, DocumentRepository/PageRepository/ChunkRepository CRUD operations, atomic transactional persistence with rollback guarantees, Alembic schema migrations, and REST API document persistence and query endpoints.
+- **Phase 14 (14 tests)**: pgvector extension setup, vector column migration, VectorSearchBackend abstraction, PGVectorRepository, HNSW cosine index, dual backend switching. *(Requires live PostgreSQL container on port 5433)*.
+- **Phase 15 (13 tests)**: Celery task registration, configuration, eager task execution, Redis broker connection, DocumentProcessingService pipeline orchestration. *(Requires live PostgreSQL container on port 5433)*.
+- **Phase 16 (17 tests)**: Centralized DI, request correlation ID propagation (`X-Request-ID`), structured sanitized error envelopes, and zero traceback leaks.
+- **Phase 18 (3 tests)**: Matching Board retrieval transparency metadata preservation, ranking delta indicators, and pure score semantics.
+- **Phase 19 (28 tests)**: Health and readiness probe fail-fast timeouts (10 tests in `test_health.py`) and upload security hardening (18 tests in `test_upload_security.py` covering path traversal sanitization, PDF extension enforcement, and file_path directory restriction).
+
+In a local standalone environment without live PostgreSQL/Redis, **377 unit and integration tests** execute and pass (100%). The 45 database-dependent tests require an active PostgreSQL + pgvector instance on port 5433.
+
+### Frontend Test Suite
+Run Vitest from the `frontend` directory:
+
+```bash
+cd frontend
+npm test
+```
+
+All **31 Vitest tests** pass across 5 suites:
+- `MatchingBoard.test.tsx` (16 tests): Matching Board rendering, KPI metrics, ranking movement indicators ($\uparrow, \downarrow, =$), score formatting, filter tabs, modal dialogues.
+- `Dashboard.test.tsx` (5 tests): Document library listing, upload modal, search filtering.
+- `BookDetail.test.tsx` (5 tests): Document detail view, metadata tabs, question answering integration.
+- `ProcessingStatus.test.tsx` (3 tests): Ingestion stage progress, polling lifecycle.
+- `ErrorHandling.test.tsx` (2 tests): Sanitized error banner display, request ID copy action.
 
 
 ---
@@ -1561,7 +1591,71 @@ npm run build
 
 ---
 
-## 21. Future Roadmap
+## 21. Phase 20: Production RAG Quality & Evaluation Subsystem
+
+Phase 20 introduces a reproducible, human-verified golden benchmark schema and a production-quality RAG evaluation workflow.
+
+### 1. Golden Benchmark Schema & Datasets
+- **Versioned Golden Benchmark (`evaluation/datasets/golden_v1.json`)**:
+  - Enforces strict verification statuses: `VERIFIED`, `NOT_VERIFIED`, and `BLOCKED`.
+  - Marked explicitly as **`NOT_VERIFIED`** pending formal domain expert human sign-off rather than fabricating synthetic labels.
+  - Distinguishes answerable vs unanswerable questions, expected ground truth answers, relevant page numbers, relevant chunk IDs, and exact textual evidence excerpts.
+  - Full cognitive category coverage:
+    - `direct_fact`: Exact factual retrieval from single passages.
+    - `definition`: Formal definitions and terminology.
+    - `explanation`: Causal, conceptual, and mathematical explanations.
+    - `multi_page`: Questions requiring synthesis across multiple separated book pages.
+    - `comparison`: Contrasting learning paradigms or model architectures.
+    - `numerical_fact`: Exact constants, dimensions, and numerical values.
+    - `unanswerable`: Out-of-scope queries absent from the corpus (e.g. bread baking, quantum computing).
+    - `ambiguous`: Questions lacking necessary context or falsely presuming universal solutions.
+- Legacy `dev_sample.json` preserved with full backward compatibility.
+
+### 2. Multi-Stage Retrieval & Reranking Comparative Evaluation
+- Evaluates Stage 1 (FAISS Vector Retrieval) vs Stage 2 (Cross-Encoder Reranking):
+  - Recall@1, Recall@3, Recall@5, Recall@10
+  - Precision@1, Precision@3, Precision@5
+  - Mean Reciprocal Rank (MRR)
+  - Chunk-level and page-level retrieval evaluation
+  - Reranking movement distribution: counts of improved, unchanged, and degraded queries
+  - **Scientific Neutrality Principle**: Reranking quality improvements are never claimed unless demonstrated by positive empirical metric deltas.
+
+### 3. Answer Quality, Grounding & Hallucination Defense
+- **Answer Correctness**: Token-level Precision, Recall, and F1 overlap against verified expected answers.
+- **NLI Groundedness & Claim Support**: Sentence-level claim decomposition with `cross-encoder/nli-deberta-v3-base` classifying claims into entailed, unsupported (neutral), contradicted, and conflicted.
+- **Answerable Success Rate**: Measures queries generating unrefused, grounded answers with zero contradictions.
+- **Citation Correctness**: Evaluates precision and recall of assigned citations against verified ground-truth chunk IDs and pages.
+- **Refusal Performance**: Measures refusal precision, safe refusal rate on unanswerable/ambiguous queries, and monitors against over-refusal of answerable questions.
+- **Safe Refusal Verification**: Verifies that queries lacking supporting evidence trigger safe refusal (`insufficient_evidence`) without generating hallucinated answers or leaking invalid citations.
+
+### 4. Critical Semantic Principles Enforced
+1. **Retrieval relevance $\neq$ factual correctness**: Vector proximity identifies semantic similarity, not objective factual truth.
+2. **Reranker score $\neq$ probability**: Cross-encoder logits represent relative ranking discriminators, not calibrated probabilities.
+3. **NLI score $\neq$ truth probability**: Natural Language Inference measures premise-hypothesis logical consistency under retrieved evidence; it does NOT prove an answer is real-world truth.
+4. **Model confidence $\neq$ factual correctness**: Fluent generation does not ensure absence of hallucination.
+
+### 5. Running the Evaluation Pipeline
+```bash
+# Execute end-to-end evaluation runner on golden_v1.json
+python evaluation/runner.py
+
+# Run evaluation on custom dataset or dev_sample.json
+python evaluation/runner.py --dataset evaluation/datasets/dev_sample.json
+
+# Run evaluation test suite (22 unit & integration tests)
+pytest backend/tests/test_evaluation.py
+```
+Generated reports are stored in `evaluation/reports/`:
+- `evaluation/reports/retrieval_report.json`
+- `evaluation/reports/grounding_report.json`
+- `evaluation/reports/evaluation_report.json`
+- `evaluation/reports/evaluation_summary.md`
+
+For full details, see the [`docs/evaluation_guide.md`](file:///c:/Book_Rag_AI/docs/evaluation_guide.md).
+
+---
+
+## 22. Future Roadmap
 
 | Phase | Milestone | Status | Focus Areas |
 | :--- | :--- | :--- | :--- |
@@ -1583,7 +1677,90 @@ npm run build
 | **Phase 15** | Redis + Celery Background Processing | **Complete** | Redis broker, Celery worker, DocumentProcessingService pipeline orchestration, async 202 upload API, durable PostgreSQL progress tracking, bounded retries, idempotency. |
 | **Phase 16** | Production FastAPI Architecture | **Complete** | Thin routers, centralized DI (`dependencies.py`), correlation ID middleware (`X-Request-ID`), structured sanitized error responses, OpenAPI metadata, service/repository boundaries. |
 | **Phase 17** | React Frontend & Product UI | **Complete** | React 18, TypeScript, Vite, Tailwind CSS, async 202 upload, stage polling, book detail, grounded QA & citations. |
-| **Phase 18** | Relevant Matching Board UI | Planned | Interactive cross-attention heatmap, candidate ranking visualization, token matching transparency. |
+| **Phase 18** | Relevant Matching Board UI | **Complete** | Interactive retrieval transparency, candidate ranking visualization, score delta indicators, 16 frontend tests. |
+| **Phase 19** | End-to-End Hardening & Deployment | **Complete & Verified** | Fast-failing readiness probes, upload security hardening, Docker 5-container architecture (db, redis, backend, worker, frontend) with live container verification, 422 backend and 31 frontend tests. |
+| **Phase 20** | Production RAG Quality & Evaluation | **Complete & Verified** | Versioned golden benchmark schema (`golden_v1.json`), multi-stage retrieval metrics, safe refusal verification. |
+| **Phase 21** | Grounding Robustness & Hallucination Defense | **Complete & Verified** | Controlled answer regeneration, claim decomposition, contradiction detection, safe refusal enforcement. |
+| **Phase 22** | Production Question Generation | **Complete & Verified** | Strict answer matching, answerable validation, deduplication, multi-page synthesis, zero-fabrication count control. |
+| **Phase 23** | Scientific Evaluation & Benchmarking | **Complete & Verified** | Full-book evaluation harness, query-type classification, latency benchmarking, duplicate tracking. |
+| **Phase 24** | Production Hardening & Device Manager | **Complete & Verified** | Centralized DeviceManager, native CUDA & safe CPU fallback, upload security, SQL injection defense. |
+| **Phase 25** | Final Integration & Production Release | **Complete & Verified** | End-to-end integration, forensic QG fix, persistent model caching, 558 backend + 36 frontend tests passing. |
+
+---
+
+## 23. Production System & Deployment Guide (Phase 25 Release)
+
+### 1. Six Production AI Models
+BookRAG AI operates 6 real neural models without third-party API dependencies:
+1. **Semantic Embeddings**: `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense vectors).
+2. **Cross-Encoder Reranking**: `cross-encoder/ms-marco-MiniLM-L-6-v2` (sequence-pair relevance scoring).
+3. **Extractive Question Answering**: `deepset/roberta-base-squad2` (exact document span extraction).
+4. **Abstractive Synthesis**: `google/flan-t5-base` (grounded abstractive reasoning).
+5. **NLI Claim Verification**: `cross-encoder/nli-deberta-v3-base` (entailment/neutral/contradiction grounding).
+6. **Controlled Question Generation**: `iarfmoose/t5-base-question-generator` (answer-first question synthesis).
+
+### 2. Hardware Acceleration & Device Execution
+- **Host Native CUDA**: On systems with an NVIDIA GPU (e.g. GeForce RTX 3050 Laptop GPU, 4GB VRAM) and native PyTorch CUDA 12.6, all models run with full GPU acceleration on `cuda:0` via `DeviceManager` (`DEVICE=auto`). Single-query response times are ~2–3 seconds.
+- **Docker Container Environment**: In standard Docker environments, PyTorch executes via safe CPU fallback without crashing (`DEVICE=cpu`). Hugging Face weights are cached persistently in the Docker named volume `hf_cache`.
+
+### 3. Local Installation & Running Locally
+
+#### Option A: Docker Compose (All 5 Services)
+```bash
+# Clone the repository
+git clone https://github.com/Somyaranjan7894/BookRAG-AI.git
+cd BookRAG-AI
+
+# Copy environment configuration
+cp .env.example .env
+
+# Launch all 5 containers (PostgreSQL+pgvector, Redis, FastAPI Backend, Celery Worker, React Frontend)
+docker compose up -d
+
+# Access the Web Application
+# Frontend: http://localhost:80
+# Backend API Docs: http://localhost:8000/docs
+```
+
+#### Option B: Host Native Development (GPU Acceleration)
+```bash
+# Backend virtual environment
+cd backend
+python -m venv .venv
+.\.venv\Scripts\activate  # Windows: .\.venv\Scripts\activate, Linux/Mac: source .venv/bin/activate
+pip install -r requirements.txt
+
+# Start FastAPI server
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Frontend
+cd ../frontend
+npm install
+npm run dev
+```
+
+### 4. Running the Complete Test Suite
+```bash
+# Backend test suite (558 tests across all phases)
+pytest -q backend/tests/
+
+# Question Generation tests (98 tests)
+pytest backend/tests/test_question_generation*.py
+
+# Frontend tests (36 tests across all components)
+cd frontend
+npm test -- --run
+
+# Frontend production build
+npm run build
+```
+
+### 5. Security & Isolation
+- **PDF Magic Bytes Validation**: Uploaded documents must start with `%PDF-` bytes.
+- **Strict Size and Page Limits**: Configurable file size limits and page caps prevent resource exhaustion.
+- **Document-Level Isolation**: Retrieval and citations strictly enforce `document_id` filtering; chunks from different books are never co-mingled.
+- **Deterministic Citations**: Grounded answers only emit citations if verified by DeBERTa NLI; safe refusal never leaks citations.
+
 
 
 

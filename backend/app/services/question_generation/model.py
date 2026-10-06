@@ -146,8 +146,10 @@ class QuestionGenerationModel:
         # Construct input sequences: "<answer> {answer} <context> {context}"
         input_texts = [f"<answer> {ans} <context> {ctx}" for ans, ctx in pairs]
 
+        from app.core.device import inference_context
+
         try:
-            with torch.inference_mode():
+            with inference_context(self.target_device):
                 encoded_inputs = self.tokenizer(
                     input_texts,
                     padding=True,
@@ -183,6 +185,8 @@ class QuestionGenerationModel:
         text = raw_text.strip()
         # Collapse repeated spaces
         text = re.sub(r"\s+", " ", text)
+        if text and text[0].isalpha():
+            text = text[0].upper() + text[1:]
         # Fix duplicated punctuation at the end: e.g. "? ?" or "??" -> "?"
         text = re.sub(r"[\s\?]+$", "?", text)
         if text and not text.endswith("?"):

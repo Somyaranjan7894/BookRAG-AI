@@ -194,6 +194,85 @@ class TestAnswerCandidateExtraction:
         assert cand.end_offset is not None
         assert chunk.text[cand.start_offset:cand.end_offset] == cand.answer_text
 
+    def test_possessive_apostrophes_are_not_parsed_as_quoted_answers(self):
+        extractor = AnswerCandidateExtractor()
+        chunk = make_test_chunk("The program's move and the opponent's response determine the next state.")
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        assert "s move and the opponent" not in [candidate.answer_text for candidate in candidates]
+
+    def test_explanation_answer_does_not_end_mid_word(self):
+        extractor = AnswerCandidateExtractor()
+        text = (
+            "The optimizer changes weights because its gradient step balances a long sequence of carefully "
+            "selected parameter adjustments across many training iterations and examples."
+        )
+        chunk = make_test_chunk(text)
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        explanation = next(candidate for candidate in candidates if candidate.candidate_type == QuestionType.EXPLANATION)
+        assert text[explanation.end_offset:explanation.end_offset + 1] not in set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+    def test_definition_extraction_prefers_definition_clause_to_quoted_term(self):
+        extractor = AnswerCandidateExtractor()
+        text = (
+            'Our definition of learning is broad enough to include most tasks that we would conventionally '
+            'call "learning" tasks, as we use the word in everyday language.'
+        )
+        chunk = make_test_chunk(text)
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        definition = next(candidate for candidate in candidates if candidate.metadata.get("definition_term") == "learning")
+        assert definition.answer_text == 'broad enough to include most tasks that we would conventionally call "learning" tasks'
+        assert chunk.text[definition.start_offset:definition.end_offset] == definition.answer_text
+        assert definition.answer_text != "learning"
+
+    def test_lms_heading_is_not_extracted_as_definition_answer(self):
+        extractor = AnswerCandidateExtractor()
+        chunk = make_test_chunk(
+            "The LMS algorithm is defined as follows: LMS weight update rule. For each training example, "
+            "use the current weights to calculate the prediction."
+        )
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        assert not any(candidate.answer_text.lower().startswith("follows:") for candidate in candidates)
+
+    def test_all_caps_section_heading_is_not_an_answer_candidate(self):
+        extractor = AnswerCandidateExtractor()
+        chunk = make_test_chunk("1.1 WELL-POSED LEARNING PROBLEMS Let us begin our study of machine learning.")
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        assert "WELL-POSED" not in [candidate.answer_text for candidate in candidates]
+
+    def test_heading_label_before_colon_is_not_an_answer_candidate(self):
+        extractor = AnswerCandidateExtractor()
+        chunk = make_test_chunk("More precisely, Definition: a computer program is said to learn from experience.")
+
+        candidates = extractor.extract_from_chunk(chunk)
+
+        assert "Definition" not in [candidate.answer_text for candidate in candidates]
+
+    def test_arbitrary_shared_word_does_not_create_multipage_candidate(self):
+        extractor = AnswerCandidateExtractor()
+        first = make_test_chunk("Several programs process examples.", chunk_id="first", page_number=1)
+        second = make_test_chunk("Programs process new examples.", chunk_id="second", page_number=2)
+
+        assert extractor.extract_multipage_candidates([first, second]) == []
+
+    def test_contrast_clause_fragment_starting_with_if_is_rejected(self):
+        extractor = AnswerCandidateExtractor()
+        first = make_test_chunk("The pruning method removes branches after training.", chunk_id="first", page_number=1)
+        second = make_test_chunk("In contrast, if the tree itself were pruned, both choices would be removed.", chunk_id="second", page_number=2)
+
+        candidates = extractor.extract_multipage_candidates([first, second])
+
+        assert not any(candidate.answer_text.lower().startswith("if ") for candidate in candidates)
+
 
 # =====================================================================
 # Suite B: Question Generation
@@ -209,6 +288,9 @@ class TestQuestionGeneration:
     def test_question_formatting_collapses_double_question_mark(self):
         cleaned = QuestionGenerationModel._clean_question("Who was Alan Turing? ?")
         assert cleaned == "Who was Alan Turing?"
+
+    def test_question_formatting_normalizes_lowercase_start(self):
+        assert QuestionGenerationModel._clean_question("what is the learning rate?") == "What is the learning rate?"
 
     def test_answer_conditioned_generation_call(self):
         mock_model = MockQuestionGenModel(
@@ -349,6 +431,103 @@ class TestAnswerMatching:
     def test_partial_overlap_with_identical_numbers_passes(self):
         assert matches_expected_answer("year 1991", "1991") is True
         assert matches_expected_answer("approximately 1.41 billion", "1.41 billion") is True
+
+    def test_truncated_expected_answer_is_rejected(self):
+        assert matches_expected_answer(
+            "the game can be lost even when early moves are optimal",
+            "because the game can be lost even when early moves are optimal if these are followed later by poor moves",
+        ) is False
+
+    def test_answer_with_minor_function_word_variation_passes(self):
+        assert matches_expected_answer(
+            "game can be lost even when early moves are optimal",
+            "because the game can be lost even when early moves are optimal",
+        ) is True
+
+    def test_noncontiguous_token_overlap_is_rejected(self):
+        assert matches_expected_answer("neural network architecture", "neural architecture") is False
+
+    def test_shared_adjective_does_not_match_longer_technical_phrase(self):
+        assert matches_expected_answer("rectified linear unit", "linear") is False
+
+    def test_longer_definition_span_requires_an_explicit_definition_relation(self):
+        assert matches_expected_answer(
+            "learning algorithms developed for computers",
+            "learning",
+            question="What is the definition of learning?",
+            source_text="The sentence mentions learning algorithms developed for computers.",
+        ) is False
+
+    def test_purpose_clause_is_not_accepted_as_how_method_answer(self):
+        source = "Assistants learn the interests of users in order to highlight relevant stories."
+        candidate = QuestionCandidate(
+            question_text="How would assistants learn from evolving user interests?",
+            answer_candidate=AnswerCandidate(
+                answer_text="highlight relevant stories",
+                source_text=source,
+                document_id="doc_test",
+                chunk_id="chunk_test",
+                page_number=1,
+                candidate_type=QuestionType.EXPLANATION,
+                metadata={"extraction_trigger": "in order to"},
+            ),
+        )
+        validator = QuestionValidator(qa_service=MockQAService(answer="highlight relevant stories"))
+
+        is_valid, _, reason = validator.validate_candidate(candidate)
+
+        assert is_valid is False
+        assert reason == "Extracted purpose clause does not answer a how/method question."
+
+    def test_longer_source_answer_is_allowed_for_definition_question(self):
+        source = (
+            'Our definition of learning is broad enough to include most tasks that we would conventionally '
+            'call "learning" tasks, as we use the word in everyday language.'
+        )
+        assert matches_expected_answer(
+            'broad enough to include most tasks that we would conventionally call "learning" tasks',
+            "learning",
+            question="What is the definition of learning?",
+            source_text=source,
+        ) is True
+
+    def test_definition_expansion_returns_verified_span_and_qa_offsets(self):
+        source = (
+            'Our definition of learning is broad enough to include most tasks that we would conventionally '
+            'call "learning" tasks, as we use the word in everyday language.'
+        )
+        predicted = 'broad enough to include most tasks that we would conventionally call "learning" tasks'
+        qa = MockQAService(answer=predicted, answerable=True)
+        validator = QuestionValidator(qa_service=qa)
+        candidate = QuestionCandidate(
+            question_text="What is the definition of learning?",
+            answer_candidate=AnswerCandidate(
+                answer_text="learning",
+                source_text=source,
+                document_id="definition_doc",
+                chunk_id="definition_chunk",
+                page_number=16,
+            ),
+        )
+
+        is_valid, question, reason = validator.validate_candidate(candidate)
+
+        assert is_valid is True
+        assert reason is None
+        assert question is not None
+        assert question.answer == predicted
+        assert question.start_offset == 0
+        assert question.end_offset == len(predicted)
+        assert question.metadata["answer_match_type"] == "grounded_definition_expansion"
+
+    def test_longer_answer_exception_requires_definition_evidence(self):
+        source = "The learning algorithm is efficient and updates its weights after each example."
+        assert matches_expected_answer(
+            "the learning algorithm is efficient",
+            "learning",
+            question="What is the definition of learning?",
+            source_text=source,
+        ) is False
 
 
 # =====================================================================

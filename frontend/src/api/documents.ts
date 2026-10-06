@@ -21,7 +21,7 @@ export const documentsApi = {
     return apiClient<DocumentUploadResponse>('/api/v1/documents', {
       method: 'POST',
       body: formData,
-      // Let fetch set Content-Type with multipart boundary
+      timeoutMs: 300000,
     });
   },
 

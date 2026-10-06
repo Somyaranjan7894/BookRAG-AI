@@ -67,6 +67,59 @@ def _extract_evidence_item(evidence_obj: Any, rank: int) -> ClaimEvidenceProvena
     )
 
 
+STOPWORDS = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for",
+    "of", "with", "by", "from", "up", "about", "into", "over", "after",
+    "is", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "do", "does", "did",
+    "what", "which", "who", "whom", "this", "that", "these", "those",
+    "how", "why", "where", "when", "can", "could", "will", "would",
+    "regarding", "answer", "according", "terms", "question",
+}
+
+
+def _is_evidence_relevant_to_claim(evidence_text: str, claim_text: str) -> bool:
+    """Determine whether an evidence chunk is semantically relevant to a claim.
+
+    An evidence chunk can only contradict a claim if it shares topic/entity vocabulary.
+    Out-of-domain or orthogonal passages (e.g. CNNs vs NLI) that share zero non-stopword
+    substantive terms cannot logically contradict the claim.
+    """
+    import re
+    ev_lower = evidence_text.lower()
+    claim_tokens = [
+        t.lower().strip()
+        for t in re.findall(r"\b[a-zA-Z0-9\+\-\*]+\b", claim_text)
+        if t.lower().strip() not in STOPWORDS and len(t) > 2
+    ]
+    if not claim_tokens:
+        return True
+    return any(tok in ev_lower for tok in claim_tokens)
+
+
+def _check_evidence_contains_fragment(evidence_text: str, fragment_text: str) -> bool:
+    """Verify whether a short answer fragment is supported by lexical containment or alignment."""
+    import re
+    ev_lower = evidence_text.lower()
+    frag_lower = fragment_text.lower().strip().rstrip(".!?")
+
+    # Direct substring match
+    if frag_lower in ev_lower:
+        return True
+
+    # Constituent token containment (for lists or multi-word entities)
+    frag_tokens = [
+        t.strip()
+        for t in re.findall(r"\b[a-zA-Z0-9\+\-\*]+\b", frag_lower)
+        if t.strip() not in STOPWORDS and len(t) > 1
+    ]
+    if not frag_tokens:
+        return False
+
+    matched = sum(1 for tok in frag_tokens if tok in ev_lower)
+    return (matched / len(frag_tokens)) >= 0.75
+
+
 class GroundingService:
     """Validates generated claims against retrieved book evidence using CrossEncoder NLI."""
 
@@ -143,12 +196,13 @@ class GroundingService:
         entailment_threshold: Optional[float] = None,
         contradiction_threshold: Optional[float] = None,
         top_k_evidence: Optional[int] = None,
+        query: Optional[str] = None,
     ) -> GroundingReport:
         """Validate decomposed claims against retrieved evidence passages.
 
         NLI Semantics:
         premise    = evidence chunk text
-        hypothesis = generated claim text
+        hypothesis = generated claim text (or contextualized declarative proposition for fragments)
         pair       = (premise, hypothesis)
 
         Claim Classification:
@@ -167,6 +221,7 @@ class GroundingService:
             entailment_threshold: Optional threshold override.
             contradiction_threshold: Optional threshold override.
             top_k_evidence: Optional evidence chunk count override.
+            query: Optional original question query used to contextualize non-sentential fragments.
 
         Returns:
             GroundingReport with claim-level validation outcomes and overall groundedness score.
@@ -230,30 +285,86 @@ class GroundingService:
                 reason="No evidence passages available for validation.",
             )
 
+        from app.services.grounding.claims import contextualize_fragment
+
         # Construct batch pairs: (premise, hypothesis) = (evidence_text, claim_text)
         pairs: List[Tuple[str, str]] = []
         pair_mapping: List[Tuple[int, int]] = []  # (claim_idx, evidence_idx)
 
+        # Contextualized pairs for non-sentential fragments
+        ctx_pairs: List[Tuple[str, str]] = []
+        ctx_pair_mapping: List[Tuple[int, int]] = []
+
         for c_idx, claim in enumerate(claims):
+            c_form = getattr(claim, "claim_form", "declarative")
+            is_fragment = c_form in ("noun_phrase", "list", "numerical", "short_span")
+            ctx_text = contextualize_fragment(query, claim.claim_text) if (is_fragment and query) else None
+
             for e_idx, ev in enumerate(selected_evidence):
                 pairs.append((ev.source_text, claim.claim_text))
                 pair_mapping.append((c_idx, e_idx))
+                if ctx_text and ctx_text != claim.claim_text:
+                    ctx_pairs.append((ev.source_text, ctx_text))
+                    ctx_pair_mapping.append((c_idx, e_idx))
 
-        # Batched NLI inference across all (evidence, claim) pairs
+        # Batched NLI inference across all pairs
         logger.debug(
-            "Executing batched NLI inference for %d (evidence, claim) pairs...",
+            "Executing batched NLI inference for %d base pairs and %d contextualized pairs...",
             len(pairs),
+            len(ctx_pairs),
         )
         scores_list = self.model.predict(pairs)
+        ctx_scores_list = self.model.predict(ctx_pairs) if ctx_pairs else []
 
-        # Organize predictions per claim
-        # Map: claim_idx -> list of (evidence_obj, NLIScores)
+        # Map predictions: (claim_idx, evidence_idx) -> NLIScores
+        raw_score_map: Dict[Tuple[int, int], NLIScores] = {}
+        for (c_idx, e_idx), sc in zip(pair_mapping, scores_list):
+            raw_score_map[(c_idx, e_idx)] = sc
+
+        ctx_score_map: Dict[Tuple[int, int], NLIScores] = {}
+        for (c_idx, e_idx), sc in zip(ctx_pair_mapping, ctx_scores_list):
+            ctx_score_map[(c_idx, e_idx)] = sc
+
+        # Organize merged predictions per claim
         claim_evaluations: Dict[int, List[Tuple[ClaimEvidenceProvenance, NLIScores]]] = {
             i: [] for i in range(len(claims))
         }
-        for (c_idx, e_idx), scores in zip(pair_mapping, scores_list):
-            ev_item = selected_evidence[e_idx]
-            claim_evaluations[c_idx].append((ev_item, scores))
+
+        for c_idx, claim in enumerate(claims):
+            c_form = getattr(claim, "claim_form", "declarative")
+            is_fragment = c_form in ("noun_phrase", "list", "numerical", "short_span")
+
+            for e_idx, ev_item in enumerate(selected_evidence):
+                sc_raw = raw_score_map[(c_idx, e_idx)]
+                sc_ctx = ctx_score_map.get((c_idx, e_idx))
+
+                if sc_ctx is not None:
+                    # Contextualized proposition removes non-sentential NLI failure
+                    merged_ent = max(sc_raw.entailment, sc_ctx.entailment)
+                    merged_contra = min(sc_raw.contradiction, sc_ctx.contradiction)
+                    merged_neutral = min(sc_raw.neutral, sc_ctx.neutral)
+                else:
+                    merged_ent = sc_raw.entailment
+                    merged_contra = sc_raw.contradiction
+                    merged_neutral = sc_raw.neutral
+
+                # Fragment containment verification: a fragment must be lexically verifiable in the evidence
+                if is_fragment:
+                    frag_supported = _check_evidence_contains_fragment(ev_item.source_text, claim.claim_text)
+                    if not frag_supported and merged_ent >= eff_ent_thresh:
+                        # If fragment is not present in this chunk, cannot claim entailment from this chunk
+                        merged_ent = min(merged_ent, 0.20)
+
+                claim_evaluations[c_idx].append(
+                    (
+                        ev_item,
+                        NLIScores(
+                            entailment=merged_ent,
+                            contradiction=merged_contra,
+                            neutral=merged_neutral,
+                        ),
+                    )
+                )
 
         # Evaluate each claim against its candidate evidence chunks
         claim_results: List[ClaimResult] = []
@@ -286,13 +397,18 @@ class GroundingService:
                         ev_item.model_copy(update={"nli_score": round(sc.entailment, 4)})
                     )
 
-                if sc.contradiction > best_contra_score:
-                    best_contra_score = sc.contradiction
+                # Relevance-Gated Contradiction:
+                # An evidence chunk can only contradict a claim if it is semantically relevant to the claim topic.
+                # Disjoint passages that share no content with the claim cannot logically contradict it.
+                is_relevant = _is_evidence_relevant_to_claim(ev_item.source_text, claim.claim_text)
+                if is_relevant:
+                    if sc.contradiction > best_contra_score:
+                        best_contra_score = sc.contradiction
 
-                if sc.contradiction >= eff_contra_thresh:
-                    contra_evidence_list.append(
-                        ev_item.model_copy(update={"nli_score": round(sc.contradiction, 4)})
-                    )
+                    if sc.contradiction >= eff_contra_thresh:
+                        contra_evidence_list.append(
+                            ev_item.model_copy(update={"nli_score": round(sc.contradiction, 4)})
+                        )
 
             # Determine claim status based on thresholds
             has_entailment = best_ent_score >= eff_ent_thresh

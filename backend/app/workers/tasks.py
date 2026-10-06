@@ -3,6 +3,7 @@
 from typing import Any, Dict
 
 from app.core.config import settings
+from app.core.device import empty_cache
 from app.core.logging import get_logger
 from app.db.session import get_session_factory
 from app.services.document_processing.exceptions import (
@@ -20,6 +21,9 @@ logger = get_logger(__name__)
     name="app.workers.tasks.process_document_task",
     max_retries=settings.CELERY_TASK_MAX_RETRIES,
     default_retry_delay=settings.CELERY_TASK_DEFAULT_RETRY_DELAY,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
     acks_late=True,
 )
 def process_document_task(self, document_id: str, file_path: str) -> Dict[str, Any]:
@@ -47,39 +51,42 @@ def process_document_task(self, document_id: str, file_path: str) -> Dict[str, A
     )
 
     session_factory = get_session_factory()
-    with session_factory() as session:
-        service = DocumentProcessingService(session=session)
-        try:
-            result = service.process(document_id=document_id, file_path=file_path)
-            logger.info(
-                "process_document_task completed successfully: task_id=%s, doc_id=%s",
-                task_id,
-                document_id,
-            )
-            return result
-        except TransientProcessingError as exc:
-            logger.warning(
-                "Transient failure processing document '%s' (task_id=%s, attempt=%d/%d): %s",
-                document_id,
-                task_id,
-                retries + 1,
-                self.max_retries,
-                exc,
-            )
-            raise self.retry(exc=exc)
-        except PermanentProcessingError as exc:
-            logger.error(
-                "Permanent unretryable failure processing document '%s' (task_id=%s): %s",
-                document_id,
-                task_id,
-                exc,
-            )
-            raise
-        except Exception as exc:
-            logger.exception(
-                "Unhandled failure processing document '%s' (task_id=%s): %s",
-                document_id,
-                task_id,
-                exc,
-            )
-            raise
+    try:
+        with session_factory() as session:
+            service = DocumentProcessingService(session=session)
+            try:
+                result = service.process(document_id=document_id, file_path=file_path)
+                logger.info(
+                    "process_document_task completed successfully: task_id=%s, doc_id=%s",
+                    task_id,
+                    document_id,
+                )
+                return result
+            except TransientProcessingError as exc:
+                logger.warning(
+                    "Transient failure processing document '%s' (task_id=%s, attempt=%d/%d): %s",
+                    document_id,
+                    task_id,
+                    retries + 1,
+                    self.max_retries,
+                    exc,
+                )
+                raise self.retry(exc=exc)
+            except PermanentProcessingError as exc:
+                logger.error(
+                    "Permanent unretryable failure processing document '%s' (task_id=%s): %s",
+                    document_id,
+                    task_id,
+                    exc,
+                )
+                raise
+            except Exception as exc:
+                logger.exception(
+                    "Unhandled failure processing document '%s' (task_id=%s): %s",
+                    document_id,
+                    task_id,
+                    exc,
+                )
+                raise
+    finally:
+        empty_cache()

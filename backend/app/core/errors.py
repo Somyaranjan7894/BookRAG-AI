@@ -861,6 +861,22 @@ def setup_exception_handlers(app: FastAPI) -> None:
         )
 
     # --------------------------------------------------------------------------
+    # Database Operational & SQL Exceptions
+    # --------------------------------------------------------------------------
+    from sqlalchemy.exc import SQLAlchemyError
+
+    @app.exception_handler(SQLAlchemyError)
+    async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
+        """Handle database operational errors without leaking connection strings or credentials."""
+        logger.error("Database operational error processing %s: %s", request.url.path, exc)
+        return create_error_response(
+            request=request,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="A database operational error occurred. Please try again later.",
+            error_type="DATABASE_ERROR",
+        )
+
+    # --------------------------------------------------------------------------
     # Fallback Catch-All Unhandled Exception Handler
     # --------------------------------------------------------------------------
     @app.exception_handler(Exception)

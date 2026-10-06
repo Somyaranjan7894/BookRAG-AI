@@ -18,29 +18,7 @@ DEFAULT_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 EXPECTED_DIMENSION = 384
 
 
-def resolve_device(requested_device: Optional[str] = None) -> str:
-    """Determine the optimal execution device based on hardware and configuration.
-
-    Args:
-        requested_device: 'auto', 'cpu', or 'cuda' (or 'cuda:N'). Defaults to 'auto'.
-
-    Returns:
-        Resolved device string ('cpu' or 'cuda'/'cuda:N').
-    """
-    dev = (requested_device or "auto").strip().lower()
-    if dev == "auto":
-        is_cuda = torch.cuda.is_available()
-        selected = "cuda" if is_cuda else "cpu"
-        logger.debug("Auto device detection: CUDA available=%s, selected='%s'", is_cuda, selected)
-        return selected
-
-    if dev.startswith("cuda"):
-        if not torch.cuda.is_available():
-            logger.warning("CUDA was explicitly requested ('%s') but is unavailable. Falling back to CPU.", dev)
-            return "cpu"
-        return dev
-
-    return "cpu"
+from app.core.device import resolve_device
 
 
 class EmbeddingModel:

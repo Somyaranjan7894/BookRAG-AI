@@ -8,6 +8,7 @@ import hashlib
 from pathlib import Path
 from typing import Optional
 
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.document import Document, Page
 from app.services.pdf.exceptions import (
@@ -56,6 +57,18 @@ class PDFIngestionService:
             logger.error("PDF ingestion failed: File '%s' is 0 bytes", resolved.name)
             raise InvalidPDFError(f"File '{resolved.name}' is empty (0 bytes).")
 
+        if resolved.stat().st_size > settings.MAX_UPLOAD_FILE_SIZE_BYTES:
+            logger.error(
+                "PDF ingestion failed: File '%s' (%d bytes) exceeds maximum limit (%d bytes)",
+                resolved.name,
+                resolved.stat().st_size,
+                settings.MAX_UPLOAD_FILE_SIZE_BYTES,
+            )
+            raise InvalidPDFError(
+                f"File '{resolved.name}' exceeds maximum allowed upload size of "
+                f"{settings.MAX_UPLOAD_FILE_SIZE_BYTES // (1024 * 1024)} MB."
+            )
+
         return resolved
 
     def ingest_pdf(
@@ -96,6 +109,12 @@ class PDFIngestionService:
                 if page_count == 0:
                     raise InvalidPDFError(
                         f"PDF document '{path.name}' contains 0 pages."
+                    )
+
+                if page_count > settings.MAX_UPLOAD_PAGE_COUNT:
+                    raise InvalidPDFError(
+                        f"PDF document '{path.name}' has {page_count} pages, "
+                        f"exceeding the maximum allowed limit of {settings.MAX_UPLOAD_PAGE_COUNT} pages."
                     )
 
                 metadata = self.parser.extract_metadata(doc)

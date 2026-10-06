@@ -38,6 +38,9 @@ ENV/
 htmlcov/
 .mypy_cache/
 .ruff_cache/
+*.db
+*.sqlite
+
 
 # IDE and OS files
 .idea/
@@ -78,9 +81,16 @@ backend/data/*
 *.faiss
 *.index
 
-# Node / Frontend artifacts (Future phases)
+# Scratch and temporary testing artifacts
+scratch/
+test_*.db
+*.db
+
+# Node / Frontend build artifacts
 frontend/node_modules/
 frontend/dist/
 frontend/.next/
 *.tsbuildinfo
+
+
 

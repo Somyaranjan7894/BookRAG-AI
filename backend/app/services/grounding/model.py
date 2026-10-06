@@ -196,14 +196,14 @@ class NLIModel:
     def predict(
         self,
         pairs: Sequence[Tuple[str, str]],
-        batch_size: int = 32,
+        batch_size: Optional[int] = None,
     ) -> List[NLIScores]:
         """Perform batched NLI inference over (premise, hypothesis) string pairs.
 
         Args:
             pairs: Sequence of (premise, hypothesis) tuples.
                    premise = evidence text, hypothesis = claim text.
-            batch_size: Inference forward-pass batch size.
+            batch_size: Inference forward-pass batch size. Defaults to INFERENCE_BATCH_SIZE.
 
         Returns:
             List of NLIScores with normalized entailment, contradiction, and neutral probabilities.
@@ -215,12 +215,15 @@ class NLIModel:
             raise NLIModelLoadError("CrossEncoder NLI model is not initialized.")
 
         try:
+            eff_batch_size = batch_size if batch_size is not None else getattr(settings, "INFERENCE_BATCH_SIZE", 8)
             pair_list = [list(p) for p in pairs]
-            with torch.inference_mode():
+            from app.core.device import inference_context
+
+            with inference_context(self.target_device):
                 # Note: apply_softmax=True applies softmax inside CrossEncoder if supported
                 raw_outputs = self._model.predict(
                     sentences=pair_list,
-                    batch_size=batch_size,
+                    batch_size=eff_batch_size,
                     apply_softmax=True,
                     convert_to_numpy=True,
                     show_progress_bar=False,

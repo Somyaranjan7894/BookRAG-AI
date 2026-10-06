@@ -1,13 +1,42 @@
 """Pytest configuration and shared test fixtures."""
 
+import os
+
+# Configure test environment BEFORE importing app modules so the cached
+# Settings object uses these values.  Mirrors CI environment in .github/workflows/ci.yml.
+os.environ.setdefault("DATABASE_URL", "sqlite:///test_bookrag.db")
+os.environ.setdefault("CELERY_TASK_ALWAYS_EAGER", "true")
+os.environ.setdefault("VECTOR_BACKEND", "faiss")
+
 from pathlib import Path
+import sys
 from typing import AsyncGenerator, Generator
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 import pytest
 import httpx
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.main import create_application
+from app.core import config as _config_module
+from app.core.config import get_settings
+from app.db.session import get_engine, reset_engine
+from app.db.base import Base
+import app.models  # noqa: F401
+
+# Clear any previously cached settings so test env vars take effect
+get_settings.cache_clear()
+_config_module.settings = get_settings()
+reset_engine()
+
+# Initialize tables for SQLite test database if using SQLite
+if "sqlite" in _config_module.settings.DATABASE_URL:
+    Base.metadata.create_all(bind=get_engine())
+
 from tests.fixtures.pdf_factory import (
     create_corrupt_pdf,
     create_deterministic_pdf,

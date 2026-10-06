@@ -1,34 +1,33 @@
 # ==============================================================================
-# BookRAG AI - Docker Compose Configuration (Phase 0 Skeleton / Placeholder)
+# BookRAG AI - Production Docker Compose Configuration (Phase 19)
 # ==============================================================================
-# NOTE: This file is intentionally NOT used for Phase 0.
-# Phase 0 runs as a lightweight local Python FastAPI service.
-#
-# In future phases, services will be enabled incrementally:
-# - backend: FastAPI application
-# - db: PostgreSQL + pgvector
-# - cache: Redis for async task queues and caching
-# - worker: Celery / background worker for PDF ingestion & embeddings
-# - frontend: React + TypeScript + Vite UI
+# Architecture:
+# React Frontend (80) -> FastAPI Backend (8000) -> PostgreSQL/pgvector (5432)
+#                                               -> Redis (6379) -> Celery Worker
 # ==============================================================================
 
-version: "3.8"
 services:
-  # PostgreSQL persistent system of record + pgvector (Phase 13 / 14)
+  # PostgreSQL with pgvector extension
   db:
     image: pgvector/pgvector:pg16
     container_name: bookrag_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: bookrag
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: bookrag_password
       POSTGRES_DB: bookrag
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bookrag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Redis message broker for Celery (Phase 15)
+  # Redis message broker & result backend
   redis:
     image: redis:7-alpine
     container_name: bookrag_redis
@@ -37,8 +36,91 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend API Server
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: bookrag_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:bookrag_password@db:5432/bookrag
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - CELERY_TASK_ALWAYS_EAGER=false
+      - VECTOR_BACKEND=pgvector
+      - CORS_ORIGINS=["http://localhost", "http://localhost:3000", "http://localhost:5173", "http://localhost:80"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./data:/app/data
+      - hf_cache:/root/.cache/huggingface
+
+  # Celery Asynchronous Worker (PDF ingestion, chunking, embeddings)
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: bookrag_worker
+    restart: unless-stopped
+    command: celery -A app.workers.celery_app.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:bookrag_password@db:5432/bookrag
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - CELERY_TASK_ALWAYS_EAGER=false
+      - VECTOR_BACKEND=pgvector
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./data:/app/data
+      - hf_cache:/root/.cache/huggingface
+
+
+  # React Frontend (Vite + Tailwind + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: bookrag_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
   redis_data:
+  hf_cache:
 

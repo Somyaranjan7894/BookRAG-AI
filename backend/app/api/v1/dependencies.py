@@ -10,7 +10,7 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.config import Settings, get_settings
+from app.core.config import Settings, get_settings, settings
 from app.core.logging import get_logger
 from app.db.session import get_db, get_session_factory
 from app.models.document import Document
@@ -198,16 +198,25 @@ def get_search_service() -> SearchService:
     """Dependency provider for SearchService.
 
     Reuses the shared development RetrievalService so indexed chunks from
-    /api/v1/retrieval are immediately searchable.
+    /api/v1/retrieval are immediately searchable in FAISS mode, or uses
+    the PostgreSQL pgvector backend when VECTOR_BACKEND == 'pgvector'.
     """
     global _search_service
     if _search_service is None:
-        dev_retrieval_svc = get_dev_retrieval_service()
         reranker_svc = get_reranker_service()
-        _search_service = SearchService(
-            retrieval_service=dev_retrieval_svc,
-            reranker_service=reranker_svc,
-        )
+        backend_type = settings.VECTOR_BACKEND.lower()
+        if backend_type == "pgvector":
+            _search_service = SearchService(
+                reranker_service=reranker_svc,
+                backend_type="pgvector",
+            )
+        else:
+            dev_retrieval_svc = get_dev_retrieval_service()
+            _search_service = SearchService(
+                retrieval_service=dev_retrieval_svc,
+                reranker_service=reranker_svc,
+                backend_type="faiss",
+            )
     return _search_service
 
 
@@ -248,7 +257,7 @@ def get_grounded_answer_service() -> GroundedAnswerService:
 
 
 def get_question_generation_service() -> QuestionGenerationService:
-    """Provide cached QuestionGenerationService singleton."""
+    """Provide a cached QuestionGenerationService singleton."""
     global _question_generation_service
     if _question_generation_service is None:
         _question_generation_service = QuestionGenerationService()

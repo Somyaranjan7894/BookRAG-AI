@@ -99,13 +99,13 @@ class RerankerModel:
     def predict(
         self,
         pairs: Sequence[Sequence[str]],
-        batch_size: int = 32,
+        batch_size: Optional[int] = None,
     ) -> np.ndarray:
         """Score candidate query-passage pairs via the CrossEncoder transformer.
 
         Args:
             pairs: List of [query, passage] string pairs.
-            batch_size: Number of pairs per forward inference pass.
+            batch_size: Number of pairs per forward inference pass. Defaults to INFERENCE_BATCH_SIZE.
 
         Returns:
             1D np.ndarray of continuous float32 cross-encoder relevance scores.
@@ -116,10 +116,13 @@ class RerankerModel:
         if not pairs:
             return np.empty((0,), dtype=np.float32)
 
-        with torch.inference_mode():
+        eff_batch_size = batch_size if batch_size is not None else getattr(settings, "INFERENCE_BATCH_SIZE", 8)
+        from app.core.device import inference_context
+
+        with inference_context(self.target_device):
             scores = self._model.predict(
                 sentences=pairs,
-                batch_size=batch_size,
+                batch_size=eff_batch_size,
                 show_progress_bar=False,
                 convert_to_numpy=True,
             )

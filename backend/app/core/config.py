@@ -26,10 +26,25 @@ class Settings(BaseSettings):
 
     # API Configuration
     API_V1_PREFIX: str = "/api/v1"
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ]
 
     # Server Network Settings
     HOST: str = "127.0.0.1"
     PORT: int = 8000
+
+    # Hardware & Inference Acceleration (Phase 24)
+    DEVICE: str = "auto"  # 'auto', 'cuda', 'cpu'
+    INFERENCE_BATCH_SIZE: int = 8
+    USE_FP16: bool = True
+
+    # Security & Resource Limits (Phase 24)
+    MAX_UPLOAD_FILE_SIZE_BYTES: int = 52428800  # 50 MB
+    MAX_UPLOAD_PAGE_COUNT: int = 500
+    DB_STATEMENT_TIMEOUT_MS: int = 30000
 
     # Text Chunking Defaults (Phase 2)
     CHUNKING_TARGET_SIZE: int = 1200
@@ -90,6 +105,7 @@ class Settings(BaseSettings):
     GROUNDING_TOP_K_EVIDENCE: int = 5
     GROUNDING_REQUIRE_ALL_CLAIMS_SUPPORTED: bool = True
     GROUNDING_MIN_CLAIM_LENGTH: int = 3
+    GROUNDING_MIN_EVIDENCE_SIMILARITY: float = 0.20
 
     # Phase 12: Question Generation & Validation
     QUESTION_GEN_MODEL_NAME: str = "iarfmoose/t5-base-question-generator"
@@ -133,6 +149,16 @@ class Settings(BaseSettings):
         if isinstance(v, str) and v.startswith("postgresql://"):
             return "postgresql+psycopg://" + v[len("postgresql://"):]
         return v
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: object) -> list[str]:
+        """Parse comma-separated string or list into a list of origins."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        if isinstance(v, list):
+            return [str(origin).strip() for origin in v if str(origin).strip()]
+        return ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
 
     model_config = SettingsConfigDict(
         env_file=".env",

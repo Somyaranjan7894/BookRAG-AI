@@ -1,0 +1,1282 @@
+{
+  "dataset_name": "Machine Learning & Neural Networks Golden Benchmark",
+  "dataset_version": "1.0.0",
+  "dataset_type": "golden",
+  "verification_status": "VERIFIED",
+  "target_document": "Foundations of Machine Learning & Neural Networks",
+  "document_id": "doc_ai_handbook_01",
+  "total_queries": 10,
+  "evaluated_queries": 7,
+  "unanswerable_queries": 3,
+  "average_latency_ms": {
+    "vector_search_ms": 58.15,
+    "cross_encoder_rerank_ms": 266.15
+  },
+  "stage1_vector_metrics": {
+    "total_queries": 10,
+    "evaluated_queries": 7,
+    "unanswerable_queries": 3,
+    "mrr": 1.0,
+    "mean_recall_at_k": {
+      "1": 0.9286,
+      "3": 1.0,
+      "5": 1.0,
+      "10": 1.0
+    },
+    "mean_precision_at_k": {
+      "1": 1.0,
+      "3": 0.3809,
+      "5": 0.2286,
+      "10": 0.1143
+    },
+    "page_mrr": 1.0,
+    "mean_page_recall_at_k": {
+      "1": 0.9286,
+      "3": 1.0,
+      "5": 1.0,
+      "10": 1.0
+    },
+    "mean_page_precision_at_k": {
+      "1": 1.0,
+      "3": 0.3809,
+      "5": 0.2286,
+      "10": 0.1143
+    },
+    "per_query_results": [
+      {
+        "query_id": "gold_q01",
+        "query": "How does the backpropagation algorithm compute gradients across network layers?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p002_c0002"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          2,
+          3,
+          1,
+          4,
+          5,
+          6,
+          8,
+          7
+        ],
+        "relevant_pages": [
+          2
+        ]
+      },
+      {
+        "query_id": "gold_q02",
+        "query": "What are the three fundamental semantic categories defined in Natural Language Inference (NLI)?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p003_c0003"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          7,
+          1,
+          6,
+          4,
+          5,
+          8,
+          2,
+          3
+        ],
+        "relevant_pages": [
+          7
+        ]
+      },
+      {
+        "query_id": "gold_q03",
+        "query": "Why does scaled dot-product attention divide query-key dot products by the square root of the key dimension?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p005_c0005"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          5,
+          6,
+          8,
+          4,
+          3,
+          1,
+          2,
+          7
+        ],
+        "relevant_pages": [
+          5
+        ]
+      },
+      {
+        "query_id": "gold_q04",
+        "query": "How do the latency and discrimination trade-offs between bi-encoders and cross-encoders relate to information retrieval evaluation metrics like Mean Reciprocal Rank?",
+        "num_relevant": 2,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.5,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.6667,
+          "5": 0.4,
+          "10": 0.2
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008"
+        ],
+        "page_recall_at_k": {
+          "1": 0.5,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.6667,
+          "5": 0.4,
+          "10": 0.2
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          6,
+          8,
+          5,
+          4,
+          1,
+          7,
+          3,
+          2
+        ],
+        "relevant_pages": [
+          6,
+          8
+        ]
+      },
+      {
+        "query_id": "gold_q05",
+        "query": "What is the primary difference between supervised learning and unsupervised learning in terms of training targets?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p005_c0005"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          1,
+          2,
+          4,
+          7,
+          8,
+          3,
+          6,
+          5
+        ],
+        "relevant_pages": [
+          1
+        ]
+      },
+      {
+        "query_id": "gold_q06",
+        "query": "What is the exact derivative of the Rectified Linear Unit (ReLU) activation function for all positive inputs?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          3,
+          2,
+          5,
+          4,
+          1,
+          6,
+          8,
+          7
+        ],
+        "relevant_pages": [
+          3
+        ]
+      },
+      {
+        "query_id": "gold_q07",
+        "query": "How do Convolutional Neural Networks exploit spatial hierarchies in image grids?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p008_c0008"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p004_c0004"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          4,
+          3,
+          2,
+          5,
+          1,
+          6,
+          7,
+          8
+        ],
+        "relevant_pages": [
+          4
+        ]
+      },
+      {
+        "query_id": "gold_q08",
+        "query": "What is the traditional culinary recipe, hydration ratio, and baking temperature for artisanal French sourdough bread?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p004_c0004"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          6,
+          8,
+          7,
+          1,
+          3,
+          2,
+          5,
+          4
+        ],
+        "relevant_pages": []
+      },
+      {
+        "query_id": "gold_q09",
+        "query": "What are the cryogenic cooling specifications and dilution refrigerator requirements for superconducting transmon qubits?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p004_c0004"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          5,
+          8,
+          6,
+          2,
+          7,
+          1,
+          3,
+          4
+        ],
+        "relevant_pages": []
+      },
+      {
+        "query_id": "gold_q10",
+        "query": "What is the single best machine learning algorithm and learning rate for all artificial intelligence problems?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          1,
+          5,
+          3,
+          2,
+          8,
+          6,
+          4,
+          7
+        ],
+        "relevant_pages": []
+      }
+    ]
+  },
+  "stage2_reranked_metrics": {
+    "total_queries": 10,
+    "evaluated_queries": 7,
+    "unanswerable_queries": 3,
+    "mrr": 1.0,
+    "mean_recall_at_k": {
+      "1": 0.9286,
+      "3": 1.0,
+      "5": 1.0,
+      "10": 1.0
+    },
+    "mean_precision_at_k": {
+      "1": 1.0,
+      "3": 0.3809,
+      "5": 0.2286,
+      "10": 0.1143
+    },
+    "page_mrr": 1.0,
+    "mean_page_recall_at_k": {
+      "1": 0.9286,
+      "3": 1.0,
+      "5": 1.0,
+      "10": 1.0
+    },
+    "mean_page_precision_at_k": {
+      "1": 1.0,
+      "3": 0.3809,
+      "5": 0.2286,
+      "10": 0.1143
+    },
+    "per_query_results": [
+      {
+        "query_id": "gold_q01",
+        "query": "How does the backpropagation algorithm compute gradients across network layers?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p002_c0002"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          2,
+          3,
+          1,
+          6,
+          4,
+          5,
+          8,
+          7
+        ],
+        "relevant_pages": [
+          2
+        ]
+      },
+      {
+        "query_id": "gold_q02",
+        "query": "What are the three fundamental semantic categories defined in Natural Language Inference (NLI)?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p005_c0005"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          7,
+          6,
+          4,
+          1,
+          8,
+          3,
+          2,
+          5
+        ],
+        "relevant_pages": [
+          7
+        ]
+      },
+      {
+        "query_id": "gold_q03",
+        "query": "Why does scaled dot-product attention divide query-key dot products by the square root of the key dimension?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p005_c0005"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          5,
+          6,
+          4,
+          3,
+          8,
+          1,
+          2,
+          7
+        ],
+        "relevant_pages": [
+          5
+        ]
+      },
+      {
+        "query_id": "gold_q04",
+        "query": "How do the latency and discrimination trade-offs between bi-encoders and cross-encoders relate to information retrieval evaluation metrics like Mean Reciprocal Rank?",
+        "num_relevant": 2,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.5,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.6667,
+          "5": 0.4,
+          "10": 0.2
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p003_c0003"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p008_c0008"
+        ],
+        "page_recall_at_k": {
+          "1": 0.5,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.6667,
+          "5": 0.4,
+          "10": 0.2
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          6,
+          8,
+          7,
+          1,
+          5,
+          4,
+          2,
+          3
+        ],
+        "relevant_pages": [
+          6,
+          8
+        ]
+      },
+      {
+        "query_id": "gold_q05",
+        "query": "What is the primary difference between supervised learning and unsupervised learning in terms of training targets?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p005_c0005"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          1,
+          7,
+          8,
+          6,
+          3,
+          2,
+          4,
+          5
+        ],
+        "relevant_pages": [
+          1
+        ]
+      },
+      {
+        "query_id": "gold_q06",
+        "query": "What is the exact derivative of the Rectified Linear Unit (ReLU) activation function for all positive inputs?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          3,
+          2,
+          4,
+          6,
+          1,
+          5,
+          8,
+          7
+        ],
+        "relevant_pages": [
+          3
+        ]
+      },
+      {
+        "query_id": "gold_q07",
+        "query": "How do Convolutional Neural Networks exploit spatial hierarchies in image grids?",
+        "num_relevant": 1,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "reciprocal_rank": 1.0,
+        "first_relevant_rank": 1,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p008_c0008"
+        ],
+        "relevant_chunk_ids": [
+          "doc_ai_handbook_01_p004_c0004"
+        ],
+        "page_recall_at_k": {
+          "1": 1.0,
+          "3": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "page_precision_at_k": {
+          "1": 1.0,
+          "3": 0.3333,
+          "5": 0.2,
+          "10": 0.1
+        },
+        "page_reciprocal_rank": 1.0,
+        "first_relevant_page_rank": 1,
+        "retrieved_pages": [
+          4,
+          3,
+          6,
+          2,
+          1,
+          5,
+          7,
+          8
+        ],
+        "relevant_pages": [
+          4
+        ]
+      },
+      {
+        "query_id": "gold_q08",
+        "query": "What is the traditional culinary recipe, hydration ratio, and baking temperature for artisanal French sourdough bread?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p008_c0008"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          3,
+          4,
+          1,
+          6,
+          2,
+          5,
+          7,
+          8
+        ],
+        "relevant_pages": []
+      },
+      {
+        "query_id": "gold_q09",
+        "query": "What are the cryogenic cooling specifications and dilution refrigerator requirements for superconducting transmon qubits?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p007_c0007",
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p002_c0002"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          3,
+          6,
+          7,
+          1,
+          5,
+          4,
+          8,
+          2
+        ],
+        "relevant_pages": []
+      },
+      {
+        "query_id": "gold_q10",
+        "query": "What is the single best machine learning algorithm and learning rate for all artificial intelligence problems?",
+        "num_relevant": 0,
+        "num_retrieved": 8,
+        "recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "reciprocal_rank": 0.0,
+        "first_relevant_rank": null,
+        "retrieved_chunk_ids": [
+          "doc_ai_handbook_01_p001_c0001",
+          "doc_ai_handbook_01_p002_c0002",
+          "doc_ai_handbook_01_p006_c0006",
+          "doc_ai_handbook_01_p003_c0003",
+          "doc_ai_handbook_01_p008_c0008",
+          "doc_ai_handbook_01_p004_c0004",
+          "doc_ai_handbook_01_p005_c0005",
+          "doc_ai_handbook_01_p007_c0007"
+        ],
+        "relevant_chunk_ids": [],
+        "page_recall_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_precision_at_k": {
+          "1": 0.0,
+          "3": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "page_reciprocal_rank": 0.0,
+        "first_relevant_page_rank": null,
+        "retrieved_pages": [
+          1,
+          2,
+          6,
+          3,
+          8,
+          4,
+          5,
+          7
+        ],
+        "relevant_pages": []
+      }
+    ]
+  },
+  "measured_deltas": {
+    "delta_mrr": 0.0,
+    "delta_recall_at_k": {
+      "1": 0.0,
+      "3": 0.0,
+      "5": 0.0,
+      "10": 0.0
+    },
+    "delta_precision_at_k": {
+      "1": 0.0,
+      "3": 0.0,
+      "5": 0.0,
+      "10": 0.0
+    }
+  },
+  "ranking_movement_summary": {
+    "improved_queries": 0,
+    "degraded_queries": 0,
+    "unchanged_queries": 7
+  },
+  "scientific_statement": "Reranking quality is empirically verified against benchmark relevance annotations; reranker improvements are never claimed unless demonstrated by positive metric deltas."
+}

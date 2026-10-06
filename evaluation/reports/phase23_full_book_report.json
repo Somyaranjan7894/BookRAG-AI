@@ -1,0 +1,5957 @@
+{
+  "benchmark": {
+    "name": "Distributed Systems & Cloud Architecture Full-Book Benchmark",
+    "version": "1.0.0",
+    "dataset_type": "golden",
+    "verification_status": "VERIFIED",
+    "document_id": "doc_dist_sys_handbook_01",
+    "document_title": "Foundations of Distributed Systems, Cloud Architecture, and Machine Learning Infrastructure",
+    "total_questions": 36,
+    "answerable_count": 28,
+    "unanswerable_count": 8
+  },
+  "retrieval_and_reranking": {
+    "stage1_metrics": {
+      "total_queries": 36,
+      "evaluated_queries": 28,
+      "unanswerable_queries": 8,
+      "mrr": 0.9554,
+      "mean_recall_at_k": {
+        "1": 0.8155,
+        "3": 0.9107,
+        "5": 0.9762,
+        "10": 0.9881
+      },
+      "mean_precision_at_k": {
+        "1": 0.9286,
+        "3": 0.3809,
+        "5": 0.2571,
+        "10": 0.1321
+      },
+      "mean_duplicate_retrieval_rate": 0.0,
+      "mean_page_duplicate_rate": 0.0,
+      "page_mrr": 0.9554,
+      "mean_page_recall_at_k": {
+        "1": 0.8155,
+        "3": 0.9107,
+        "5": 0.9762,
+        "10": 0.9881
+      },
+      "mean_page_precision_at_k": {
+        "1": 0.9286,
+        "3": 0.3809,
+        "5": 0.2571,
+        "10": 0.1321
+      },
+      "per_query_results": [
+        {
+          "query_id": "fb_q01",
+          "query": "What is the mathematical condition for the happens-before relation when receiving a message in Lamport logical clocks?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p005_c0004",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p006_c0005",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p048_c0047",
+            "doc_dist_sys_handbook_01_p009_c0008",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p050_c0049"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p005_c0004"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            5,
+            12,
+            6,
+            45,
+            48,
+            9,
+            10,
+            3,
+            14,
+            50
+          ],
+          "relevant_pages": [
+            5
+          ]
+        },
+        {
+          "query_id": "fb_q02",
+          "query": "What is the default randomized election timeout range utilized by followers in the Raft consensus algorithm?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p022_c0021",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p013_c0012"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p017_c0016"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            17,
+            16,
+            18,
+            19,
+            21,
+            4,
+            22,
+            15,
+            41,
+            13
+          ],
+          "relevant_pages": [
+            17
+          ]
+        },
+        {
+          "query_id": "fb_q03",
+          "query": "How are Kafka topic messages assigned to individual partitions by producers?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p052_c0051",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p046_c0045",
+            "doc_dist_sys_handbook_01_p080_c0079",
+            "doc_dist_sys_handbook_01_p032_c0031"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p044_c0043"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            44,
+            45,
+            43,
+            52,
+            34,
+            8,
+            24,
+            46,
+            80,
+            32
+          ],
+          "relevant_pages": [
+            44
+          ]
+        },
+        {
+          "query_id": "fb_q04",
+          "query": "What fixed number of hash slots are used to scale memory capacity horizontally in Redis Cluster?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p089_c0088",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p028_c0027",
+            "doc_dist_sys_handbook_01_p029_c0028",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p059_c0058",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p074_c0073"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p090_c0089"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            90,
+            89,
+            32,
+            28,
+            29,
+            30,
+            91,
+            59,
+            26,
+            74
+          ],
+          "relevant_pages": [
+            90
+          ]
+        },
+        {
+          "query_id": "fb_q05",
+          "query": "How does the handbook define State Machine Replication in distributed systems?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p014_c0013"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p007_c0006"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            7,
+            12,
+            16,
+            31,
+            33,
+            41,
+            4,
+            42,
+            19,
+            14
+          ],
+          "relevant_pages": [
+            7
+          ]
+        },
+        {
+          "query_id": "fb_q06",
+          "query": "What is the definition of a Watermark in Event Time stream processing?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p048_c0047",
+            "doc_dist_sys_handbook_01_p047_c0046",
+            "doc_dist_sys_handbook_01_p052_c0051",
+            "doc_dist_sys_handbook_01_p051_c0050",
+            "doc_dist_sys_handbook_01_p046_c0045",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p049_c0048",
+            "doc_dist_sys_handbook_01_p002_c0001"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p048_c0047"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            48,
+            47,
+            52,
+            51,
+            46,
+            50,
+            45,
+            43,
+            49,
+            2
+          ],
+          "relevant_pages": [
+            48
+          ]
+        },
+        {
+          "query_id": "fb_q07",
+          "query": "What is the definition of the Cache Stampede or Thundering Herd problem?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p092_c0091",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p011_c0010",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p051_c0050"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            87,
+            92,
+            17,
+            43,
+            44,
+            96,
+            11,
+            21,
+            84,
+            51
+          ],
+          "relevant_pages": [
+            87
+          ]
+        },
+        {
+          "query_id": "fb_q08",
+          "query": "What are the Four Golden Signals defined in Site Reliability Engineering for distributed observability?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p093_c0092",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p101_c0100",
+            "doc_dist_sys_handbook_01_p097_c0096",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p105_c0104",
+            "doc_dist_sys_handbook_01_p103_c0102",
+            "doc_dist_sys_handbook_01_p012_c0011"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p095_c0094"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            95,
+            93,
+            10,
+            101,
+            97,
+            102,
+            94,
+            105,
+            103,
+            12
+          ],
+          "relevant_pages": [
+            95
+          ]
+        },
+        {
+          "query_id": "fb_q09",
+          "query": "Why does the FLP theorem prove that deterministic consensus is impossible in an asynchronous network with a single crash failure?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p010_c0009"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p004_c0003"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            4,
+            12,
+            20,
+            17,
+            16,
+            13,
+            7,
+            50,
+            31,
+            10
+          ],
+          "relevant_pages": [
+            4
+          ]
+        },
+        {
+          "query_id": "fb_q10",
+          "query": "Why is the classical Two-Phase Commit protocol classified as an inherently blocking protocol?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p038_c0037",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p015_c0014"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p035_c0034"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            35,
+            34,
+            36,
+            41,
+            42,
+            37,
+            14,
+            38,
+            20,
+            15
+          ],
+          "relevant_pages": [
+            35
+          ]
+        },
+        {
+          "query_id": "fb_q11",
+          "query": "Why does HNSW graph search organize vectors into multiple hierarchical layers?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p061_c0060",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p055_c0054",
+            "doc_dist_sys_handbook_01_p056_c0055",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p065_c0064"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            57,
+            58,
+            61,
+            62,
+            55,
+            56,
+            53,
+            64,
+            72,
+            65
+          ],
+          "relevant_pages": [
+            57
+          ]
+        },
+        {
+          "query_id": "fb_q12",
+          "query": "Why does traditional LLM serving suffer from severe GPU memory fragmentation, and how does PagedAttention resolve it?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p075_c0074",
+            "doc_dist_sys_handbook_01_p082_c0081",
+            "doc_dist_sys_handbook_01_p076_c0075",
+            "doc_dist_sys_handbook_01_p077_c0076",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p086_c0085"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p075_c0074"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            75,
+            82,
+            76,
+            77,
+            74,
+            85,
+            91,
+            87,
+            78,
+            86
+          ],
+          "relevant_pages": [
+            75
+          ]
+        },
+        {
+          "query_id": "fb_q13",
+          "query": "What are the structural differences between LSM-tree writes and B+ tree writes in terms of disk I/O patterns?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p029_c0028"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p024_c0023"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            24,
+            27,
+            23,
+            32,
+            31,
+            25,
+            26,
+            30,
+            84,
+            29
+          ],
+          "relevant_pages": [
+            23,
+            24
+          ]
+        },
+        {
+          "query_id": "fb_q14",
+          "query": "What is the difference between synchronous replication and asynchronous replication regarding Recovery Point Objective and write latency?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p036_c0035"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p031_c0030"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            31,
+            7,
+            102,
+            12,
+            16,
+            3,
+            21,
+            40,
+            42,
+            36
+          ],
+          "relevant_pages": [
+            31
+          ]
+        },
+        {
+          "query_id": "fb_q15",
+          "query": "How do bi-encoders and cross-encoders compare in terms of token interaction and query runtime latency?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p081_c0080",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p079_c0078",
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p068_c0067"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p065_c0064"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            64,
+            67,
+            65,
+            81,
+            72,
+            66,
+            79,
+            70,
+            78,
+            68
+          ],
+          "relevant_pages": [
+            64,
+            65
+          ]
+        },
+        {
+          "query_id": "fb_q16",
+          "query": "What is the difference between Role-Based Access Control (RBAC) and Attribute-Based Access Control (ABAC)?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p099_c0098",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p038_c0037",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p103_c0102",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p032_c0031"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p099_c0098"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            99,
+            33,
+            39,
+            38,
+            34,
+            103,
+            27,
+            26,
+            23,
+            32
+          ],
+          "relevant_pages": [
+            99
+          ]
+        },
+        {
+          "query_id": "fb_q17",
+          "query": "What is the strict majority quorum size formula in an N-node cluster, and how many nodes form a quorum in a 5-node cluster?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p011_c0010",
+            "doc_dist_sys_handbook_01_p028_c0027",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p016_c0015"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            13,
+            8,
+            20,
+            17,
+            90,
+            19,
+            11,
+            28,
+            14,
+            16
+          ],
+          "relevant_pages": [
+            13
+          ]
+        },
+        {
+          "query_id": "fb_q18",
+          "query": "What is the memory size in bytes of a 768-dimensional float32 vector, and what size is it after Product Quantization with 96 subspaces?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p059_c0058",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p075_c0074",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p055_c0054",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p054_c0053"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p059_c0058"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            59,
+            78,
+            74,
+            67,
+            53,
+            75,
+            91,
+            55,
+            62,
+            54
+          ],
+          "relevant_pages": [
+            59
+          ]
+        },
+        {
+          "query_id": "fb_q19",
+          "query": "What is the typical uncertainty bound epsilon exposed by Google Spanner TrueTime API across datacenter GPS and atomic clocks?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p009_c0008",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p047_c0046",
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p005_c0004",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p006_c0005",
+            "doc_dist_sys_handbook_01_p088_c0087"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p040_c0039"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            40,
+            9,
+            10,
+            47,
+            95,
+            3,
+            5,
+            12,
+            6,
+            88
+          ],
+          "relevant_pages": [
+            40
+          ]
+        },
+        {
+          "query_id": "fb_q20",
+          "query": "What is the allowable monthly downtime in minutes for an SRE service targeting a 99.9% availability SLO?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p093_c0092",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p096_c0095"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p093_c0092"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            93,
+            94,
+            95,
+            102,
+            40,
+            3,
+            10,
+            90,
+            87,
+            96
+          ],
+          "relevant_pages": [
+            93
+          ]
+        },
+        {
+          "query_id": "fb_q21",
+          "query": "If a network partition isolates 2 nodes from 3 nodes in a 5-node Raft cluster, why can the 3-node partition make progress while the 2-node partition cannot?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 0.25,
+          "first_relevant_rank": 4,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p015_c0014"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p017_c0016"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 0.25,
+          "first_relevant_page_rank": 4,
+          "retrieved_pages": [
+            19,
+            16,
+            8,
+            17,
+            13,
+            18,
+            41,
+            36,
+            20,
+            15
+          ],
+          "relevant_pages": [
+            13,
+            17
+          ]
+        },
+        {
+          "query_id": "fb_q22",
+          "query": "Why does a Bloom filter in an SSTable never produce false negatives, and why is this property critical for read performance?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p061_c0060",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p024_c0023"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p025_c0024"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            25,
+            26,
+            50,
+            61,
+            27,
+            23,
+            39,
+            30,
+            31,
+            24
+          ],
+          "relevant_pages": [
+            25
+          ]
+        },
+        {
+          "query_id": "fb_q23",
+          "query": "Why does Snapshot Isolation permit write skew anomalies while Strict Two-Phase Locking prevents them?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p089_c0088",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p031_c0030"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p039_c0038"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            39,
+            35,
+            37,
+            88,
+            36,
+            96,
+            50,
+            89,
+            41,
+            31
+          ],
+          "relevant_pages": [
+            37,
+            39
+          ]
+        },
+        {
+          "query_id": "fb_q24",
+          "query": "Why does adding randomized jitter to exponential backoff prevent synchronized retry storms in distributed systems?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p101_c0100",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p011_c0010"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p096_c0095"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            96,
+            10,
+            87,
+            4,
+            12,
+            17,
+            3,
+            101,
+            50,
+            11
+          ],
+          "relevant_pages": [
+            96
+          ]
+        },
+        {
+          "query_id": "fb_q25",
+          "query": "How do consensus leader leases and distributed consensus resolve the blocking coordinator vulnerability in Two-Phase Commit?",
+          "num_relevant": 3,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.3
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p042_c0041"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p041_c0040"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.3
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            35,
+            41,
+            34,
+            36,
+            19,
+            15,
+            21,
+            14,
+            18,
+            42
+          ],
+          "relevant_pages": [
+            21,
+            35,
+            41
+          ]
+        },
+        {
+          "query_id": "fb_q26",
+          "query": "How does the two-stage retrieval cascade integrate bi-encoder ANN vector search with cross-encoder reranking to optimize both latency and precision?",
+          "num_relevant": 3,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.6667,
+            "10": 0.6667
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 0.5,
+          "first_relevant_rank": 2,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p061_c0060"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p066_c0065"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.6667,
+            "10": 0.6667
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 0.5,
+          "first_relevant_page_rank": 2,
+          "retrieved_pages": [
+            72,
+            64,
+            65,
+            66,
+            67,
+            70,
+            68,
+            69,
+            60,
+            61
+          ],
+          "relevant_pages": [
+            57,
+            64,
+            66
+          ]
+        },
+        {
+          "query_id": "fb_q27",
+          "query": "How do write-ahead logs in LSM-trees and write-behind caching strategies compare regarding data durability upon sudden power loss?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 0.5,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p087_c0086"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p085_c0084"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 0.5,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            24,
+            27,
+            23,
+            31,
+            85,
+            84,
+            32,
+            88,
+            86,
+            87
+          ],
+          "relevant_pages": [
+            24,
+            85
+          ]
+        },
+        {
+          "query_id": "fb_q28",
+          "query": "How do Mean Reciprocal Rank (MRR) and reranker rank movement metrics reflect the performance difference between Stage 1 vector search and Stage 2 cross-encoder reranking?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p063_c0062"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p070_c0069"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            70,
+            69,
+            72,
+            68,
+            65,
+            67,
+            66,
+            64,
+            60,
+            63
+          ],
+          "relevant_pages": [
+            69,
+            70
+          ]
+        },
+        {
+          "query_id": "fb_q29",
+          "query": "What is the historical culinary fermentation recipe, salt ratio, and aging period for ancient Roman garum fish sauce?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p076_c0075",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p082_c0081",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p002_c0001",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p071_c0070"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            86,
+            87,
+            76,
+            94,
+            82,
+            74,
+            91,
+            2,
+            62,
+            71
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q30",
+          "query": "What are the quantum key distribution protocols and single-photon detector specifications for BB84 satellite quantum communications?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p090_c0089"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            44,
+            34,
+            45,
+            20,
+            10,
+            78,
+            14,
+            43,
+            25,
+            90
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q31",
+          "query": "What are the metallurgical smelting temperatures and carbon quenching techniques for Wootz crucible steel swords?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p028_c0027"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            26,
+            58,
+            84,
+            25,
+            87,
+            24,
+            37,
+            85,
+            91,
+            28
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q32",
+          "query": "What are the orbital mechanics, Hohmann transfer delta-v equations, and atmospheric entry corridors for crewed missions to Callisto?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p080_c0079",
+            "doc_dist_sys_handbook_01_p054_c0053",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p076_c0075",
+            "doc_dist_sys_handbook_01_p097_c0096",
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p056_c0055",
+            "doc_dist_sys_handbook_01_p024_c0023"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            57,
+            80,
+            54,
+            62,
+            76,
+            97,
+            40,
+            58,
+            56,
+            24
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q33",
+          "query": "What is the single universally superior database isolation level and storage engine for all cloud enterprise applications?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p100_c0099",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p029_c0028"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            23,
+            33,
+            32,
+            26,
+            27,
+            30,
+            100,
+            88,
+            39,
+            29
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q34",
+          "query": "What is the universally optimal cache eviction algorithm and memory TTL for all distributed caching clusters?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p092_c0091",
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p083_c0082",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p075_c0074",
+            "doc_dist_sys_handbook_01_p089_c0088"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            87,
+            92,
+            86,
+            83,
+            85,
+            88,
+            84,
+            91,
+            75,
+            89
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q35",
+          "query": "What is the single best consensus algorithm between Paxos and Raft that must always be selected for every distributed system?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p022_c0021",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p012_c0011"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            16,
+            22,
+            15,
+            19,
+            14,
+            41,
+            18,
+            20,
+            17,
+            12
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q36",
+          "query": "What is the single best chunk size and embedding dimension that produces perfect retrieval for every document in existence?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p071_c0070",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p055_c0054"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            71,
+            53,
+            64,
+            68,
+            60,
+            67,
+            72,
+            69,
+            62,
+            55
+          ],
+          "relevant_pages": []
+        }
+      ]
+    },
+    "stage2_metrics": {
+      "total_queries": 36,
+      "evaluated_queries": 28,
+      "unanswerable_queries": 8,
+      "mrr": 0.9456,
+      "mean_recall_at_k": {
+        "1": 0.8095,
+        "3": 0.9226,
+        "5": 0.9405,
+        "10": 0.9881
+      },
+      "mean_precision_at_k": {
+        "1": 0.9286,
+        "3": 0.3928,
+        "5": 0.2429,
+        "10": 0.1321
+      },
+      "mean_duplicate_retrieval_rate": 0.0,
+      "mean_page_duplicate_rate": 0.0,
+      "page_mrr": 0.9456,
+      "mean_page_recall_at_k": {
+        "1": 0.8095,
+        "3": 0.9226,
+        "5": 0.9405,
+        "10": 0.9881
+      },
+      "mean_page_precision_at_k": {
+        "1": 0.9286,
+        "3": 0.3928,
+        "5": 0.2429,
+        "10": 0.1321
+      },
+      "per_query_results": [
+        {
+          "query_id": "fb_q01",
+          "query": "What is the mathematical condition for the happens-before relation when receiving a message in Lamport logical clocks?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p005_c0004",
+            "doc_dist_sys_handbook_01_p006_c0005",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p009_c0008",
+            "doc_dist_sys_handbook_01_p048_c0047"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p005_c0004"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            5,
+            6,
+            12,
+            14,
+            50,
+            3,
+            10,
+            45,
+            9,
+            48
+          ],
+          "relevant_pages": [
+            5
+          ]
+        },
+        {
+          "query_id": "fb_q02",
+          "query": "What is the default randomized election timeout range utilized by followers in the Raft consensus algorithm?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p022_c0021",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p013_c0012"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p017_c0016"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            17,
+            16,
+            41,
+            18,
+            21,
+            19,
+            4,
+            22,
+            15,
+            13
+          ],
+          "relevant_pages": [
+            17
+          ]
+        },
+        {
+          "query_id": "fb_q03",
+          "query": "How are Kafka topic messages assigned to individual partitions by producers?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p052_c0051",
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p080_c0079",
+            "doc_dist_sys_handbook_01_p046_c0045"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p044_c0043"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            44,
+            45,
+            43,
+            52,
+            8,
+            32,
+            34,
+            24,
+            80,
+            46
+          ],
+          "relevant_pages": [
+            44
+          ]
+        },
+        {
+          "query_id": "fb_q04",
+          "query": "What fixed number of hash slots are used to scale memory capacity horizontally in Redis Cluster?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p028_c0027",
+            "doc_dist_sys_handbook_01_p089_c0088",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p029_c0028",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p059_c0058",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p026_c0025"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p090_c0089"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            90,
+            28,
+            89,
+            32,
+            29,
+            91,
+            59,
+            74,
+            30,
+            26
+          ],
+          "relevant_pages": [
+            90
+          ]
+        },
+        {
+          "query_id": "fb_q05",
+          "query": "How does the handbook define State Machine Replication in distributed systems?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p014_c0013"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p007_c0006"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            7,
+            16,
+            12,
+            31,
+            42,
+            33,
+            4,
+            41,
+            19,
+            14
+          ],
+          "relevant_pages": [
+            7
+          ]
+        },
+        {
+          "query_id": "fb_q06",
+          "query": "What is the definition of a Watermark in Event Time stream processing?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p048_c0047",
+            "doc_dist_sys_handbook_01_p052_c0051",
+            "doc_dist_sys_handbook_01_p047_c0046",
+            "doc_dist_sys_handbook_01_p046_c0045",
+            "doc_dist_sys_handbook_01_p049_c0048",
+            "doc_dist_sys_handbook_01_p051_c0050",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p002_c0001"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p048_c0047"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            48,
+            52,
+            47,
+            46,
+            49,
+            51,
+            50,
+            45,
+            43,
+            2
+          ],
+          "relevant_pages": [
+            48
+          ]
+        },
+        {
+          "query_id": "fb_q07",
+          "query": "What is the definition of the Cache Stampede or Thundering Herd problem?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p092_c0091",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p051_c0050",
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p043_c0042",
+            "doc_dist_sys_handbook_01_p011_c0010",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p017_c0016"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            87,
+            92,
+            84,
+            51,
+            44,
+            96,
+            43,
+            11,
+            21,
+            17
+          ],
+          "relevant_pages": [
+            87
+          ]
+        },
+        {
+          "query_id": "fb_q08",
+          "query": "What are the Four Golden Signals defined in Site Reliability Engineering for distributed observability?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p097_c0096",
+            "doc_dist_sys_handbook_01_p105_c0104",
+            "doc_dist_sys_handbook_01_p101_c0100",
+            "doc_dist_sys_handbook_01_p093_c0092",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p103_c0102",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p010_c0009"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p095_c0094"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            95,
+            94,
+            97,
+            105,
+            101,
+            93,
+            102,
+            103,
+            12,
+            10
+          ],
+          "relevant_pages": [
+            95
+          ]
+        },
+        {
+          "query_id": "fb_q09",
+          "query": "Why does the FLP theorem prove that deterministic consensus is impossible in an asynchronous network with a single crash failure?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p016_c0015"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p004_c0003"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            4,
+            20,
+            12,
+            31,
+            10,
+            7,
+            50,
+            13,
+            17,
+            16
+          ],
+          "relevant_pages": [
+            4
+          ]
+        },
+        {
+          "query_id": "fb_q10",
+          "query": "Why is the classical Two-Phase Commit protocol classified as an inherently blocking protocol?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p038_c0037"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p035_c0034"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            35,
+            42,
+            41,
+            36,
+            34,
+            37,
+            15,
+            14,
+            20,
+            38
+          ],
+          "relevant_pages": [
+            35
+          ]
+        },
+        {
+          "query_id": "fb_q11",
+          "query": "Why does HNSW graph search organize vectors into multiple hierarchical layers?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p061_c0060",
+            "doc_dist_sys_handbook_01_p055_c0054",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p056_c0055",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p072_c0071"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            57,
+            62,
+            58,
+            61,
+            55,
+            53,
+            56,
+            64,
+            65,
+            72
+          ],
+          "relevant_pages": [
+            57
+          ]
+        },
+        {
+          "query_id": "fb_q12",
+          "query": "Why does traditional LLM serving suffer from severe GPU memory fragmentation, and how does PagedAttention resolve it?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p075_c0074",
+            "doc_dist_sys_handbook_01_p082_c0081",
+            "doc_dist_sys_handbook_01_p076_c0075",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p077_c0076",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p091_c0090"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p075_c0074"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            75,
+            82,
+            76,
+            78,
+            74,
+            77,
+            87,
+            85,
+            86,
+            91
+          ],
+          "relevant_pages": [
+            75
+          ]
+        },
+        {
+          "query_id": "fb_q13",
+          "query": "What are the structural differences between LSM-tree writes and B+ tree writes in terms of disk I/O patterns?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.5,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 0.3333,
+          "first_relevant_rank": 3,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p029_c0028",
+            "doc_dist_sys_handbook_01_p084_c0083"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p024_c0023"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.5,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.3333,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 0.3333,
+          "first_relevant_page_rank": 3,
+          "retrieved_pages": [
+            32,
+            27,
+            23,
+            24,
+            31,
+            26,
+            30,
+            25,
+            29,
+            84
+          ],
+          "relevant_pages": [
+            23,
+            24
+          ]
+        },
+        {
+          "query_id": "fb_q14",
+          "query": "What is the difference between synchronous replication and asynchronous replication regarding Recovery Point Objective and write latency?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p007_c0006",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p040_c0039"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p031_c0030"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            31,
+            102,
+            12,
+            3,
+            42,
+            7,
+            36,
+            21,
+            16,
+            40
+          ],
+          "relevant_pages": [
+            31
+          ]
+        },
+        {
+          "query_id": "fb_q15",
+          "query": "How do bi-encoders and cross-encoders compare in terms of token interaction and query runtime latency?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p081_c0080",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p079_c0078",
+            "doc_dist_sys_handbook_01_p078_c0077"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p065_c0064"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            65,
+            67,
+            64,
+            72,
+            66,
+            70,
+            81,
+            68,
+            79,
+            78
+          ],
+          "relevant_pages": [
+            64,
+            65
+          ]
+        },
+        {
+          "query_id": "fb_q16",
+          "query": "What is the difference between Role-Based Access Control (RBAC) and Attribute-Based Access Control (ABAC)?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p099_c0098",
+            "doc_dist_sys_handbook_01_p038_c0037",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p103_c0102",
+            "doc_dist_sys_handbook_01_p026_c0025"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p099_c0098"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            99,
+            38,
+            39,
+            33,
+            32,
+            34,
+            23,
+            27,
+            103,
+            26
+          ],
+          "relevant_pages": [
+            99
+          ]
+        },
+        {
+          "query_id": "fb_q17",
+          "query": "What is the strict majority quorum size formula in an N-node cluster, and how many nodes form a quorum in a 5-node cluster?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p011_c0010",
+            "doc_dist_sys_handbook_01_p028_c0027",
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p014_c0013"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            13,
+            20,
+            8,
+            17,
+            11,
+            28,
+            90,
+            19,
+            16,
+            14
+          ],
+          "relevant_pages": [
+            13
+          ]
+        },
+        {
+          "query_id": "fb_q18",
+          "query": "What is the memory size in bytes of a 768-dimensional float32 vector, and what size is it after Product Quantization with 96 subspaces?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p059_c0058",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p054_c0053",
+            "doc_dist_sys_handbook_01_p075_c0074",
+            "doc_dist_sys_handbook_01_p055_c0054",
+            "doc_dist_sys_handbook_01_p067_c0066"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p059_c0058"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            59,
+            78,
+            53,
+            62,
+            74,
+            91,
+            54,
+            75,
+            55,
+            67
+          ],
+          "relevant_pages": [
+            59
+          ]
+        },
+        {
+          "query_id": "fb_q19",
+          "query": "What is the typical uncertainty bound epsilon exposed by Google Spanner TrueTime API across datacenter GPS and atomic clocks?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p009_c0008",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p006_c0005",
+            "doc_dist_sys_handbook_01_p005_c0004",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p047_c0046",
+            "doc_dist_sys_handbook_01_p088_c0087"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p040_c0039"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            40,
+            9,
+            3,
+            95,
+            10,
+            6,
+            5,
+            12,
+            47,
+            88
+          ],
+          "relevant_pages": [
+            40
+          ]
+        },
+        {
+          "query_id": "fb_q20",
+          "query": "What is the allowable monthly downtime in minutes for an SRE service targeting a 99.9% availability SLO?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p093_c0092",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p095_c0094",
+            "doc_dist_sys_handbook_01_p102_c0101",
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p010_c0009"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p093_c0092"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            93,
+            94,
+            95,
+            102,
+            40,
+            87,
+            96,
+            90,
+            3,
+            10
+          ],
+          "relevant_pages": [
+            93
+          ]
+        },
+        {
+          "query_id": "fb_q21",
+          "query": "If a network partition isolates 2 nodes from 3 nodes in a 5-node Raft cluster, why can the 3-node partition make progress while the 2-node partition cannot?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.2
+          },
+          "reciprocal_rank": 0.1429,
+          "first_relevant_rank": 7,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p008_c0007",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p015_c0014"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p013_c0012",
+            "doc_dist_sys_handbook_01_p017_c0016"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 0.1429,
+          "first_relevant_page_rank": 7,
+          "retrieved_pages": [
+            8,
+            19,
+            20,
+            36,
+            41,
+            16,
+            13,
+            17,
+            18,
+            15
+          ],
+          "relevant_pages": [
+            13,
+            17
+          ]
+        },
+        {
+          "query_id": "fb_q22",
+          "query": "Why does a Bloom filter in an SSTable never produce false negatives, and why is this property critical for read performance?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p061_c0060",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p027_c0026"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p025_c0024"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            25,
+            26,
+            61,
+            24,
+            39,
+            23,
+            31,
+            50,
+            30,
+            27
+          ],
+          "relevant_pages": [
+            25
+          ]
+        },
+        {
+          "query_id": "fb_q23",
+          "query": "Why does Snapshot Isolation permit write skew anomalies while Strict Two-Phase Locking prevents them?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p050_c0049",
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p089_c0088",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p031_c0030"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p039_c0038"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            39,
+            37,
+            35,
+            36,
+            41,
+            50,
+            96,
+            89,
+            88,
+            31
+          ],
+          "relevant_pages": [
+            37,
+            39
+          ]
+        },
+        {
+          "query_id": "fb_q24",
+          "query": "Why does adding randomized jitter to exponential backoff prevent synchronized retry storms in distributed systems?",
+          "num_relevant": 1,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p096_c0095",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p004_c0003",
+            "doc_dist_sys_handbook_01_p011_c0010",
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p003_c0002",
+            "doc_dist_sys_handbook_01_p012_c0011",
+            "doc_dist_sys_handbook_01_p101_c0100",
+            "doc_dist_sys_handbook_01_p050_c0049"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p096_c0095"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 1.0,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.3333,
+            "5": 0.2,
+            "10": 0.1
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            96,
+            87,
+            4,
+            11,
+            10,
+            17,
+            3,
+            12,
+            101,
+            50
+          ],
+          "relevant_pages": [
+            96
+          ]
+        },
+        {
+          "query_id": "fb_q25",
+          "query": "How do consensus leader leases and distributed consensus resolve the blocking coordinator vulnerability in Two-Phase Commit?",
+          "num_relevant": 3,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.3
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p036_c0035",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p042_c0041",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p018_c0017"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p021_c0020",
+            "doc_dist_sys_handbook_01_p035_c0034",
+            "doc_dist_sys_handbook_01_p041_c0040"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.3
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            41,
+            35,
+            36,
+            15,
+            42,
+            19,
+            34,
+            21,
+            14,
+            18
+          ],
+          "relevant_pages": [
+            21,
+            35,
+            41
+          ]
+        },
+        {
+          "query_id": "fb_q26",
+          "query": "How does the two-stage retrieval cascade integrate bi-encoder ANN vector search with cross-encoder reranking to optimize both latency and precision?",
+          "num_relevant": 3,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 0.6667
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p061_c0060",
+            "doc_dist_sys_handbook_01_p069_c0068"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p066_c0065"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.3333,
+            "3": 0.6667,
+            "5": 0.6667,
+            "10": 0.6667
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            66,
+            72,
+            64,
+            70,
+            65,
+            60,
+            68,
+            67,
+            61,
+            69
+          ],
+          "relevant_pages": [
+            57,
+            64,
+            66
+          ]
+        },
+        {
+          "query_id": "fb_q27",
+          "query": "How do write-ahead logs in LSM-trees and write-behind caching strategies compare regarding data durability upon sudden power loss?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p031_c0030",
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p087_c0086"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p085_c0084"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            85,
+            27,
+            24,
+            31,
+            23,
+            32,
+            84,
+            88,
+            86,
+            87
+          ],
+          "relevant_pages": [
+            24,
+            85
+          ]
+        },
+        {
+          "query_id": "fb_q28",
+          "query": "How do Mean Reciprocal Rank (MRR) and reranker rank movement metrics reflect the performance difference between Stage 1 vector search and Stage 2 cross-encoder reranking?",
+          "num_relevant": 2,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "reciprocal_rank": 1.0,
+          "first_relevant_rank": 1,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p070_c0069",
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p066_c0065",
+            "doc_dist_sys_handbook_01_p063_c0062",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p065_c0064",
+            "doc_dist_sys_handbook_01_p067_c0066"
+          ],
+          "relevant_chunk_ids": [
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p070_c0069"
+          ],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.5,
+            "3": 1.0,
+            "5": 1.0,
+            "10": 1.0
+          },
+          "page_precision_at_k": {
+            "1": 1.0,
+            "3": 0.6667,
+            "5": 0.4,
+            "10": 0.2
+          },
+          "page_reciprocal_rank": 1.0,
+          "first_relevant_page_rank": 1,
+          "retrieved_pages": [
+            70,
+            69,
+            68,
+            72,
+            60,
+            66,
+            63,
+            64,
+            65,
+            67
+          ],
+          "relevant_pages": [
+            69,
+            70
+          ]
+        },
+        {
+          "query_id": "fb_q29",
+          "query": "What is the historical culinary fermentation recipe, salt ratio, and aging period for ancient Roman garum fish sauce?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p094_c0093",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p076_c0075",
+            "doc_dist_sys_handbook_01_p071_c0070",
+            "doc_dist_sys_handbook_01_p074_c0073",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p082_c0081",
+            "doc_dist_sys_handbook_01_p002_c0001"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            87,
+            94,
+            91,
+            76,
+            71,
+            74,
+            62,
+            86,
+            82,
+            2
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q30",
+          "query": "What are the quantum key distribution protocols and single-photon detector specifications for BB84 satellite quantum communications?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p010_c0009",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p090_c0089",
+            "doc_dist_sys_handbook_01_p034_c0033",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p044_c0043",
+            "doc_dist_sys_handbook_01_p078_c0077",
+            "doc_dist_sys_handbook_01_p045_c0044",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p043_c0042"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            10,
+            14,
+            90,
+            34,
+            20,
+            44,
+            78,
+            45,
+            25,
+            43
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q31",
+          "query": "What are the metallurgical smelting temperatures and carbon quenching techniques for Wootz crucible steel swords?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p037_c0036",
+            "doc_dist_sys_handbook_01_p025_c0024",
+            "doc_dist_sys_handbook_01_p028_c0027",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p091_c0090"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            58,
+            87,
+            26,
+            84,
+            24,
+            37,
+            25,
+            28,
+            85,
+            91
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q32",
+          "query": "What are the orbital mechanics, Hohmann transfer delta-v equations, and atmospheric entry corridors for crewed missions to Callisto?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p054_c0053",
+            "doc_dist_sys_handbook_01_p058_c0057",
+            "doc_dist_sys_handbook_01_p097_c0096",
+            "doc_dist_sys_handbook_01_p057_c0056",
+            "doc_dist_sys_handbook_01_p040_c0039",
+            "doc_dist_sys_handbook_01_p080_c0079",
+            "doc_dist_sys_handbook_01_p024_c0023",
+            "doc_dist_sys_handbook_01_p056_c0055",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p076_c0075"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            54,
+            58,
+            97,
+            57,
+            40,
+            80,
+            24,
+            56,
+            62,
+            76
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q33",
+          "query": "What is the single universally superior database isolation level and storage engine for all cloud enterprise applications?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p023_c0022",
+            "doc_dist_sys_handbook_01_p026_c0025",
+            "doc_dist_sys_handbook_01_p027_c0026",
+            "doc_dist_sys_handbook_01_p032_c0031",
+            "doc_dist_sys_handbook_01_p039_c0038",
+            "doc_dist_sys_handbook_01_p033_c0032",
+            "doc_dist_sys_handbook_01_p029_c0028",
+            "doc_dist_sys_handbook_01_p100_c0099",
+            "doc_dist_sys_handbook_01_p030_c0029",
+            "doc_dist_sys_handbook_01_p088_c0087"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            23,
+            26,
+            27,
+            32,
+            39,
+            33,
+            29,
+            100,
+            30,
+            88
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q34",
+          "query": "What is the universally optimal cache eviction algorithm and memory TTL for all distributed caching clusters?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p086_c0085",
+            "doc_dist_sys_handbook_01_p092_c0091",
+            "doc_dist_sys_handbook_01_p087_c0086",
+            "doc_dist_sys_handbook_01_p089_c0088",
+            "doc_dist_sys_handbook_01_p083_c0082",
+            "doc_dist_sys_handbook_01_p088_c0087",
+            "doc_dist_sys_handbook_01_p084_c0083",
+            "doc_dist_sys_handbook_01_p085_c0084",
+            "doc_dist_sys_handbook_01_p091_c0090",
+            "doc_dist_sys_handbook_01_p075_c0074"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            86,
+            92,
+            87,
+            89,
+            83,
+            88,
+            84,
+            85,
+            91,
+            75
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q35",
+          "query": "What is the single best consensus algorithm between Paxos and Raft that must always be selected for every distributed system?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p016_c0015",
+            "doc_dist_sys_handbook_01_p022_c0021",
+            "doc_dist_sys_handbook_01_p041_c0040",
+            "doc_dist_sys_handbook_01_p014_c0013",
+            "doc_dist_sys_handbook_01_p020_c0019",
+            "doc_dist_sys_handbook_01_p019_c0018",
+            "doc_dist_sys_handbook_01_p015_c0014",
+            "doc_dist_sys_handbook_01_p018_c0017",
+            "doc_dist_sys_handbook_01_p017_c0016",
+            "doc_dist_sys_handbook_01_p012_c0011"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            16,
+            22,
+            41,
+            14,
+            20,
+            19,
+            15,
+            18,
+            17,
+            12
+          ],
+          "relevant_pages": []
+        },
+        {
+          "query_id": "fb_q36",
+          "query": "What is the single best chunk size and embedding dimension that produces perfect retrieval for every document in existence?",
+          "num_relevant": 0,
+          "num_retrieved": 10,
+          "recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "reciprocal_rank": 0.0,
+          "first_relevant_rank": null,
+          "retrieved_chunk_ids": [
+            "doc_dist_sys_handbook_01_p071_c0070",
+            "doc_dist_sys_handbook_01_p053_c0052",
+            "doc_dist_sys_handbook_01_p064_c0063",
+            "doc_dist_sys_handbook_01_p072_c0071",
+            "doc_dist_sys_handbook_01_p062_c0061",
+            "doc_dist_sys_handbook_01_p069_c0068",
+            "doc_dist_sys_handbook_01_p060_c0059",
+            "doc_dist_sys_handbook_01_p068_c0067",
+            "doc_dist_sys_handbook_01_p067_c0066",
+            "doc_dist_sys_handbook_01_p055_c0054"
+          ],
+          "relevant_chunk_ids": [],
+          "duplicate_retrieval_rate": 0.0,
+          "page_duplicate_rate": 0.0,
+          "page_recall_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_precision_at_k": {
+            "1": 0.0,
+            "3": 0.0,
+            "5": 0.0,
+            "10": 0.0
+          },
+          "page_reciprocal_rank": 0.0,
+          "first_relevant_page_rank": null,
+          "retrieved_pages": [
+            71,
+            53,
+            64,
+            72,
+            62,
+            69,
+            60,
+            68,
+            67,
+            55
+          ],
+          "relevant_pages": []
+        }
+      ]
+    },
+    "deltas": {
+      "delta_mrr": -0.0098,
+      "delta_recall_at_k": {
+        "1": -0.006,
+        "3": 0.0119,
+        "5": -0.0357,
+        "10": 0.0
+      },
+      "delta_precision_at_k": {
+        "1": 0.0,
+        "3": 0.0119,
+        "5": -0.0142,
+        "10": 0.0
+      },
+      "delta_duplicate_rate": 0.0
+    },
+    "rank_movement": {
+      "improved": 1,
+      "unchanged": 25,
+      "degraded": 2
+    },
+    "scientific_statement": "Reranking quality is empirically verified against benchmark relevance annotations; reranker improvements are never claimed unless demonstrated by positive metric deltas."
+  },
+  "answer_quality_and_grounding": {
+    "answerable_success_rate": 0.4643,
+    "answerable_claim_support_rate": 0.5111,
+    "mean_correctness_f1": 0.1803,
+    "citation_precision": 0.625,
+    "citation_recall": 0.5595,
+    "claims_summary": {
+      "total": 53,
+      "supported": 26,
+      "unsupported": 20,
+      "contradicted": 5,
+      "conflicted": 2
+    }
+  },
+  "multipage_synthesis": {
+    "total_multipage_queries": 4,
+    "all_pages_retrieved_count": 3,
+    "all_pages_retrieved_rate": 0.75,
+    "mean_page_coverage_rate": 0.9167,
+    "evidence_sufficiency_count": 3,
+    "evidence_sufficiency_rate": 0.75,
+    "correct_synthesis_count": 1,
+    "correct_synthesis_rate": 0.25,
+    "zero_unsupported_info_count": 1,
+    "zero_unsupported_info_rate": 0.25,
+    "full_citation_coverage_count": 0,
+    "full_citation_coverage_rate": 0.0,
+    "mean_citation_page_coverage": 0.1666,
+    "mean_answer_f1": 0.1285,
+    "overall_status": "FAIL",
+    "per_query_results": [
+      {
+        "query_id": "fb_q25",
+        "query": "How do consensus leader leases and distributed consensus resolve the blocking coordinator vulnerability in Two-Phase Commit?",
+        "required_pages": [
+          21,
+          35,
+          41
+        ],
+        "required_chunk_ids": [
+          "doc_dist_sys_handbook_01_p021_c0020",
+          "doc_dist_sys_handbook_01_p035_c0034",
+          "doc_dist_sys_handbook_01_p041_c0040"
+        ],
+        "retrieved_pages": [
+          41,
+          35,
+          36,
+          15,
+          42,
+          19,
+          34,
+          21,
+          14,
+          18
+        ],
+        "retrieved_chunk_ids": [
+          "doc_dist_sys_handbook_01_p041_c0040",
+          "doc_dist_sys_handbook_01_p035_c0034",
+          "doc_dist_sys_handbook_01_p036_c0035",
+          "doc_dist_sys_handbook_01_p015_c0014",
+          "doc_dist_sys_handbook_01_p042_c0041",
+          "doc_dist_sys_handbook_01_p019_c0018",
+          "doc_dist_sys_handbook_01_p034_c0033",
+          "doc_dist_sys_handbook_01_p021_c0020",
+          "doc_dist_sys_handbook_01_p014_c0013",
+          "doc_dist_sys_handbook_01_p018_c0017"
+        ],
+        "all_required_pages_retrieved": true,
+        "page_coverage_rate": 1.0,
+        "evidence_sufficiency": true,
+        "generated_answer": null,
+        "expected_answer": "Classical 2PC blocks when a coordinator crashes while participants are in-doubt; modern databases replace single coordinator and participant nodes with Raft or Paxos consensus replica groups with leader leases, so if a leader crashes, surviving followers elect a new leader that reads replicated in-doubt intent from the distributed log to safely resolve transactions without blocking.",
+        "answer_correctness_f1": 0.0,
+        "synthesis_used_evidence": false,
+        "unsupported_claims_count": 2,
+        "contradicted_claims_count": 0,
+        "has_unsupported_information": true,
+        "cited_pages": [
+          41
+        ],
+        "all_required_pages_cited": false,
+        "citation_page_coverage": 0.3333,
+        "status": "FAIL",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q26",
+        "query": "How does the two-stage retrieval cascade integrate bi-encoder ANN vector search with cross-encoder reranking to optimize both latency and precision?",
+        "required_pages": [
+          57,
+          64,
+          66
+        ],
+        "required_chunk_ids": [
+          "doc_dist_sys_handbook_01_p057_c0056",
+          "doc_dist_sys_handbook_01_p064_c0063",
+          "doc_dist_sys_handbook_01_p066_c0065"
+        ],
+        "retrieved_pages": [
+          66,
+          72,
+          64,
+          70,
+          65,
+          60,
+          68,
+          67,
+          61,
+          69
+        ],
+        "retrieved_chunk_ids": [
+          "doc_dist_sys_handbook_01_p066_c0065",
+          "doc_dist_sys_handbook_01_p072_c0071",
+          "doc_dist_sys_handbook_01_p064_c0063",
+          "doc_dist_sys_handbook_01_p070_c0069",
+          "doc_dist_sys_handbook_01_p065_c0064",
+          "doc_dist_sys_handbook_01_p060_c0059",
+          "doc_dist_sys_handbook_01_p068_c0067",
+          "doc_dist_sys_handbook_01_p067_c0066",
+          "doc_dist_sys_handbook_01_p061_c0060",
+          "doc_dist_sys_handbook_01_p069_c0068"
+        ],
+        "all_required_pages_retrieved": false,
+        "page_coverage_rate": 0.6667,
+        "evidence_sufficiency": false,
+        "generated_answer": "Stage 1 (Fast Retrieval) uses a Bi-Encoder with an ANN index (FAISS or pgvector) to retrieve candidate_k = 50 to 100 candidate passages in under 10 milliseconds, maximizing candidate recall. Stage 2 (Precision Reranking) applies a Cross-Encoder exclusively to the top candidate_k passages, reranking them with full cross-attention to select the final top_k = 3 to 5 passages for LLM context generation. This cascade achieves the precision of full cross-attention",
+        "expected_answer": "Stage 1 uses a bi-encoder with an HNSW graph index to rapidly retrieve candidate_k (50-100) passages in under 10ms with high candidate recall, while Stage 2 applies a Cross-Encoder with full bidirectional self-attention exclusively to those candidates to select the final top 3-5 passages, achieving high precision within a 50-100ms latency budget.",
+        "answer_correctness_f1": 0.5138,
+        "synthesis_used_evidence": true,
+        "unsupported_claims_count": 0,
+        "contradicted_claims_count": 0,
+        "has_unsupported_information": false,
+        "cited_pages": [
+          66,
+          72
+        ],
+        "all_required_pages_cited": false,
+        "citation_page_coverage": 0.3333,
+        "status": "FAIL",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q27",
+        "query": "How do write-ahead logs in LSM-trees and write-behind caching strategies compare regarding data durability upon sudden power loss?",
+        "required_pages": [
+          24,
+          85
+        ],
+        "required_chunk_ids": [
+          "doc_dist_sys_handbook_01_p024_c0023",
+          "doc_dist_sys_handbook_01_p085_c0084"
+        ],
+        "retrieved_pages": [
+          85,
+          27,
+          24,
+          31,
+          23,
+          32,
+          84,
+          88,
+          86,
+          87
+        ],
+        "retrieved_chunk_ids": [
+          "doc_dist_sys_handbook_01_p085_c0084",
+          "doc_dist_sys_handbook_01_p027_c0026",
+          "doc_dist_sys_handbook_01_p024_c0023",
+          "doc_dist_sys_handbook_01_p031_c0030",
+          "doc_dist_sys_handbook_01_p023_c0022",
+          "doc_dist_sys_handbook_01_p032_c0031",
+          "doc_dist_sys_handbook_01_p084_c0083",
+          "doc_dist_sys_handbook_01_p088_c0087",
+          "doc_dist_sys_handbook_01_p086_c0085",
+          "doc_dist_sys_handbook_01_p087_c0086"
+        ],
+        "all_required_pages_retrieved": true,
+        "page_coverage_rate": 1.0,
+        "evidence_sufficiency": true,
+        "generated_answer": null,
+        "expected_answer": "LSM-trees append incoming writes sequentially to a persistent disk Write-Ahead Log before inserting into RAM to ensure durability across power outages, whereas write-behind caching acknowledges writes in RAM and buffers updates asynchronously, so power loss before dirty buffers flush causes permanent data loss.",
+        "answer_correctness_f1": 0.0,
+        "synthesis_used_evidence": false,
+        "unsupported_claims_count": 4,
+        "contradicted_claims_count": 0,
+        "has_unsupported_information": true,
+        "cited_pages": [],
+        "all_required_pages_cited": false,
+        "citation_page_coverage": 0.0,
+        "status": "FAIL",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q28",
+        "query": "How do Mean Reciprocal Rank (MRR) and reranker rank movement metrics reflect the performance difference between Stage 1 vector search and Stage 2 cross-encoder reranking?",
+        "required_pages": [
+          69,
+          70
+        ],
+        "required_chunk_ids": [
+          "doc_dist_sys_handbook_01_p069_c0068",
+          "doc_dist_sys_handbook_01_p070_c0069"
+        ],
+        "retrieved_pages": [
+          70,
+          69,
+          68,
+          72,
+          60,
+          66,
+          63,
+          64,
+          65,
+          67
+        ],
+        "retrieved_chunk_ids": [
+          "doc_dist_sys_handbook_01_p070_c0069",
+          "doc_dist_sys_handbook_01_p069_c0068",
+          "doc_dist_sys_handbook_01_p068_c0067",
+          "doc_dist_sys_handbook_01_p072_c0071",
+          "doc_dist_sys_handbook_01_p060_c0059",
+          "doc_dist_sys_handbook_01_p066_c0065",
+          "doc_dist_sys_handbook_01_p063_c0062",
+          "doc_dist_sys_handbook_01_p064_c0063",
+          "doc_dist_sys_handbook_01_p065_c0064",
+          "doc_dist_sys_handbook_01_p067_c0066"
+        ],
+        "all_required_pages_retrieved": true,
+        "page_coverage_rate": 1.0,
+        "evidence_sufficiency": true,
+        "generated_answer": null,
+        "expected_answer": "MRR measures the reciprocal rank of the first relevant document; evaluating reranking computes Delta MRR = MRR_Stage2 - MRR_Stage1 and classifies queries into Improved (relevant item moved closer to rank 1), Unchanged, and Degraded to empirically verify whether cross-encoders added quality.",
+        "answer_correctness_f1": 0.0,
+        "synthesis_used_evidence": false,
+        "unsupported_claims_count": 1,
+        "contradicted_claims_count": 1,
+        "has_unsupported_information": true,
+        "cited_pages": [
+          68
+        ],
+        "all_required_pages_cited": false,
+        "citation_page_coverage": 0.0,
+        "status": "FAIL",
+        "notes": null
+      }
+    ]
+  },
+  "safety_and_refusal": {
+    "benchmark_name": "Distributed Systems & Cloud Architecture Full-Book Benchmark",
+    "total_queries": 36,
+    "answerable_queries": 28,
+    "unanswerable_queries": 4,
+    "ambiguous_queries": 4,
+    "refusal_precision": 0.875,
+    "false_refusal_rate": 0.5357,
+    "incorrect_answer_rate": 0.125,
+    "safe_refusal_rate": 0.875,
+    "zero_citation_leakage_rate": 0.875,
+    "correct_refusals_count": 7,
+    "false_refusals_count": 15,
+    "incorrect_unanswerable_count": 1,
+    "citation_leakage_count": 1,
+    "overall_status": "FAIL",
+    "per_query_results": [
+      {
+        "query_id": "fb_q01",
+        "query": "What is the mathematical condition for the happens-before relation when receiving a message in Lamport logical clocks?",
+        "category": "direct_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "contradicted",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q02",
+        "query": "What is the default randomized election timeout range utilized by followers in the Raft consensus algorithm?",
+        "category": "direct_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q03",
+        "query": "How are Kafka topic messages assigned to individual partitions by producers?",
+        "category": "direct_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "key-based hash partitioning (MurmurHash2(key) mod num_partitions) or round-robin distribution",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q04",
+        "query": "What fixed number of hash slots are used to scale memory capacity horizontally in Redis Cluster?",
+        "category": "direct_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q05",
+        "query": "How does the handbook define State Machine Replication in distributed systems?",
+        "category": "definition",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "State Machine Replication (SMR) is the foundational architecture for building fault-tolerant distributed services. A deterministic state machine begins in an initial state S_0 and transitions to state S_t+1 = f(S_t, m) upon processing input command m. If multiple independent replicas initialize in the identical state S_0 and process an identical sequence of input commands [m_1, m_2, ..., m_k] in strictly the same total order, all non-faulty replicas will arrive at identical final states and produce identical outputs.",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q06",
+        "query": "What is the definition of a Watermark in Event Time stream processing?",
+        "category": "definition",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "a specialized control signal embedded into the data stream that establishes a temporal completion threshold",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q07",
+        "query": "What is the definition of the Cache Stampede or Thundering Herd problem?",
+        "category": "definition",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "occurs when a popular cached key expires under high concurrent load",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q08",
+        "query": "What are the Four Golden Signals defined in Site Reliability Engineering for distributed observability?",
+        "category": "definition",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "Latency, Traffic, Errors, and Saturation",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q09",
+        "query": "Why does the FLP theorem prove that deterministic consensus is impossible in an asynchronous network with a single crash failure?",
+        "category": "explanation",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "every consensus protocol must possess an initial bivalent execution state from which both 0 and 1 decision values remain reachable",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q10",
+        "query": "Why is the classical Two-Phase Commit protocol classified as an inherently blocking protocol?",
+        "category": "explanation",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q11",
+        "query": "Why does HNSW graph search organize vectors into multiple hierarchical layers?",
+        "category": "explanation",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "inspired by skip-lists",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q12",
+        "query": "Why does traditional LLM serving suffer from severe GPU memory fragmentation, and how does PagedAttention resolve it?",
+        "category": "explanation",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q13",
+        "query": "What are the structural differences between LSM-tree writes and B+ tree writes in terms of disk I/O patterns?",
+        "category": "comparison",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q14",
+        "query": "What is the difference between synchronous replication and asynchronous replication regarding Recovery Point Objective and write latency?",
+        "category": "comparison",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "In synchronous replication, the primary node waits for confirmation from all replica nodes before returning a successful write acknowledgment to the client; this guarantees zero data loss (Recovery Point Objective RPO = 0) at the cost of write latency bounded by the slowest replica node. In asynchronous replication, the primary acknowledges writes immediately after local commit and propagates updates in background streams; this maximizes write throughput and minimizes client latency, but network or hardware failure prior to replication creates data loss windows.",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q15",
+        "query": "How do bi-encoders and cross-encoders compare in terms of token interaction and query runtime latency?",
+        "category": "comparison",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q16",
+        "query": "What is the difference between Role-Based Access Control (RBAC) and Attribute-Based Access Control (ABAC)?",
+        "category": "comparison",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q17",
+        "query": "What is the strict majority quorum size formula in an N-node cluster, and how many nodes form a quorum in a 5-node cluster?",
+        "category": "numerical_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q18",
+        "query": "What is the memory size in bytes of a 768-dimensional float32 vector, and what size is it after Product Quantization with 96 subspaces?",
+        "category": "numerical_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q19",
+        "query": "What is the typical uncertainty bound epsilon exposed by Google Spanner TrueTime API across datacenter GPS and atomic clocks?",
+        "category": "numerical_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "7 milliseconds",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q20",
+        "query": "What is the allowable monthly downtime in minutes for an SRE service targeting a 99.9% availability SLO?",
+        "category": "numerical_fact",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "43.8",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q21",
+        "query": "If a network partition isolates 2 nodes from 3 nodes in a 5-node Raft cluster, why can the 3-node partition make progress while the 2-node partition cannot?",
+        "category": "reasoning",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "contradicted",
+        "generated_answer": null,
+        "citations_assigned_count": 2,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q22",
+        "query": "Why does a Bloom filter in an SSTable never produce false negatives, and why is this property critical for read performance?",
+        "category": "reasoning",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "contradicted",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q23",
+        "query": "Why does Snapshot Isolation permit write skew anomalies while Strict Two-Phase Locking prevents them?",
+        "category": "reasoning",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "Snapshot isolation prevents dirty reads, non-repeatable reads, and phantom reads",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q24",
+        "query": "Why does adding randomized jitter to exponential backoff prevent synchronized retry storms in distributed systems?",
+        "category": "reasoning",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "by introducing random delay: t = min(t_max, t_base * 2attempt) + uniform(0, jitter)",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q25",
+        "query": "How do consensus leader leases and distributed consensus resolve the blocking coordinator vulnerability in Two-Phase Commit?",
+        "category": "multi_page_synthesis",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q26",
+        "query": "How does the two-stage retrieval cascade integrate bi-encoder ANN vector search with cross-encoder reranking to optimize both latency and precision?",
+        "category": "multi_page_synthesis",
+        "is_answerable_gold": true,
+        "refusal_triggered": false,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "grounded",
+        "generated_answer": "Stage 1 (Fast Retrieval) uses a Bi-Encoder with an ANN index (FAISS or pgvector) to retrieve candidate_k = 50 to 100 candidate passages in under 10 milliseconds, maximizing candidate recall. Stage 2 (Precision Reranking) applies a Cross-Encoder exclusively to the top candidate_k passages, reranking them with full cross-attention to select the final top_k = 3 to 5 passages for LLM context generation. This cascade achieves the precision of full cross-attention",
+        "citations_assigned_count": 2,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q27",
+        "query": "How do write-ahead logs in LSM-trees and write-behind caching strategies compare regarding data durability upon sudden power loss?",
+        "category": "multi_page_synthesis",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q28",
+        "query": "How do Mean Reciprocal Rank (MRR) and reranker rank movement metrics reflect the performance difference between Stage 1 vector search and Stage 2 cross-encoder reranking?",
+        "category": "multi_page_synthesis",
+        "is_answerable_gold": true,
+        "refusal_triggered": true,
+        "refusal_correct": false,
+        "is_false_refusal": true,
+        "is_incorrect_answer": false,
+        "grounding_status": "contradicted",
+        "generated_answer": null,
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": false,
+        "status": "WARNING",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q29",
+        "query": "What is the historical culinary fermentation recipe, salt ratio, and aging period for ancient Roman garum fish sauce?",
+        "category": "unanswerable",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q30",
+        "query": "What are the quantum key distribution protocols and single-photon detector specifications for BB84 satellite quantum communications?",
+        "category": "unanswerable",
+        "is_answerable_gold": false,
+        "refusal_triggered": false,
+        "refusal_correct": false,
+        "is_false_refusal": false,
+        "is_incorrect_answer": true,
+        "grounding_status": "grounded",
+        "generated_answer": "Paxos Protocol Foundations: The Single-Decree Synod Leslie Lamport's Paxos consensus algorithm guarantees safety under arbitrary message loss, reordering, and duplication in asynchronous networks. The Single-Decree Synod protocol reaches agreement on a single proposed value across two phases: Phase 1 (Prepare/Promise) and Phase 2 (Accept/Accepted). In Phase 1a, a proposer chooses a globally unique, monotonically increasing proposal number n and broadcasts Prepare(n) to acceptor",
+        "citations_assigned_count": 1,
+        "citation_leakage_detected": true,
+        "status": "FAIL",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q31",
+        "query": "What are the metallurgical smelting temperatures and carbon quenching techniques for Wootz crucible steel swords?",
+        "category": "unanswerable",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q32",
+        "query": "What are the orbital mechanics, Hohmann transfer delta-v equations, and atmospheric entry corridors for crewed missions to Callisto?",
+        "category": "unanswerable",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q33",
+        "query": "What is the single universally superior database isolation level and storage engine for all cloud enterprise applications?",
+        "category": "ambiguous",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q34",
+        "query": "What is the universally optimal cache eviction algorithm and memory TTL for all distributed caching clusters?",
+        "category": "ambiguous",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q35",
+        "query": "What is the single best consensus algorithm between Paxos and Raft that must always be selected for every distributed system?",
+        "category": "ambiguous",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      },
+      {
+        "query_id": "fb_q36",
+        "query": "What is the single best chunk size and embedding dimension that produces perfect retrieval for every document in existence?",
+        "category": "ambiguous",
+        "is_answerable_gold": false,
+        "refusal_triggered": true,
+        "refusal_correct": true,
+        "is_false_refusal": false,
+        "is_incorrect_answer": false,
+        "grounding_status": "unsupported",
+        "generated_answer": null,
+        "citations_assigned_count": 0,
+        "citation_leakage_detected": false,
+        "status": "PASS",
+        "notes": null
+      }
+    ]
+  },
+  "question_generation": {
+    "benchmark_name": "Distributed Systems & Cloud Architecture Full-Book Benchmark",
+    "total_chunks_evaluated": 6,
+    "total_pages_covered": 6,
+    "total_raw_candidates": 36,
+    "total_accepted_questions": 5,
+    "total_rejected_questions": 31,
+    "acceptance_rate": 0.1389,
+    "rejection_rate": 0.8611,
+    "duplicate_rate": 0.1667,
+    "answer_mismatch_rate": 0.3889,
+    "unanswerable_rate": 0.3056,
+    "quality_failure_rate": 0.0,
+    "provenance_completeness_rate": 1.0,
+    "grounding_validity_rate": 1.0,
+    "question_type_distribution": {
+      "explanation": 1,
+      "what": 3,
+      "numerical_fact": 1
+    },
+    "overall_status": "PASS",
+    "per_chunk_evaluations": [
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p003_c0002",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 3,
+        "raw_candidates_count": 6,
+        "accepted_count": 0,
+        "rejected_count": 6,
+        "duplicates_count": 1,
+        "answer_mismatches_count": 3,
+        "unanswerable_count": 2,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [],
+        "accepted_questions": []
+      },
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p017_c0016",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 17,
+        "raw_candidates_count": 6,
+        "accepted_count": 0,
+        "rejected_count": 6,
+        "duplicates_count": 1,
+        "answer_mismatches_count": 1,
+        "unanswerable_count": 4,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [],
+        "accepted_questions": []
+      },
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p024_c0023",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 24,
+        "raw_candidates_count": 6,
+        "accepted_count": 1,
+        "rejected_count": 5,
+        "duplicates_count": 0,
+        "answer_mismatches_count": 4,
+        "unanswerable_count": 1,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [
+          "explanation"
+        ],
+        "accepted_questions": [
+          {
+            "question_id": "qgen_doc_dist_sys_handbook_01_doc_dist_sys_handbook_01_p024_c0023_0428",
+            "question": "Why is the write latency sub-microsecond?",
+            "answer": "Because MemTable insertions occur in RAM, write latency is sub-microsecond",
+            "question_type": "explanation",
+            "difficulty": "hard",
+            "document_id": "doc_dist_sys_handbook_01",
+            "chunk_id": "doc_dist_sys_handbook_01_p024_c0023",
+            "chunk_ids": [
+              "doc_dist_sys_handbook_01_p024_c0023"
+            ],
+            "page_number": 24,
+            "page_numbers": [
+              24
+            ],
+            "source_text": "Chapter 3: Storage Architectures, LSM-Trees & Partitioning Page 24 3.2 Log-Structured Merge-Tree (LSM-Tree) Architecture The Log-Structured Merge-Tree (LSM-Tree) architecture decouples incoming write operations from persistent disk organization. An LSM-tree consists of three core components: an in-memory sorted write buffer termed the MemTable (frequently implemented as a SkipList or Red-Black Tree), a disk-based sequential Write-Ahead Log (WAL) ensuring durability across power outages, and immutable on-disk Sorted String Table (SSTable) files structured into hierarchical levels (Level 0, Level 1, ..., Level k). Incoming writes append immediately to the WAL and insert into the MemTable. Because MemTable insertions occur in RAM, write latency is sub-microsecond. Foundations of Distributed Systems | Document ID: doc_dist_sys_handbook_01",
+            "start_offset": 696,
+            "end_offset": 770,
+            "qa_predicted_answer": "MemTable insertions occur in RAM",
+            "qa_confidence_score": 13.9112,
+            "validation_status": "validated",
+            "rejection_reason": null,
+            "metadata": {
+              "qa_score": 13.9112,
+              "no_answer_score": 6.733,
+              "candidate_type": "explanation",
+              "is_multipage": false
+            }
+          }
+        ]
+      },
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p057_c0056",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 57,
+        "raw_candidates_count": 6,
+        "accepted_count": 2,
+        "rejected_count": 4,
+        "duplicates_count": 2,
+        "answer_mismatches_count": 1,
+        "unanswerable_count": 1,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [
+          "what",
+          "what"
+        ],
+        "accepted_questions": [
+          {
+            "question_id": "qgen_doc_dist_sys_handbook_01_doc_dist_sys_handbook_01_p057_c0056_2458",
+            "question": "What is the name of the algorithm?",
+            "answer": "Hierarchical Navigable Small World",
+            "question_type": "what",
+            "difficulty": "medium",
+            "document_id": "doc_dist_sys_handbook_01",
+            "chunk_id": "doc_dist_sys_handbook_01_p057_c0056",
+            "chunk_ids": [
+              "doc_dist_sys_handbook_01_p057_c0056"
+            ],
+            "page_number": 57,
+            "page_numbers": [
+              57
+            ],
+            "source_text": "Chapter 6: Vector Databases & High-Dimensional Similarity Search Page 57 6.5 Hierarchical Navigable Small World (HNSW) Graphs Hierarchical Navigable Small World (HNSW) is the state-of-the-art graph-based ANN index algorithm developed by Malkov and Yashunin. HNSW structures vectors into a multi-layer hierarchical graph inspired by skip-lists. The bottom layer (Layer 0) contains all database vectors connected in a dense proximity graph. Upper layers contain exponentially fewer vectors (governed by decay parameter m_L = 1 / ln(M)), forming long-range highway links. Search begins at the top entry layer with greedy routing, jumping across large distances to locate the local minimum, and descends layer by layer until reaching Layer 0, where beam search with candidate size ef_search identifies the top-k nearest neighbors in O(log N) time. Foundations of Distributed Systems | Document ID: doc_dist_sys_handbook_01",
+            "start_offset": 77,
+            "end_offset": 111,
+            "qa_predicted_answer": "Hierarchical Navigable Small World (HNSW) Graphs Hierarchical Navigable Small World",
+            "qa_confidence_score": 6.7538,
+            "validation_status": "validated",
+            "rejection_reason": null,
+            "metadata": {
+              "qa_score": 6.7538,
+              "no_answer_score": 4.971,
+              "candidate_type": "who",
+              "is_multipage": false
+            }
+          },
+          {
+            "question_id": "qgen_doc_dist_sys_handbook_01_doc_dist_sys_handbook_01_p057_c0056_9456",
+            "question": "What is a hierarchical navigational graph?",
+            "answer": "Graphs Hierarchical Navigable Small",
+            "question_type": "what",
+            "difficulty": "medium",
+            "document_id": "doc_dist_sys_handbook_01",
+            "chunk_id": "doc_dist_sys_handbook_01_p057_c0056",
+            "chunk_ids": [
+              "doc_dist_sys_handbook_01_p057_c0056"
+            ],
+            "page_number": 57,
+            "page_numbers": [
+              57
+            ],
+            "source_text": "Chapter 6: Vector Databases & High-Dimensional Similarity Search Page 57 6.5 Hierarchical Navigable Small World (HNSW) Graphs Hierarchical Navigable Small World (HNSW) is the state-of-the-art graph-based ANN index algorithm developed by Malkov and Yashunin. HNSW structures vectors into a multi-layer hierarchical graph inspired by skip-lists. The bottom layer (Layer 0) contains all database vectors connected in a dense proximity graph. Upper layers contain exponentially fewer vectors (governed by decay parameter m_L = 1 / ln(M)), forming long-range highway links. Search begins at the top entry layer with greedy routing, jumping across large distances to locate the local minimum, and descends layer by layer until reaching Layer 0, where beam search with candidate size ef_search identifies the top-k nearest neighbors in O(log N) time. Foundations of Distributed Systems | Document ID: doc_dist_sys_handbook_01",
+            "start_offset": 119,
+            "end_offset": 154,
+            "qa_predicted_answer": "Hierarchical Navigable Small World",
+            "qa_confidence_score": 4.327,
+            "validation_status": "validated",
+            "rejection_reason": null,
+            "metadata": {
+              "qa_score": 4.327,
+              "no_answer_score": 4.1953,
+              "candidate_type": "who",
+              "is_multipage": false
+            }
+          }
+        ]
+      },
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p075_c0074",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 75,
+        "raw_candidates_count": 6,
+        "accepted_count": 1,
+        "rejected_count": 5,
+        "duplicates_count": 1,
+        "answer_mismatches_count": 2,
+        "unanswerable_count": 2,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [
+          "numerical_fact"
+        ],
+        "accepted_questions": [
+          {
+            "question_id": "qgen_doc_dist_sys_handbook_01_doc_dist_sys_handbook_01_p075_c0074_8282",
+            "question": "How much memory waste does PagedAttention allow?",
+            "answer": "4%",
+            "question_type": "numerical_fact",
+            "difficulty": "medium",
+            "document_id": "doc_dist_sys_handbook_01",
+            "chunk_id": "doc_dist_sys_handbook_01_p075_c0074",
+            "chunk_ids": [
+              "doc_dist_sys_handbook_01_p075_c0074"
+            ],
+            "page_number": 75,
+            "page_numbers": [
+              75
+            ],
+            "source_text": "Chapter 8: Large Language Model Serving & KV Cache Optimization Page 75 8.3 PagedAttention and vLLM Architecture Traditional LLM serving engines pre-allocate contiguous memory chunks for the maximum possible sequence length (e.g., 4096 tokens), resulting in severe memory fragmentation (up to 60% to 80% wasted VRAM due to internal, external, and reservation fragmentation). Kwon et al. introduced PagedAttention and the vLLM architecture, inspired by virtual memory paging in operating systems. PagedAttention divides the KV cache into fixed-size physical blocks (e.g., 16 or 32 tokens per block). The engine maintains a Block Table mapping logical token positions to non-contiguous physical memory pages, eliminating internal fragmentation and enabling near-zero memory waste (under 4%). Furthermore, PagedAttention enables zero-copy parallel sampling and prompt sharing. Foundations of Distributed Systems | Document ID: doc_dist_sys_handbook_01",
+            "start_offset": 785,
+            "end_offset": 787,
+            "qa_predicted_answer": "under 4%).",
+            "qa_confidence_score": 12.3057,
+            "validation_status": "validated",
+            "rejection_reason": null,
+            "metadata": {
+              "qa_score": 12.3057,
+              "no_answer_score": 6.9059,
+              "candidate_type": "numerical",
+              "is_multipage": false
+            }
+          }
+        ]
+      },
+      {
+        "chunk_id": "doc_dist_sys_handbook_01_p095_c0094",
+        "document_id": "doc_dist_sys_handbook_01",
+        "page_number": 95,
+        "raw_candidates_count": 6,
+        "accepted_count": 1,
+        "rejected_count": 5,
+        "duplicates_count": 1,
+        "answer_mismatches_count": 3,
+        "unanswerable_count": 1,
+        "quality_failures_count": 0,
+        "all_provenance_complete": true,
+        "all_grounded_in_source": true,
+        "question_types": [
+          "what"
+        ],
+        "accepted_questions": [
+          {
+            "question_id": "qgen_doc_dist_sys_handbook_01_doc_dist_sys_handbook_01_p095_c0094_5487",
+            "question": "What is the name of the chapter?",
+            "answer": "Site Reliability Engineering",
+            "question_type": "what",
+            "difficulty": "medium",
+            "document_id": "doc_dist_sys_handbook_01",
+            "chunk_id": "doc_dist_sys_handbook_01_p095_c0094",
+            "chunk_ids": [
+              "doc_dist_sys_handbook_01_p095_c0094"
+            ],
+            "page_number": 95,
+            "page_numbers": [
+              95
+            ],
+            "source_text": "Chapter 10: Site Reliability Engineering, Observability & Security Page 95 10.3 The Four Golden Signals of Distributed Observability Google's SRE framework identifies the Four Golden Signals for monitoring distributed systems: Latency, Traffic, Errors, and Saturation. Latency measures the time required to service a request, distinguishing successful request latency from error latency. Traffic measures the demand placed on the system (e.g., HTTP requests per second, network I/O throughput). Errors measures the rate of requests that fail explicitly (HTTP 500) or semantically (wrong content). Saturation measures the fraction of system resources currently consumed (e.g., CPU utilization, memory pressure, database connection pool exhaustion). Foundations of Distributed Systems | Document ID: doc_dist_sys_handbook_01",
+            "start_offset": 12,
+            "end_offset": 40,
+            "qa_predicted_answer": "Site Reliability Engineering, Observability & Security",
+            "qa_confidence_score": 8.4068,
+            "validation_status": "validated",
+            "rejection_reason": null,
+            "metadata": {
+              "qa_score": 8.4068,
+              "no_answer_score": 4.306,
+              "candidate_type": "who",
+              "is_multipage": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "overall_status": "WARNING"
+}

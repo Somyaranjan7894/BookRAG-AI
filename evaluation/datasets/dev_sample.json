@@ -1,0 +1,130 @@
+{
+  "name": "Machine Learning & Neural Networks Dev Benchmark",
+  "version": "1.0.0",
+  "dataset_type": "sample",
+  "description": "Standardized development and sample evaluation benchmark evaluating retrieval, Cross-Encoder reranking, and NLI groundedness across core machine learning domains.",
+  "document_id": "doc_ai_handbook_01",
+  "document_title": "Foundations of Machine Learning & Neural Networks",
+  "items": [
+    {
+      "id": "eval_q01",
+      "question": "How does the backpropagation algorithm compute gradients of the loss function?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [2],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p002_c0002"],
+      "expected_answer": "Backpropagation computes gradients using the multivariate chain rule across layers of computational graphs, propagating error backward from output to input.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "factual",
+      "notes": "Core mathematical backprop question testing exact concept retrieval."
+    },
+    {
+      "id": "eval_q02",
+      "question": "What is the primary architectural difference between a Bi-Encoder and a Cross-Encoder in information retrieval?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [6],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p006_c0006"],
+      "expected_answer": "Bi-encoders encode queries and passages independently into dense vectors for fast inner-product search, whereas cross-encoders perform joint cross-attention across concatenated query and passage tokens.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "definition",
+      "notes": "Tests discrimination of dual-tower versus full-attention transformer retrieval."
+    },
+    {
+      "id": "eval_q03",
+      "question": "Why does scaled dot-product attention divide the query-key dot product by the square root of the key dimension?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [5],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p005_c0005"],
+      "expected_answer": "Dividing by the square root of the key dimension prevents the dot products from growing excessively large for large dimensions, which would push the softmax function into regions with extremely small gradients.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "causal",
+      "notes": "Tests attention scaling mathematical motivation."
+    },
+    {
+      "id": "eval_q04",
+      "question": "What problem does the ReLU activation function mitigate compared to sigmoid and tanh?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [3],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p003_c0003"],
+      "expected_answer": "ReLU mitigates the vanishing gradient problem in deep networks because its gradient is a constant 1 for positive inputs, avoiding the saturated regions of sigmoid and tanh.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "factual",
+      "notes": "Tests activation function comparison and vanishing gradient understanding."
+    },
+    {
+      "id": "eval_q05",
+      "question": "What does Mean Reciprocal Rank (MRR) measure in retrieval evaluation?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [8],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p008_c0008"],
+      "expected_answer": "Mean Reciprocal Rank evaluates the reciprocal of the rank at which the first relevant document is retrieved, averaged across all sample queries.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "definition",
+      "notes": "Tests evaluation metric retrieval."
+    },
+    {
+      "id": "eval_q06",
+      "question": "How do Convolutional Neural Networks exploit spatial hierarchies in image data?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [4],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p004_c0004"],
+      "expected_answer": "CNNs use localized convolution kernels with shared weights and pooling layers to extract translation-invariant spatial features from low-level edges to high-level representations.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "factual",
+      "notes": "Tests computer vision neural architecture concepts."
+    },
+    {
+      "id": "eval_q07",
+      "question": "How does supervised learning differ from unsupervised learning?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [1],
+      "relevant_chunk_ids": ["doc_ai_handbook_01_p001_c0001"],
+      "expected_answer": "Supervised learning algorithms optimize predictions using explicit ground-truth input-label pairs, whereas unsupervised learning discovers latent patterns, clusters, or probability distributions without target labels.",
+      "answerable": true,
+      "dataset_type": "sample",
+      "category": "comparison",
+      "notes": "Tests foundational paradigm comparison."
+    },
+    {
+      "id": "eval_q08",
+      "question": "What is the traditional culinary recipe and hydration ratio for baking French sourdough bread?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [],
+      "relevant_chunk_ids": [],
+      "expected_answer": null,
+      "answerable": false,
+      "dataset_type": "sample",
+      "category": "unanswerable_out_of_scope",
+      "notes": "Refusal test case: topic is completely absent from technical machine learning book."
+    },
+    {
+      "id": "eval_q09",
+      "question": "Which national team won the FIFA World Cup tournament in 1994 and who scored the final penalty?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [],
+      "relevant_chunk_ids": [],
+      "expected_answer": null,
+      "answerable": false,
+      "dataset_type": "sample",
+      "category": "unanswerable_out_of_scope",
+      "notes": "Refusal test case: historical sports fact not present in the corpus."
+    },
+    {
+      "id": "eval_q10",
+      "question": "What are the cryogenic cooling specifications for superconducting transmon qubits?",
+      "document_id": "doc_ai_handbook_01",
+      "relevant_page_numbers": [],
+      "relevant_chunk_ids": [],
+      "expected_answer": null,
+      "answerable": false,
+      "dataset_type": "sample",
+      "category": "unanswerable_out_of_scope",
+      "notes": "Refusal test case: physics/quantum computing domain absent from classical ML text."
+    }
+  ]
+}

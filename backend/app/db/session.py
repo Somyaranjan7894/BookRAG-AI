@@ -30,6 +30,9 @@ def get_engine() -> Engine:
                 echo=settings.DB_ECHO,
             )
         else:
+            connect_args = {}
+            if "postgresql" in settings.DATABASE_URL:
+                connect_args["options"] = f"-c statement_timeout={settings.DB_STATEMENT_TIMEOUT_MS}"
             _engine = create_engine(
                 settings.DATABASE_URL,
                 echo=settings.DB_ECHO,
@@ -37,6 +40,7 @@ def get_engine() -> Engine:
                 max_overflow=settings.DB_MAX_OVERFLOW,
                 pool_timeout=settings.DB_POOL_TIMEOUT,
                 pool_pre_ping=True,
+                connect_args=connect_args,
             )
     return _engine
 
